@@ -1,0 +1,16 @@
+return {}
+-- return {
+-- 	"aaronhallaert/advanced-git-search.nvim",
+-- 	cmd = { "AdvancedGitSearch" },
+-- 	dependencies = {
+-- 		"nvim-telescope/telescope.nvim",
+-- 	},
+-- 	config = function()
+-- 		local ok, telescope = pcall(require, "telescope")
+-- 		if ok then
+-- 			telescope.load_extension("advanced_git_search")
+-- 		else
+-- 			vim.notify("Telescope not available for advanced-git-search", vim.log.levels.WARN)
+-- 		end
+-- 	end,
+-- }

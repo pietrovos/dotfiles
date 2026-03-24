@@ -1,0 +1,38 @@
+if true then
+	return {}
+end
+-- return {
+-- 	"AckslD/nvim-neoclip.lua",
+-- 	dependencies = {
+-- 		"nvim-telescope/telescope.nvim",
+-- 		{ "kkharji/sqlite.lua", module = "sqlite" },
+-- 	},
+-- 	opts = {
+-- 		history = 1000,
+-- 		enable_persistent_history = false,
+-- 		preview = true,
+-- 		default_register = "+",
+-- 		enable_macro_history = true,
+-- 		continuous_sync = false,
+-- 		initial_mode = "normal",
+-- 		keys = {
+-- 			telescope = {
+-- 				n = {
+-- 					select = "<cr>",
+-- 					paste = "p",
+-- 					delete = "d",
+-- 					custom = {},
+-- 				},
+-- 				i = {
+-- 					select = "<cr>",
+-- 					paste = "<C-p>",
+-- 					delete = "<C-d>",
+-- 					custom = {},
+-- 				},
+-- 			},
+-- 		},
+-- 		on_select = {
+-- 			set_reg = true,
+-- 		},
+-- 	},
+-- }

@@ -1,0 +1,192 @@
+return {}
+-- return {
+-- 	"olimorris/codecompanion.nvim",
+-- 	config = true,
+-- 	lazy = true,
+-- 	cmd = { "CodeCompanion", "CodeCompanionChat", "CodeCompanionAgent", "CodeCompanionToggle" },
+-- 	dependencies = {
+-- 		"nvim-lua/plenary.nvim",
+-- 		"nvim-treesitter/nvim-treesitter",
+-- 	},
+-- 	opts = function(_, opts)
+-- 		-- Change this one variable to switch between adapters
+-- 		local selected_adapter = "copilotclaude" -- Can be "copilotclaude", "claudeapi", "deepseek", "gemini", "gpt", etc.
+--
+-- 		-- Define all adapters configuration
+-- 		local adapters_config = {
+-- 			copilotclaude = function()
+-- 				return require("codecompanion.adapters").extend("copilot", {
+-- 					name = "copilotclaude",
+-- 					schema = {
+-- 						model = {
+-- 							default = "claude-sonnet-4",
+-- 						},
+-- 					},
+-- 				})
+-- 			end,
+-- 			claudeapi = function()
+-- 				return require("codecompanion.adapters").extend("anthropic", {
+-- 					name = "claudeapi",
+-- 					schema = {
+-- 						model = {
+-- 							default = "claude-3-7-sonnet-latest",
+-- 						},
+-- 					},
+-- 				})
+-- 			end,
+-- 			copilotgpt = function()
+-- 				return require("codecompanion.adapters").extend("copilot", {
+-- 					name = "copilotgpt",
+-- 					schema = {
+-- 						model = {
+-- 							default = "gpt-4.1",
+-- 						},
+-- 					},
+-- 				})
+-- 			end,
+-- 			deepseek = function()
+-- 				return require("codecompanion.adapters").extend("deepseek", {
+-- 					schema = {
+-- 						model = {
+-- 							default = "deepseek-chat",
+-- 						},
+-- 						temperature = {
+-- 							default = 0,
+-- 						},
+-- 					},
+-- 				})
+-- 			end,
+-- 			gemini = function()
+-- 				return require("codecompanion.adapters").extend("gemini", {
+-- 					schema = {
+-- 						model = {
+-- 							default = "gemini-2.5-pro-exp-03-25",
+-- 						},
+-- 					},
+-- 				})
+-- 			end,
+--
+-- 			openai4 = function()
+-- 				return require("codecompanion.adapters").extend("openai", {
+-- 					schema = {
+-- 						model = {
+-- 							default = "gpt-4.1",
+-- 						},
+-- 					},
+-- 				})
+-- 			end,
+--
+-- 			-- Add configurations for other adapters here
+-- 			-- claudeapi = function() ... end,
+-- 			-- gemini = function() ... end,
+-- 			-- gpt = function() ... end,
+-- 		}
+--
+-- 		-- Set the selected adapter
+-- 		opts.adapters = {
+-- 			[selected_adapter] = adapters_config[selected_adapter],
+-- 		}
+--
+-- 		-- Set strategies based on selected adapter
+-- 		opts.strategies = {
+-- 			chat = {
+-- 				adapter = selected_adapter,
+-- 				tools = {
+-- 					opts = {
+-- 						auto_submit_success = true,
+-- 						auto_submit_errors = true,
+-- 					},
+-- 				},
+-- 				-- summary = {
+-- 				--   -- REQUIRED: Choose the adapter for summarization.
+-- 				--   -- Using a cheaper/faster model is recommended.
+-- 				--   -- Examples: "openai", "anthropic", "ollama", "copilot"
+-- 				--   -- If nil, it will use the main chat adapter (which might be expensive).
+-- 				--   adapter = "openai", -- Or "ollama", "anthropic", etc.
+-- 				--
+-- 				--   -- REQUIRED (usually): Choose the specific model for summarization.
+-- 				--   -- Examples: "gpt-4o-mini", "claude-3-haiku-20240307", "llama3:8b"
+-- 				--   -- If nil, it uses the chosen adapter's default model.
+-- 				--   model = "gpt-4o-mini", -- Or "llama3:8b", "claude-3-haiku-20240307", etc.
+-- 				--
+-- 				--   -- OPTIONAL: Customize the summarization prompt if needed.
+-- 				--   -- The default prompt is usually good, but you can tailor it.
+-- 				--   -- prompt = [[Your custom summarization prompt using %s for history...]],
+-- 				--
+-- 				--   -- OPTIONAL: Change the role assigned to the summary message in history.
+-- 				--   -- Default is "system". You could use "user" or "assistant" if preferred.
+-- 				--   -- summary_message_role = "user",
+-- 				--
+-- 				--   -- OPTIONAL: Change the internal tag for the summary message.
+-- 				--   -- summary_message_tag = "my_summary",
+-- 				-- },
+-- 			},
+-- 			inline = {
+-- 				adapter = selected_adapter == "copilotclaude" and "copilot" or selected_adapter,
+-- 			},
+-- 			agent = {
+-- 				adapter = selected_adapter,
+-- 			},
+-- 		}
+--
+-- 		opts.display = {
+-- 			chat = {
+-- 				show_settings = "true",
+-- 			},
+-- 		}
+--
+-- 		-- Set fzf-lua as the picker instead of telescope
+-- 		opts.display.picker = "fzf_lua"
+--
+-- 		-- Override all providers to use fzf-lua instead of telescope
+-- 		-- Ensure nested tables exist first
+-- 		opts.strategies = opts.strategies or {}
+-- 		opts.strategies.chat = opts.strategies.chat or {}
+-- 		opts.strategies.chat.slash_commands = opts.strategies.chat.slash_commands or {}
+--
+-- 		-- Set providers for slash commands
+-- 		if not opts.strategies.chat.slash_commands.buffer then
+-- 			opts.strategies.chat.slash_commands.buffer = {}
+-- 		end
+-- 		if not opts.strategies.chat.slash_commands.buffer.opts then
+-- 			opts.strategies.chat.slash_commands.buffer.opts = {}
+-- 		end
+-- 		opts.strategies.chat.slash_commands.buffer.opts.provider = "fzf_lua"
+--
+-- 		if not opts.strategies.chat.slash_commands.fetch then
+-- 			opts.strategies.chat.slash_commands.fetch = {}
+-- 		end
+-- 		if not opts.strategies.chat.slash_commands.fetch.opts then
+-- 			opts.strategies.chat.slash_commands.fetch.opts = {}
+-- 		end
+-- 		opts.strategies.chat.slash_commands.fetch.opts.provider = "fzf_lua"
+--
+-- 		if not opts.strategies.chat.slash_commands.file then
+-- 			opts.strategies.chat.slash_commands.file = {}
+-- 		end
+-- 		if not opts.strategies.chat.slash_commands.file.opts then
+-- 			opts.strategies.chat.slash_commands.file.opts = {}
+-- 		end
+-- 		opts.strategies.chat.slash_commands.file.opts.provider = "fzf_lua"
+--
+-- 		if not opts.strategies.chat.slash_commands.help then
+-- 			opts.strategies.chat.slash_commands.help = {}
+-- 		end
+-- 		if not opts.strategies.chat.slash_commands.help.opts then
+-- 			opts.strategies.chat.slash_commands.help.opts = {}
+-- 		end
+-- 		opts.strategies.chat.slash_commands.help.opts.provider = "fzf_lua"
+--
+-- 		if not opts.strategies.chat.slash_commands.symbols then
+-- 			opts.strategies.chat.slash_commands.symbols = {}
+-- 		end
+-- 		if not opts.strategies.chat.slash_commands.symbols.opts then
+-- 			opts.strategies.chat.slash_commands.symbols.opts = {}
+-- 		end
+-- 		opts.strategies.chat.slash_commands.symbols.opts.provider = "fzf_lua"
+--
+-- 		-- Set provider for action palette
+-- 		opts.display.action_palette = opts.display.action_palette or {}
+-- 		opts.display.action_palette.provider = "fzf_lua"
+-- 	end,
+-- }
