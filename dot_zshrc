@@ -100,8 +100,8 @@ cu() {
 }
 
 up() {
-  sudo pacman -S --needed - < ~/.config/pkglist/pacman.txt
-  yay -S --needed - < ~/.config/pkglist/yay.txt
+  sudo pacman -Syu --needed - < ~/.config/pkglist/pacman.txt
+  yay -Syu --needed - < ~/.config/pkglist/yay.txt
 }
 
 # export MANPATH="/usr/local/man:$MANPATH"
