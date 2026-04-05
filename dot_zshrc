@@ -94,6 +94,9 @@ export PATH="$HOME/.local/scripts:$PATH"
 alias tc='tmux-config-sessionizer'
 
 cu() {
+  mkdir -p ~/.config/pkglist && \
+    pacman -Qqe > ~/.config/pkglist/pacman.txt && \
+    yay -Qqe > ~/.config/pkglist/yay.txt && \
   chezmoi re-add --recursive ~/.config && \
     chezmoi re-add ~/.zshrc && \
     chezmoi re-add ~/.p10k.zsh

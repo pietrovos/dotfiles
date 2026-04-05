@@ -1,5 +1,6 @@
 1password-beta
 1password-cli
+7zip
 adw-gtk-theme
 aether
 alacritty
@@ -18,6 +19,7 @@ btrfs-progs
 chezmoi
 chromium
 clang
+claude-code
 cliphist
 cmake
 cool-retro-term
@@ -144,6 +146,7 @@ python-terminaltexteffects
 qt5-wayland
 qt6-wayland
 reflector
+resvg
 ripgrep
 ruby
 rust
@@ -193,6 +196,7 @@ xmlstarlet
 xournalpp
 yaru-icon-theme
 yay
+yazi
 yq
 zoxide
 zram-generator
