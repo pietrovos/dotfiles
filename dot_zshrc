@@ -93,6 +93,17 @@ eval "$(zoxide init zsh)"
 export PATH="$HOME/.local/scripts:$PATH"
 alias tc='tmux-config-sessionizer'
 
+cu() {
+  chezmoi re-add --recursive ~/.config && \
+    chezmoi re-add ~/.zshrc && \
+    chezmoi re-add ~/.p10k.zsh
+}
+
+up() {
+  sudo pacman -S --needed - < ~/.config/pkglist/pacman.txt
+  yay -S --needed - < ~/.config/pkglist/yay.txt
+}
+
 # export MANPATH="/usr/local/man:$MANPATH"
 
 # You may need to manually set your language environment
