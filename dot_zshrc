@@ -90,7 +90,7 @@ eval "$(zoxide init zsh)"
 
 # User configuration
 
-export PATH="$HOME/.local/scripts:$PATH"
+export PATH="$HOME/.cargo/bin:$HOME/.local/scripts:$PATH"
 alias tc='tmux-config-sessionizer'
 
 cu() {
@@ -144,3 +144,25 @@ IFS= read -r -d '' cwd < "$tmp"
 [ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd"
 rm -f -- "$tmp"
 }
+
+. "$HOME/.local/share/../bin/env"
+
+_copy_last_command_block() {
+  [[ -n "$KITTY_WINDOW_ID" ]] || return 0
+
+  local command_text output
+  command_text=$(fc -ln -1)
+  output=$(kitten @ get-text --match "id:$KITTY_WINDOW_ID" --extent last_cmd_output 2>/dev/null) || return 0
+
+  if [[ -n "$command_text" && -n "$output" ]]; then
+    printf '$ %s\n%s' "$command_text" "$output" | wl-copy
+  elif [[ -n "$command_text" ]]; then
+    printf '$ %s\n' "$command_text" | wl-copy
+  else
+    printf '%s' "$output" | wl-copy
+  fi
+
+}
+
+zle -N copy-last-command-block _copy_last_command_block
+bindkey '^G' copy-last-command-block

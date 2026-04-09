@@ -16,6 +16,7 @@ brave-bin
 brightnessctl
 btop
 btrfs-progs
+chafa
 chezmoi
 chromium
 clang
@@ -28,6 +29,7 @@ cups
 cups-browsed
 cups-filters
 cups-pdf
+discordo-git
 docker
 docker-buildx
 docker-compose
@@ -45,12 +47,14 @@ fcitx5-gtk
 fcitx5-qt
 fd
 ffmpegthumbnailer
+flatpak
 font-manager
 fontconfig
 fzf
 gemini-cli
 git
 github-cli
+glow
 gnome-calculator
 gnome-disk-utility
 gnome-keyring
@@ -156,8 +160,11 @@ signal-desktop
 slurp
 sof-firmware
 spicetify-cli
+spicetify-cli-debug
 spotify
+spotify-player
 starship
+supergfxctl
 sushi
 swaybg
 swayosd
