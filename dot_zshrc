@@ -98,6 +98,7 @@ cu() {
     pacman -Qqe > ~/.config/pkglist/pacman.txt && \
     yay -Qqe > ~/.config/pkglist/yay.txt && \
   chezmoi re-add --recursive ~/.config && \
+    chezmoi re-add --recursive ~/.local/scripts && \
     chezmoi re-add ~/.zshrc && \
     chezmoi re-add ~/.p10k.zsh
 }
