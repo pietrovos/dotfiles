@@ -159,7 +159,6 @@ sddm
 signal-desktop
 slurp
 sof-firmware
-spicetify-cli
 spicetify-cli-debug
 spotify
 spotify-player
