@@ -146,7 +146,7 @@ IFS= read -r -d '' cwd < "$tmp"
 rm -f -- "$tmp"
 }
 
-. "$HOME/.local/share/../bin/env"
+[[ -f "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"
 
 _copy_last_command_block() {
   [[ -n "$KITTY_WINDOW_ID" ]] || return 0
