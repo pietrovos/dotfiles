@@ -20,7 +20,8 @@ vim.opt.rtp:prepend(lazypath)
 -- Setup lazy.nvim
 require("lazy").setup({
   spec = {
-    -- import your plugins
+    { "LazyVim/LazyVim", import = "lazyvim.plugins" },
+    { import = "lazyvim.plugins.extras.editor.neo-tree" },
     { import = "plugins" },
   },
   -- Configure any other settings here. See the documentation for more details.

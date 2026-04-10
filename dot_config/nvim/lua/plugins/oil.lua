@@ -144,7 +144,7 @@ return {
 		watch_for_changes = true,
 	},
 	-- Optional dependencies
-	dependencies = { { "echasnovski/mini.icons", opts = {} } },
+	dependencies = { { "nvim-mini/mini.icons", opts = {} } },
 	config = function(_, opts)
 		local oil = require("oil")
 		oil.setup(opts)

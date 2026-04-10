@@ -66,6 +66,7 @@ ffmpegthumbnailer
 flatpak
 font-manager
 fontconfig
+fwupd
 fzf
 gemini-cli
 ghostty
@@ -188,6 +189,7 @@ swaybg
 swayosd
 system-config-printer
 terminus-font
+thermald
 tldr
 tmux
 tobi-try
@@ -207,7 +209,6 @@ vim
 visual-studio-code-bin
 walker
 waybar
-wayfreeze
 wget
 whois
 wireless-regdb

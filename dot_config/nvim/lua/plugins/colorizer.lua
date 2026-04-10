@@ -1,7 +1,10 @@
 
 return {
-  "norcalli/nvim-colorizer.lua",
+  "catgoose/nvim-colorizer.lua",
+  event = { "BufReadPost", "BufNewFile" },
   config = function()
-    require("colorizer").setup()
+    if vim.o.termguicolors then
+      require("colorizer").setup()
+    end
   end,
 }

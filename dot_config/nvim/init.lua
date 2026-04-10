@@ -1,5 +1,6 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
+vim.opt.termguicolors = true
 -- vim.g.loaded_matchparen = 1
 vim.api.nvim_create_autocmd("BufReadPost", {
 	callback = function(args)
