@@ -2,14 +2,14 @@
 
 set -euo pipefail
 
-if ! command -v omarchy >/dev/null; then
+if ! command -v omarchy-theme-set >/dev/null; then
   exit 0
 fi
 
-if ! omarchy theme list | grep -qx "Custom"; then
+if [[ ! -d "$HOME/.config/omarchy/themes/custom" ]]; then
   exit 0
 fi
 
-if [[ $(omarchy theme current) != "Custom" ]]; then
-  omarchy theme set "Custom"
+if [[ ! -f "$HOME/.config/omarchy/current/theme.name" ]] || [[ $(<"$HOME/.config/omarchy/current/theme.name") != "custom" ]]; then
+  omarchy-theme-set custom
 fi
