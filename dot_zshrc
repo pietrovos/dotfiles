@@ -108,6 +108,15 @@ up() {
   yay -Syu --needed - < ~/.config/pkglist/yay.txt
 }
 
+cpush() {
+  local message="${1:-Update dotfiles}"
+
+  git -C ~/.local/share/chezmoi status && \
+    git -C ~/.local/share/chezmoi add . && \
+    git -C ~/.local/share/chezmoi commit -m "$message" && \
+    git -C ~/.local/share/chezmoi push
+}
+
 # export MANPATH="/usr/local/man:$MANPATH"
 
 # You may need to manually set your language environment
