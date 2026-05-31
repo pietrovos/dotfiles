@@ -167,16 +167,3 @@ _copy_last_command_block() {
 
 zle -N copy-last-command-block _copy_last_command_block
 bindkey '^G' copy-last-command-block
-
-
-
-cat << "EOF"
- _________________
-< Your Art Here! >
- -----------------
-        \   ^__^
-         \  (oo)\_______
-            (__)\       )\/\
-                ||----w |
-                ||     ||
-EOF
