@@ -1,5 +1,0 @@
-pane	Main	1	1	:*	1	archlinux	:/home/pietrovos/.local/share/chezmoi	1	zsh	:chezmoi cd
-pane	Main	2	0	:-	1	OpenCode	:/home/pietrovos	1	opencode	:opencode
-window	Main	1	:chezmoi	1	:*	cb7f,106x57,0,0,2	:
-window	Main	2	:pietrovos	0	:-	b2a1,79x42,0,0,4	:
-state	Main	

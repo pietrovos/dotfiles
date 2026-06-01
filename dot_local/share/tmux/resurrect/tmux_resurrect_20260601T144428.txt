@@ -1,5 +1,0 @@
-pane	Main	1	0	:-	1	archlinux	:/home/pietrovos/.local/share/chezmoi	1	zsh	:
-pane	Main	2	1	:*	1	OC | Tmux session hibernation on shutdown	:/home/pietrovos	1	opencode	:opencode
-window	Main	1	:chezmoi	0	:-	ca5e,213x57,0,0,1	:
-window	Main	2	:pietrovos	1	:*	cb7f,106x57,0,0,2	:
-state	Main	
