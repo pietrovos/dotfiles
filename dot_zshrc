@@ -118,19 +118,28 @@ tmux() {
   [[ -n "$session" ]] && command tmux attach-session -t "$session"
 }
 
+pkglist_filter() {
+  grep -Fxv \
+    -e brave \
+    -e brave-bin \
+    -e neovim \
+    -e spicetify \
+    -e spicetify-cli
+}
+
 cu() {
   mkdir -p ~/.config/pkglist && \
-    pacman -Qqe > ~/.config/pkglist/pacman.txt && \
-    yay -Qqe > ~/.config/pkglist/yay.txt && \
+    pacman -Qqen | pkglist_filter > ~/.config/pkglist/pacman.txt && \
+    pacman -Qqem | pkglist_filter > ~/.config/pkglist/yay.txt && \
   chezmoi re-add --recursive ~/.config && \
-    chezmoi re-add --recursive ~/.local/scripts && \
+    chezmoi add --recursive ~/.local/scripts && \
     chezmoi re-add ~/.zshrc && \
     chezmoi re-add ~/.p10k.zsh
 }
 
 up() {
-  sudo pacman -Syu --needed - < ~/.config/pkglist/pacman.txt
-  yay -Syu --needed - < ~/.config/pkglist/yay.txt
+  sudo pacman -Syu --needed - < <(pkglist_filter < ~/.config/pkglist/pacman.txt)
+  yay -Syu --needed - < <(pkglist_filter < ~/.config/pkglist/yay.txt)
 }
 
 cpush() {
