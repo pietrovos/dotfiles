@@ -123,18 +123,32 @@ pkglist_filter() {
     -e brave \
     -e brave-bin \
     -e neovim \
+    -e omarchy-nvim \
     -e spicetify \
     -e spicetify-cli
+}
+
+pkglist_filter_file() {
+  local file="$1"
+  local tmp
+
+  [[ -f "$file" ]] || return 0
+  tmp="$(mktemp)" || return 1
+  pkglist_filter < "$file" > "$tmp" && mv "$tmp" "$file"
 }
 
 cu() {
   mkdir -p ~/.config/pkglist && \
     pacman -Qqen | pkglist_filter > ~/.config/pkglist/pacman.txt && \
     pacman -Qqem | pkglist_filter > ~/.config/pkglist/yay.txt && \
+    pkglist_filter_file ~/.config/pkglist/pacman.txt && \
+    pkglist_filter_file ~/.config/pkglist/yay.txt && \
   chezmoi re-add --recursive ~/.config && \
     chezmoi add --recursive ~/.local/scripts && \
     chezmoi re-add ~/.zshrc && \
-    chezmoi re-add ~/.p10k.zsh
+    chezmoi re-add ~/.p10k.zsh && \
+    pkglist_filter_file ~/.local/share/chezmoi/dot_config/pkglist/pacman.txt && \
+    pkglist_filter_file ~/.local/share/chezmoi/dot_config/pkglist/yay.txt
 }
 
 up() {

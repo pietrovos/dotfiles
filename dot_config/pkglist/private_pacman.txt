@@ -13,7 +13,6 @@ bash-completion
 bat
 bluetui
 bolt
-brave-bin
 brightnessctl
 btop
 btrfs-progs
@@ -89,7 +88,6 @@ impala
 imv
 inetutils
 intel-ucode
-intellij-idea-ultimate-edition
 inxi
 iwd
 jq
@@ -126,7 +124,6 @@ mpv
 nano
 nautilus
 nautilus-python
-neovim
 node-gyp
 noto-fonts
 noto-fonts-cjk
@@ -140,7 +137,6 @@ nvidia-utils
 obs-studio
 obsidian
 omarchy-keyring
-omarchy-nvim
 omarchy-walker
 openbsd-netcat
 opencode
@@ -177,7 +173,6 @@ signal-desktop
 slurp
 socat
 sof-firmware
-spicetify-cli
 spotify
 spotify-player
 starship
