@@ -12,7 +12,7 @@ sudo pacman -S --needed --noconfirm \
   wl-clipboard \
   tmux
 
-mkdir -p "$HOME/.config" "$HOME/.oh-my-zsh/custom/plugins" "$HOME/.oh-my-zsh/custom/themes" "$HOME/.tmux/plugins"
+mkdir -p "$HOME/.config" "$HOME/.oh-my-zsh/custom/plugins" "$HOME/.oh-my-zsh/custom/themes" "$HOME/.tmux/plugins" "$HOME/.local/share/tmux/resurrect"
 
 cat >"$HOME/.config/xdg-terminals.list" <<'EOF'
 # Terminal emulator preference order for xdg-terminal-exec

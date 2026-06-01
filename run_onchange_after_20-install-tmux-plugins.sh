@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-mkdir -p "$HOME/.tmux/plugins"
+mkdir -p "$HOME/.tmux/plugins" "$HOME/.local/share/tmux/resurrect"
 
 clone_or_update() {
   local repo=$1
