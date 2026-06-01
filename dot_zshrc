@@ -93,6 +93,31 @@ eval "$(zoxide init zsh)"
 export PATH="$HOME/.cargo/bin:$HOME/.local/scripts:$PATH"
 alias tc='tmux-config-sessionizer'
 
+tmux() {
+  if (( $# > 0 )); then
+    command tmux "$@"
+    return
+  fi
+
+  local sessions session
+  sessions=$(command tmux list-sessions -F '#S' 2>/dev/null)
+
+  if [[ -z "$sessions" ]]; then
+    command tmux
+    return
+  fi
+
+  if command -v fzf >/dev/null 2>&1; then
+    session=$(printf '%s\n' "$sessions" | fzf --prompt='tmux session> ')
+  else
+    select session in ${(f)sessions}; do
+      [[ -n "$session" ]] && break
+    done
+  fi
+
+  [[ -n "$session" ]] && command tmux attach-session -t "$session"
+}
+
 cu() {
   mkdir -p ~/.config/pkglist && \
     pacman -Qqe > ~/.config/pkglist/pacman.txt && \

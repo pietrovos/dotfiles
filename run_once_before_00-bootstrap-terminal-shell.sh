@@ -12,7 +12,7 @@ sudo pacman -S --needed --noconfirm \
   wl-clipboard \
   tmux
 
-mkdir -p "$HOME/.config" "$HOME/.oh-my-zsh/custom/plugins" "$HOME/.oh-my-zsh/custom/themes"
+mkdir -p "$HOME/.config" "$HOME/.oh-my-zsh/custom/plugins" "$HOME/.oh-my-zsh/custom/themes" "$HOME/.tmux/plugins"
 
 cat >"$HOME/.config/xdg-terminals.list" <<'EOF'
 # Terminal emulator preference order for xdg-terminal-exec
@@ -42,6 +42,9 @@ clone_or_update https://github.com/zsh-users/zsh-autosuggestions.git "$HOME/.oh-
 clone_or_update https://github.com/zsh-users/zsh-syntax-highlighting.git "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
 clone_or_update https://github.com/zsh-users/zsh-completions.git "$HOME/.oh-my-zsh/custom/plugins/zsh-completions"
 clone_or_update https://github.com/Aloxaf/fzf-tab.git "$HOME/.oh-my-zsh/custom/plugins/fzf-tab"
+clone_or_update https://github.com/tmux-plugins/tpm.git "$HOME/.tmux/plugins/tpm"
+clone_or_update https://github.com/tmux-plugins/tmux-resurrect.git "$HOME/.tmux/plugins/tmux-resurrect"
+clone_or_update https://github.com/tmux-plugins/tmux-continuum.git "$HOME/.tmux/plugins/tmux-continuum"
 
 cat >"$HOME/.oh-my-zsh/custom/plugins/zsh-completions/zsh-completions.plugin.zsh" <<'EOF'
 fpath+=${0:A:h}/src
