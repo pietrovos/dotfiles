@@ -28,17 +28,19 @@ return {
 			--
 			-- See :h blink-cmp-config-keymap for defining your own keymap
 			keymap = { preset = "super-tab",
-       ["<F3>"] = {
-        function() -- sidekick next edit suggestion
-          return require("sidekick").nes_jump_or_apply()
-        end,
-        function() -- if you are using Neovim's native inline completions
-          return vim.lsp.inline_completion.get()
-        end,
-        "fallback",
-      },
+				["<F3>"] = {
+					function() -- sidekick next edit suggestion
+						return require("sidekick").nes_jump_or_apply()
+					end,
+					function() -- if native inline completions are available
+						if vim.lsp.inline_completion and vim.lsp.inline_completion.get then
+							return vim.lsp.inline_completion.get()
+						end
+					end,
+					"fallback",
+				},
 
-      },
+			},
 
 			appearance = {
 				-- 'mono' (default) for 'Nerd Font Mono' or 'normal' for 'Nerd Font'

@@ -36,7 +36,9 @@ vim.lsp.enable({
   "copilot",
 })
 
-vim.lsp.inline_completion.enable()
+if vim.lsp.inline_completion and vim.lsp.inline_completion.enable then
+	vim.lsp.inline_completion.enable()
+end
 
 -- LSP Configuration for Neovim 0.11
 -- This file sets up LSP with the new vim.lsp.enable() API
