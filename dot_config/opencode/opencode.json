@@ -1,0 +1,6 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "theme": "lucent-orng",
+  "autoupdate": false,
+  "permission": "allow"
+}
