@@ -1,2 +1,2 @@
-/.local/share/tmux/resurrect
-/.config/nvim/lazy-lock.json
+.local/share/tmux/resurrect
+.config/nvim/lazy-lock.json

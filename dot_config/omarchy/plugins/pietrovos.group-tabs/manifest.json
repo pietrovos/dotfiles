@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "pietrovos.group-tabs",
+  "name": "Grouped Window Tabs",
+  "version": "1.0.0",
+  "author": "pietrovos",
+  "description": "Numbered controls for the focused Hyprland window group",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "GroupTabs.qml"
+  },
+  "barWidget": {
+    "displayName": "Grouped Window Tabs",
+    "description": "Numbered controls for the focused window group",
+    "category": "Compositor",
+    "allowMultiple": false
+  }
+}
