@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+source_dir="${HOME}/.local/share/chezmoi"
+lock_file="${XDG_RUNTIME_DIR:-/tmp}/chezmoi-sync-${UID}.lock"
+
+exec 9>"${lock_file}"
+flock -n 9 || exit 0
+
+cd "${source_dir}"
+
+# Preserve ordinary edits to managed targets before accepting remote changes.
+targets=()
+while IFS= read -r line; do
+  if [[ ${line:0:1} != " " ]]; then
+    targets+=("${line:3}")
+  fi
+done < <(chezmoi status --path-style relative)
+
+if ((${#targets[@]})); then
+  chezmoi add -- "${targets[@]}"
+fi
+
+git add --all
+if ! git diff --cached --quiet; then
+  git commit -m "Sync dotfiles from $(hostname --short)"
+fi
+
+git pull --rebase --autostash
+git push
+chezmoi apply

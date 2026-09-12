@@ -1,0 +1,7 @@
+[Unit]
+Description=Synchronize chezmoi dotfiles
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/chezmoi-sync
