@@ -24,6 +24,10 @@ from Omarchy defaults when these files can be inspected.
   `ALT+SHIFT+0` move the active member to positions 1 through 10 via
   `~/.config/hypr/reorder-group-window`. `SUPER+SHIFT+R` opens OpenCode in the
   current terminal directory via `~/.config/hypr/opencode-duplicate`.
+- OpenCode completion history is available from the
+  `pietrovos.opencode-completions` bar widget, which reads state records from
+  `~/.local/state/opencode/completions/` and focuses the saved workspace and
+  group member when a record is selected.
 
 ## Required Workflow
 
