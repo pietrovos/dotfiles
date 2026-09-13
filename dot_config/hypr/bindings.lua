@@ -47,7 +47,12 @@ for index = 1, 10 do
   end
 
   local key = index == 10 and "0" or tostring(index)
-  bind("ALT + " .. key, "Switch to group window " .. index, hl.dsp.group.active({ index = index }))
+  bind("ALT + " .. key, "Switch to group window " .. index, "/home/pietrovos/.config/hypr/select-group-window " .. index)
+end
+
+for index = 1, 10 do
+  local key = index == 10 and "0" or tostring(index)
+  bind("ALT + SHIFT + " .. key, "Move group window to position " .. index, "/home/pietrovos/.config/hypr/reorder-group-window " .. index)
 end
 
 -- Add extra bindings below.

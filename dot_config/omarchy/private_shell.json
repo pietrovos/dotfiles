@@ -1,33 +1,15 @@
 {
-  "version": 1,
-  "idle": {
-    "screensaver": 150,
-    "lock": 300
-  },
   "bar": {
-    "position": "top",
-    "transparent": false,
     "centerAnchor": "omarchy.clock",
     "layout": {
-      "left": [
-        {
-          "id": "omarchy.menu"
-        },
-        {
-          "id": "pietrovos.workspaces"
-        },
-        {
-          "id": "pietrovos.group-tabs"
-        }
-      ],
       "center": [
         {
           "id": "omarchy.indicators"
         },
         {
-          "id": "omarchy.clock",
           "format": "dddd h:mm AP",
           "formatAlt": "d MMMM 'W'ww yyyy",
+          "id": "omarchy.clock",
           "verticalFormat": "h\nAP\nmm"
         },
         {
@@ -38,6 +20,17 @@
         },
         {
           "id": "omarchy.system-update"
+        }
+      ],
+      "left": [
+        {
+          "id": "omarchy.menu"
+        },
+        {
+          "id": "pietrovos.workspaces"
+        },
+        {
+          "id": "pietrovos.group-tabs"
         }
       ],
       "right": [
@@ -63,7 +56,14 @@
           "id": "omarchy.power"
         }
       ]
-    }
+    },
+    "position": "top",
+    "transparent": false
   },
-  "plugins": []
+  "idle": {
+    "lock": 300,
+    "screensaver": 150
+  },
+  "plugins": [],
+  "version": 1
 }

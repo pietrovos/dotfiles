@@ -1,0 +1,30 @@
+#!/bin/sh
+
+target=$1
+[ "$target" = 0 ] && target=10
+
+case "$target" in
+  ''|*[!0-9]*) exit 1 ;;
+esac
+
+active=$(hyprctl activewindow -j) || exit 1
+address=$(printf '%s' "$active" | jq -r '.address // empty')
+members=$(printf '%s' "$active" | jq -r '(.grouped // []) | length')
+
+[ -n "$address" ] && [ "$members" -gt 0 ] && [ "$target" -le "$members" ] || exit 0
+
+current=$(printf '%s' "$active" | jq -r --arg address "$address" '.grouped | index($address) + 1')
+[ "$current" -eq "$target" ] && exit 0
+
+if [ "$current" -gt "$target" ]; then
+  forward=false
+  moves=$((current - target))
+else
+  forward=true
+  moves=$((target - current))
+fi
+
+while [ "$moves" -gt 0 ]; do
+  hyprctl dispatch "hl.dsp.group.move_window({ forward = $forward })" >/dev/null || exit 1
+  moves=$((moves - 1))
+done

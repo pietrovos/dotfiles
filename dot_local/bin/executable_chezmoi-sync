@@ -18,7 +18,7 @@ while IFS= read -r line; do
 done < <(chezmoi status --path-style relative)
 
 if ((${#targets[@]})); then
-  chezmoi add -- "${targets[@]}"
+  chezmoi add -- "${targets[@]/#/${HOME}/}"
 fi
 
 git add --all
