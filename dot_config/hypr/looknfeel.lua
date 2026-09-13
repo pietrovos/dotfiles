@@ -9,6 +9,8 @@ hl.config({
   },
 
   group = {
+    insert_after_current = false,
+
     -- Group members are selected from the top bar instead.
     groupbar = {
       enabled = false,
