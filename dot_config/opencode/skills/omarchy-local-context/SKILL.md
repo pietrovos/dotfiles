@@ -27,8 +27,8 @@ from Omarchy defaults when these files can be inspected.
 - OpenCode completion history is available from the
   `pietrovos.opencode-completions` bar widget, which reads state records from
   `~/.local/state/opencode/completions/` and focuses the saved workspace and
-  group member when a record is selected. Right-clicking it opens the
-  `~/.local/bin/opencode-completions-tui` terminal picker.
+  group member when a record is selected. Clicking the corresponding desktop
+  notification focuses its saved window and removes the record from the tray.
 
 ## Required Workflow
 

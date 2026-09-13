@@ -47,9 +47,10 @@ async function recordCompletion(sessionID: string, title: string, window: HyprCl
   await output(["mkdir", "-p", stateDirectory])
   await Bun.write(`${stateDirectory}/${filename}.tmp`, `${JSON.stringify(record)}\n`)
   await output(["mv", `${stateDirectory}/${filename}.tmp`, `${stateDirectory}/${filename}`])
+  return `${stateDirectory}/${filename}`
 }
 
-async function notify(window: HyprClient | undefined, body: string) {
+async function notify(window: HyprClient | undefined, body: string, recordPath: string) {
   const command = [
     "notify-send",
     "--app-name=OpenCode",
@@ -72,6 +73,8 @@ async function notify(window: HyprClient | undefined, body: string) {
     if (groupIndex > 0) {
       await output(["hyprctl", "dispatch", `hl.dsp.group.active({ index = ${groupIndex} })`])
     }
+
+    await output(["rm", "-f", recordPath])
   }
 }
 
@@ -89,8 +92,8 @@ export const CompletionNotification: Plugin = async ({ client }) => ({
         ? ` | Group tab ${window.grouped.indexOf(window.address) + 1}/${window.grouped.length}`
         : ""
 
-      await recordCompletion(event.properties.sessionID, result.data.title, window)
-      void notify(window, `Workspace ${workspace}${tab}`)
+      const recordPath = await recordCompletion(event.properties.sessionID, result.data.title, window)
+      void notify(window, `Workspace ${workspace}${tab}`, recordPath)
     } catch {
       // Notifications must never interrupt an OpenCode session.
     }

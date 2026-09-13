@@ -46,11 +46,6 @@ BarWidget {
     root.refresh()
   }
 
-  function launchTui() {
-    if (!root.bar) return
-    root.bar.run("setsid uwsm-app -- xdg-terminal-exec --app-id=org.omarchy.opencode -e opencode-completions-tui >/dev/null 2>&1 &")
-  }
-
   implicitWidth: button.implicitWidth
   implicitHeight: button.implicitHeight
 
@@ -60,8 +55,7 @@ BarWidget {
     text: "\uf00c"
     tooltipText: "OpenCode completions"
     onPressed: function(button) {
-      if (button === Qt.RightButton) root.launchTui()
-      else root.popupOpen = !root.popupOpen
+      if (button !== Qt.RightButton) root.popupOpen = !root.popupOpen
     }
 
     Rectangle {
