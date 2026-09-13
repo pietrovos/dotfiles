@@ -28,7 +28,7 @@ async function windowForProcess() {
   }
 }
 
-export const CompletionNotification: Plugin = async ({ client, directory }) => ({
+export const CompletionNotification: Plugin = async ({ client }) => ({
   event: async ({ event }) => {
     if (event.type !== "session.idle") return
 
@@ -47,7 +47,7 @@ export const CompletionNotification: Plugin = async ({ client, directory }) => (
         "--app-name=OpenCode",
         "--expire-time=10000",
         "OpenCode finished",
-        `${directory}\nWorkspace ${workspace}${tab}`,
+        `Workspace ${workspace}${tab}`,
       ])
     } catch {
       // Notifications must never interrupt an OpenCode session.
