@@ -28,6 +28,27 @@ async function windowForProcess() {
   }
 }
 
+async function notify(window: HyprClient | undefined, body: string) {
+  const command = [
+    "notify-send",
+    "--app-name=OpenCode",
+    "--expire-time=10000",
+    "OpenCode finished",
+    body,
+  ]
+
+  if (!window) {
+    await output(command)
+    return
+  }
+
+  // Omarchy invokes the default action when the notification card is clicked.
+  const action = await output([...command.slice(0, -2), "--action=default=Focus", ...command.slice(-2)])
+  if (action.trim() === "default") {
+    await output(["hyprctl", "dispatch", "focuswindow", `address:${window.address}`])
+  }
+}
+
 export const CompletionNotification: Plugin = async ({ client }) => ({
   event: async ({ event }) => {
     if (event.type !== "session.idle") return
@@ -42,13 +63,7 @@ export const CompletionNotification: Plugin = async ({ client }) => ({
         ? ` | Group tab ${window.grouped.indexOf(window.address) + 1}/${window.grouped.length}`
         : ""
 
-      await output([
-        "notify-send",
-        "--app-name=OpenCode",
-        "--expire-time=10000",
-        "OpenCode finished",
-        `Workspace ${workspace}${tab}`,
-      ])
+      void notify(window, `Workspace ${workspace}${tab}`)
     } catch {
       // Notifications must never interrupt an OpenCode session.
     }
