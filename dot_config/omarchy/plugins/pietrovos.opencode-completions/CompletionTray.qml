@@ -39,6 +39,13 @@ BarWidget {
     popupOpen = false
   }
 
+  function deleteRecord(record) {
+    if (!record._file || !root.bar) return
+    root.bar.run("rm -f " + Util.shellQuote(record._file))
+    records = records.filter(function(item) { return item._file !== record._file })
+    root.refresh()
+  }
+
   function launchTui() {
     if (!root.bar) return
     root.bar.run("setsid uwsm-app -- xdg-terminal-exec --app-id=org.omarchy.opencode -e opencode-completions-tui >/dev/null 2>&1 &")
@@ -136,7 +143,7 @@ BarWidget {
 
               Text {
                 anchors.left: parent.left
-                anchors.right: parent.right
+                anchors.right: deleteButton.left
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.margins: Style.space(8)
                 text: "Workspace " + record.workspace + (record.groupCount > 1 ? " | Tab " + record.groupIndex + "/" + record.groupCount : "")
@@ -151,6 +158,29 @@ BarWidget {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: root.focusRecord(record)
               }
+
+              Item {
+                id: deleteButton
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                width: Style.space(28)
+                height: parent.height
+
+                Text {
+                  anchors.centerIn: parent
+                  text: "x"
+                  color: Qt.darker(Color.foreground, 1.3)
+                  font.family: Style.font.family
+                  font.pixelSize: Style.font.body
+                  font.bold: true
+                }
+
+                MouseArea {
+                  anchors.fill: parent
+                  cursorShape: Qt.PointingHandCursor
+                  onClicked: root.deleteRecord(record)
+                }
+              }
             }
           }
         }
@@ -161,7 +191,7 @@ BarWidget {
   // Polling lets separate OpenCode processes append records without a shared daemon.
   Process {
     id: recordsProbe
-    command: ["sh", "-c", "find \"" + root.completionDir + "\" -maxdepth 1 -type f -name '*.json' -printf '%T@ %p\\n' 2>/dev/null | sort -nr | head -n 50 | cut -d' ' -f2- | xargs -r cat"]
+    command: ["sh", "-c", "find \"" + root.completionDir + "\" -maxdepth 1 -type f -name '*.json' -printf '%T@ %p\\n' 2>/dev/null | sort -nr | head -n 50 | cut -d' ' -f2- | while IFS= read -r file; do jq -c --arg file \"$file\" '. + {_file: $file}' \"$file\"; done"]
     stdout: StdioCollector {
       waitForEnd: true
       onStreamFinished: root.setRecords(text)

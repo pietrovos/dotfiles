@@ -4,28 +4,30 @@ set -o pipefail
 
 state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/opencode/completions"
 
-mapfile -t records < <(find "$state_dir" -maxdepth 1 -type f -name '*.json' -printf '%T@ %p\n' 2>/dev/null | sort -nr | cut -d' ' -f2-)
-
-if (( ${#records[@]} == 0 )); then
-  printf 'No OpenCode completions have been recorded yet.\n'
-  read -r -n 1 -p 'Press any key to close...'
-  exit 0
-fi
-
-selection=$(
-  for file in "${records[@]}"; do
+completion_entries() {
+  while IFS= read -r file; do
     location=$(jq -r '"Workspace " + (.workspace // "unknown") + (if (.groupCount // 0) > 1 then " | Tab " + ((.groupIndex // 0) | tostring) + "/" + (.groupCount | tostring) else "" end)' "$file")
     printf '%s\t%s\n' "$file" "$location"
-  done | fzf --delimiter=$'\t' --with-nth=2 --prompt='OpenCode completions > ' --header='Enter: focus completion   Esc: close'
-) || exit 0
+  done < <(find "$state_dir" -maxdepth 1 -type f -name '*.json' -printf '%T@ %p\n' 2>/dev/null | sort -nr | cut -d' ' -f2-)
+}
 
-record_file=${selection%%$'\t'*}
-address=$(jq -r '.address // empty' "$record_file")
-group_index=$(jq -r '.groupIndex // 0' "$record_file")
+while true; do
+  selection=$(completion_entries | fzf --delimiter=$'\t' --with-nth=2 --prompt='OpenCode completions > ' --header='Enter: focus completion   d: delete   Esc: close' --expect=d) || exit 0
 
-[[ -n $address ]] || exit 0
+  if [[ $selection == d$'\n'* ]]; then
+    record_file=${selection#*$'\n'}
+    rm -f -- "${record_file%%$'\t'*}"
+    continue
+  fi
 
-hyprctl dispatch "hl.dsp.focus({ window = \"address:$address\" })"
-if (( group_index > 0 )); then
-  hyprctl dispatch "hl.dsp.group.active({ index = $group_index })"
-fi
+  record_file=${selection%%$'\t'*}
+  address=$(jq -r '.address // empty' "$record_file")
+  group_index=$(jq -r '.groupIndex // 0' "$record_file")
+  [[ -n $address ]] || exit 0
+
+  hyprctl dispatch "hl.dsp.focus({ window = \"address:$address\" })"
+  if (( group_index > 0 )); then
+    hyprctl dispatch "hl.dsp.group.active({ index = $group_index })"
+  fi
+  exit 0
+done
