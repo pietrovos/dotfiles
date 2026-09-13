@@ -7,6 +7,8 @@ type HyprClient = {
   grouped: string[]
 }
 
+const stateDirectory = `${process.env.XDG_STATE_HOME || `${process.env.HOME}/.local/state`}/opencode/completions`
+
 async function output(command: string[]) {
   const process = Bun.spawn(command, { stdout: "pipe", stderr: "ignore" })
   const text = await new Response(process.stdout).text()
@@ -26,6 +28,25 @@ async function windowForProcess() {
     const window = clients.find((client) => client.pid === pid)
     if (window) return window
   }
+}
+
+async function recordCompletion(sessionID: string, title: string, window: HyprClient | undefined) {
+  const completedAt = Date.now()
+  const groupIndex = window ? window.grouped.indexOf(window.address) + 1 : 0
+  const record = {
+    sessionID,
+    title,
+    address: window?.address || "",
+    workspace: window?.workspace.name || String(window?.workspace.id || "unknown"),
+    groupIndex,
+    groupCount: window?.grouped.length || 0,
+    completedAt,
+  }
+  const filename = `${completedAt}-${sessionID}.json`
+
+  await output(["mkdir", "-p", stateDirectory])
+  await Bun.write(`${stateDirectory}/${filename}.tmp`, `${JSON.stringify(record)}\n`)
+  await output(["mv", `${stateDirectory}/${filename}.tmp`, `${stateDirectory}/${filename}`])
 }
 
 async function notify(window: HyprClient | undefined, body: string) {
@@ -68,6 +89,7 @@ export const CompletionNotification: Plugin = async ({ client }) => ({
         ? ` | Group tab ${window.grouped.indexOf(window.address) + 1}/${window.grouped.length}`
         : ""
 
+      await recordCompletion(event.properties.sessionID, result.data.title, window)
       void notify(window, `Workspace ${workspace}${tab}`)
     } catch {
       // Notifications must never interrupt an OpenCode session.
