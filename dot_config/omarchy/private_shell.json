@@ -31,9 +31,6 @@
         },
         {
           "id": "pietrovos.group-tabs"
-        },
-        {
-          "id": "pietrovos.opencode-completions"
         }
       ],
       "right": [
@@ -42,6 +39,9 @@
         },
         {
           "id": "omarchy.agents"
+        },
+        {
+          "id": "pietrovos.opencode-completions"
         },
         {
           "id": "omarchy.bluetooth"

@@ -42,14 +42,11 @@ BarWidget {
   implicitWidth: button.implicitWidth
   implicitHeight: button.implicitHeight
 
-  WidgetButton {
+  BarIconButton {
     id: button
     bar: root.bar
     text: "\uf00c"
-    labelVisible: false
-    fontSize: Style.bar.iconFont
-    fixedWidth: root.vertical ? -1 : Style.bar.iconSlot
-    fixedHeight: root.vertical ? Style.bar.iconSlot : -1
+    tooltipText: "OpenCode completions"
     onPressed: root.popupOpen = !root.popupOpen
 
     Rectangle {
