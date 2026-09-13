@@ -39,6 +39,11 @@ BarWidget {
     popupOpen = false
   }
 
+  function launchTui() {
+    if (!root.bar) return
+    root.bar.run("setsid uwsm-app -- xdg-terminal-exec --app-id=org.omarchy.opencode -e opencode-completions-tui >/dev/null 2>&1 &")
+  }
+
   implicitWidth: button.implicitWidth
   implicitHeight: button.implicitHeight
 
@@ -47,7 +52,10 @@ BarWidget {
     bar: root.bar
     text: "\uf00c"
     tooltipText: "OpenCode completions"
-    onPressed: root.popupOpen = !root.popupOpen
+    onPressed: function(button) {
+      if (button === Qt.RightButton) root.launchTui()
+      else root.popupOpen = !root.popupOpen
+    }
 
     Rectangle {
       visible: root.records.length > 0
@@ -122,34 +130,20 @@ BarWidget {
               required property var modelData
               readonly property var record: modelData
               width: recordsColumn.width
-              implicitHeight: Style.space(46)
+              implicitHeight: Style.space(32)
               radius: Style.cornerRadius
               color: Qt.rgba(Color.foreground.r, Color.foreground.g, Color.foreground.b, 0.08)
 
-              Column {
+              Text {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.margins: Style.space(8)
-                spacing: 2
-
-                Text {
-                  width: parent.width
-                  text: record.title || "OpenCode session"
-                  color: Color.foreground
-                  font.family: Style.font.family
-                  font.pixelSize: Style.font.bodySmall
-                  elide: Text.ElideRight
-                }
-
-                Text {
-                  width: parent.width
-                  text: "Workspace " + record.workspace + (record.groupCount > 1 ? " | Tab " + record.groupIndex + "/" + record.groupCount : "")
-                  color: Qt.darker(Color.foreground, 1.5)
-                  font.family: Style.font.family
-                  font.pixelSize: Style.font.caption
-                  elide: Text.ElideRight
-                }
+                text: "Workspace " + record.workspace + (record.groupCount > 1 ? " | Tab " + record.groupIndex + "/" + record.groupCount : "")
+                color: Color.foreground
+                font.family: Style.font.family
+                font.pixelSize: Style.font.bodySmall
+                elide: Text.ElideRight
               }
 
               MouseArea {
