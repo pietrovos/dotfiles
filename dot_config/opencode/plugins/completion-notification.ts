@@ -45,7 +45,12 @@ async function notify(window: HyprClient | undefined, body: string) {
   // Omarchy invokes the default action when the notification card is clicked.
   const action = await output([...command.slice(0, -2), "--action=default=Focus", ...command.slice(-2)])
   if (action.trim() === "default") {
-    await output(["hyprctl", "dispatch", "focuswindow", `address:${window.address}`])
+    await output(["hyprctl", "dispatch", `hl.dsp.focus({ window = \"address:${window.address}\" })`])
+
+    const groupIndex = window.grouped.indexOf(window.address) + 1
+    if (groupIndex > 0) {
+      await output(["hyprctl", "dispatch", `hl.dsp.group.active({ index = ${groupIndex} })`])
+    }
   }
 }
 
