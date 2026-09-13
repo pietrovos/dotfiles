@@ -29,7 +29,7 @@ BarWidget {
     records = next
   }
 
-  function focus(record) {
+  function focusRecord(record) {
     if (!record.address || !root.bar) return
 
     var command = "hyprctl dispatch " + Util.shellQuote("hl.dsp.focus({ window = \"address:" + record.address + "\" })")
@@ -155,7 +155,7 @@ BarWidget {
               MouseArea {
                 anchors.fill: parent
                 cursorShape: Qt.PointingHandCursor
-                onClicked: root.focus(record)
+                onClicked: root.focusRecord(record)
               }
             }
           }
