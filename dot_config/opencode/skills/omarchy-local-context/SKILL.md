@@ -18,13 +18,12 @@ from Omarchy defaults when these files can be inspected.
   `~/.config/hypr/looknfeel.lua`.
 - New group windows append at the end because
   `group.insert_after_current = false` is set in `looknfeel.lua`.
-- `SUPER+G` toggles window grouping. `ALT+G` uses Hyprland's
-  `moveoutofgroup` dispatcher to remove only the active window. `ALT+1` through
-  `ALT+0` select group members 1 through 10 with no action when the requested
-  position is absent. `ALT+SHIFT+1` through `ALT+SHIFT+0` move the active
-  member to positions 1 through 10 via `~/.config/hypr/reorder-group-window`.
-  `SUPER+SHIFT+R` opens OpenCode in the current terminal directory via
-  `~/.config/hypr/opencode-duplicate`.
+- `SUPER+G` toggles window grouping. `ALT+G` moves the active window out of a
+  group. `ALT+1` through `ALT+0` select group members 1 through 10 with no
+  action when the requested position is absent. `ALT+SHIFT+1` through
+  `ALT+SHIFT+0` move the active member to positions 1 through 10 via
+  `~/.config/hypr/reorder-group-window`. `SUPER+SHIFT+R` opens OpenCode in the
+  current terminal directory via `~/.config/hypr/opencode-duplicate`.
 
 ## Required Workflow
 

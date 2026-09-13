@@ -7,7 +7,7 @@ end
 bind("SUPER + ESCAPE", nil, "hyprctl dispatch focuscurrentorlast")
 bind("SUPER + G", "Toggle window grouping", hl.dsp.group.toggle())
 hl.unbind("SUPER + ALT + G")
-bind("ALT + G", "Move active window out of group", "hyprctl dispatch moveoutofgroup")
+bind("ALT + G", "Move active window out of group", hl.dsp.window.move({ out_of_group = true }))
 
 bind("SUPER + RETURN", "Terminal", { omarchy = "terminal" })
 bind("SUPER + ALT + RETURN", "Tmux", { omarchy = "terminal-tmux" })
