@@ -37,4 +37,4 @@ fi
 
 git pull --rebase --autostash
 git push
-chezmoi apply
+chezmoi apply --force
