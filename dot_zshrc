@@ -90,7 +90,7 @@ eval "$(zoxide init zsh)"
 
 # User configuration
 
-export PATH="$HOME/.cargo/bin:$HOME/.local/scripts:$PATH"
+export PATH="$HOME/.cargo/bin:$HOME/.local/scripts:$HOME/.local/bin:$PATH"
 alias tc='tmux-config-sessionizer'
 
 tmux() {
@@ -202,6 +202,8 @@ IFS= read -r -d '' cwd < "$tmp"
 [ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd"
 rm -f -- "$tmp"
 }
+
+alias yazi='y'
 
 [[ -f "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"
 

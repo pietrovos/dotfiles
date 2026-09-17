@@ -22,13 +22,16 @@ from Omarchy defaults when these files can be inspected.
   group. `ALT+1` through `ALT+0` select group members 1 through 10 with no
   action when the requested position is absent. `ALT+SHIFT+1` through
   `ALT+SHIFT+0` move the active member to positions 1 through 10 via
-  `~/.config/hypr/reorder-group-window`. `SUPER+SHIFT+R` opens OpenCode in the
+  `~/.config/hypr/reorder-group-window`. `SUPER+SHIFT+R` opens the custom OpenCode build in the
   current terminal directory via `~/.config/hypr/opencode-duplicate`.
-- OpenCode completion history is available from the
-  `pietrovos.opencode-completions` bar widget, which reads state records from
-  `~/.local/state/opencode/completions/` and focuses the saved workspace and
-  group member when a record is selected. Clicking the corresponding desktop
-  notification focuses its saved window and removes the record from the tray.
+- OpenCode completion notifications identify the originating workspace and
+  group tab. Question notifications show only that location, remain visible
+  until clicked, focus that window when clicked, and use critical urgency for
+  red attention styling.
+- `SUPER+CTRL+ALT+C` toggles the active Codex CLI account between `primary`
+  and `secondary` through `~/.local/bin/codex-account`. The selected login
+  also supplies the Codex usage widget's rate limits; credentials remain
+  machine-local in `~/.local/share/codex-accounts/`.
 
 ## Required Workflow
 

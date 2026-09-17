@@ -7,8 +7,6 @@ type HyprClient = {
   grouped: string[]
 }
 
-const stateDirectory = `${process.env.XDG_STATE_HOME || `${process.env.HOME}/.local/state`}/opencode/completions`
-
 async function output(command: string[]) {
   const process = Bun.spawn(command, { stdout: "pipe", stderr: "ignore" })
   const text = await new Response(process.stdout).text()
@@ -30,34 +28,21 @@ async function windowForProcess() {
   }
 }
 
-async function recordCompletion(sessionID: string, title: string, window: HyprClient | undefined) {
-  const completedAt = Date.now()
-  const groupIndex = window ? window.grouped.indexOf(window.address) + 1 : 0
-  const record = {
-    sessionID,
-    title,
-    address: window?.address || "",
-    workspace: window?.workspace.name || String(window?.workspace.id || "unknown"),
-    groupIndex,
-    groupCount: window?.grouped.length || 0,
-    completedAt,
-  }
-  const filename = `${completedAt}-${sessionID}.json`
-
-  await output(["mkdir", "-p", stateDirectory])
-  await Bun.write(`${stateDirectory}/${filename}.tmp`, `${JSON.stringify(record)}\n`)
-  await output(["mv", `${stateDirectory}/${filename}.tmp`, `${stateDirectory}/${filename}`])
-  return `${stateDirectory}/${filename}`
+async function isFocused(window: HyprClient | undefined) {
+  if (!window) return false
+  const active = JSON.parse(await output(["hyprctl", "activewindow", "-j"])) as { address?: string }
+  return active.address === window.address
 }
 
-async function notify(window: HyprClient | undefined, body: string, recordPath: string) {
+async function notify(window: HyprClient | undefined, title: string, body?: string) {
   const command = [
     "notify-send",
     "--app-name=OpenCode",
-    "--expire-time=10000",
-    "OpenCode finished",
-    body,
+    "--urgency=critical",
+    "--expire-time=0",
+    title,
   ]
+  if (body) command.push(body)
 
   if (!window) {
     await output(command)
@@ -65,7 +50,7 @@ async function notify(window: HyprClient | undefined, body: string, recordPath: 
   }
 
   // Omarchy invokes the default action when the notification card is clicked.
-  const action = await output([...command.slice(0, -2), "--action=default=Focus", ...command.slice(-2)])
+  const action = await output([...command.slice(0, -1), "--action=default=Focus", command.at(-1)!])
   if (action.trim() === "default") {
     await output(["hyprctl", "dispatch", `hl.dsp.focus({ window = \"address:${window.address}\" })`])
 
@@ -74,26 +59,31 @@ async function notify(window: HyprClient | undefined, body: string, recordPath: 
       await output(["hyprctl", "dispatch", `hl.dsp.group.active({ index = ${groupIndex} })`])
     }
 
-    await output(["rm", "-f", recordPath])
   }
 }
 
 export const CompletionNotification: Plugin = async ({ client }) => ({
   event: async ({ event }) => {
-    if (event.type !== "session.idle") return
+    if (event.type !== "session.idle" && event.type !== "question.asked") return
 
     try {
       const result = await client.session.get({ path: { id: event.properties.sessionID } })
       if (!result.data || result.data.parentID) return
 
       const window = await windowForProcess()
+      if (await isFocused(window)) return
+
       const workspace = window?.workspace.name || String(window?.workspace.id || "unknown")
       const tab = window && window.grouped.length > 1
-        ? ` | Group tab ${window.grouped.indexOf(window.address) + 1}/${window.grouped.length}`
+        ? `, Group ${window.grouped.indexOf(window.address) + 1}/${window.grouped.length}`
         : ""
 
-      const recordPath = await recordCompletion(event.properties.sessionID, result.data.title, window)
-      void notify(window, `Workspace ${workspace}${tab}`, recordPath)
+      if (event.type === "question.asked") {
+        void notify(window, `Workspace ${workspace}${tab}`)
+        return
+      }
+
+      void notify(window, "OpenCode finished", `Workspace ${workspace}${tab}`)
     } catch {
       // Notifications must never interrupt an OpenCode session.
     }

@@ -18,7 +18,16 @@ while IFS= read -r line; do
 done < <(chezmoi status --path-style relative)
 
 if ((${#targets[@]})); then
-  chezmoi add -- "${targets[@]/#/${HOME}/}"
+  existing_targets=()
+  for target in "${targets[@]}"; do
+    if [[ -e "${HOME}/${target}" || -L "${HOME}/${target}" ]]; then
+      existing_targets+=("${HOME}/${target}")
+    fi
+  done
+
+  if ((${#existing_targets[@]})); then
+    chezmoi add -- "${existing_targets[@]}"
+  fi
 fi
 
 git add --all

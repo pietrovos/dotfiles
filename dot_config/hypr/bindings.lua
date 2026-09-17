@@ -31,7 +31,7 @@ bind("SUPER + SHIFT + SLASH", "Passwords", { launch = "1password" })
 bind("SUPER + SHIFT + ALT + A", "ChatGPT", { webapp = "https://chatgpt.com" })
 bind("SUPER + SHIFT + A", "Grok", { webapp = "https://grok.com" })
 bind("SUPER + SHIFT + C", "Calendar", { webapp = "https://app.hey.com/calendar/weeks/" })
-bind("SUPER + SHIFT + E", "Email", { webapp = "https://app.hey.com" })
+bind("SUPER + SHIFT + E", "Email", { webapp = "https://mail.google.com/mail/u/0/#inbox" })
 bind("SUPER + SHIFT + Y", "YouTube", { webapp = "https://youtube.com/" })
 bind("SUPER + SHIFT + ALT + G", "WhatsApp", { webapp = "https://web.whatsapp.com/", focus = true })
 bind("SUPER + SHIFT + CTRL + G", "Google Messages", { webapp = "https://messages.google.com/web/conversations", focus = true })
@@ -39,6 +39,7 @@ bind("SUPER + SHIFT + P", "Paint", { webapp = "https://jspaint.app" })
 bind("SUPER + SHIFT + X", "X", { webapp = "https://x.com/" })
 bind("SUPER + SHIFT + ALT + X", "X Post", { webapp = "https://x.com/compose/post" })
 bind("SUPER + SHIFT + I", "Install Theme menu", "omarchy-launch-tui omarchy-theme-install")
+bind("SUPER + CTRL + ALT + C", "Toggle Codex account", "/home/pietrovos/.local/bin/codex-account toggle")
 
 -- Grouped-window tabs: Alt+1 through Alt+0 select positions 1 through 10.
 for index = 1, 10 do
