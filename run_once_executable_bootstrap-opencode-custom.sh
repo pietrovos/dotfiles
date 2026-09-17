@@ -17,5 +17,5 @@ else
 fi
 
 mise install bun@1.3.14
-mise exec bun@1.3.14 -- bun --cwd "${repo}" install
-mise exec bun@1.3.14 -- bun --cwd "${repo}/packages/opencode" run build --single
+mise exec bun@1.3.14 -- bun install --cwd "${repo}"
+mise exec bun@1.3.14 -- bun run --cwd "${repo}/packages/opencode" build --single
