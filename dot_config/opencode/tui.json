@@ -1,4 +1,7 @@
 {
   "$schema": "https://opencode.ai/tui.json",
+  "attention": {
+    "notifications": false
+  },
   "theme": "lucent-orng"
 }

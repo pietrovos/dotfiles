@@ -27,7 +27,8 @@ from Omarchy defaults when these files can be inspected.
 - OpenCode completion notifications identify the originating workspace and
   group tab. Question notifications show only that location, remain visible
   until clicked, focus that window when clicked, and use critical urgency for
-  red attention styling.
+  red attention styling. OpenCode's built-in TUI desktop notifications are
+  disabled so the custom notification is the only alert.
 - `SUPER+CTRL+ALT+C` toggles the active Codex CLI account between `primary`
   and `secondary` through `~/.local/bin/codex-account`. The selected login
   also supplies the Codex usage widget's rate limits; credentials remain
