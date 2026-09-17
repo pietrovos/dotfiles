@@ -29,9 +29,9 @@ from Omarchy defaults when these files can be inspected.
   until clicked, focus that window when clicked, and use critical urgency for
   red attention styling. OpenCode's built-in TUI desktop notifications are
   disabled so the custom notification is the only alert.
-- The cloned `pietrovos.notifications` shell service renders critical
-  notifications with an explicit red background and border, independent of
-  the active theme's urgent color.
+- The cloned `pietrovos.notifications` shell service renders only OpenCode
+  question notifications with an explicit red background and border,
+  independent of the active theme's urgent color.
 - `SUPER+CTRL+ALT+C` toggles the active Codex CLI account between `primary`
   and `secondary` through `~/.local/bin/codex-account`. The selected login
   also supplies the Codex usage widget's rate limits; credentials remain

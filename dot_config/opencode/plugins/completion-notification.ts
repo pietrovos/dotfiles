@@ -34,10 +34,10 @@ async function isFocused(window: HyprClient | undefined) {
   return active.address === window.address
 }
 
-async function notify(window: HyprClient | undefined, title: string, body?: string) {
+async function notify(window: HyprClient | undefined, title: string, body?: string, isQuestion = false) {
   const command = [
     "notify-send",
-    "--app-name=OpenCode",
+    `--app-name=${isQuestion ? "OpenCode Question" : "OpenCode"}`,
     "--urgency=critical",
     "--expire-time=0",
     title,
@@ -79,7 +79,7 @@ export const CompletionNotification: Plugin = async ({ client }) => ({
         : ""
 
       if (event.type === "question.asked") {
-        void notify(window, `Workspace ${workspace}${tab}`)
+        void notify(window, `Workspace ${workspace}${tab}`, undefined, true)
         return
       }
 

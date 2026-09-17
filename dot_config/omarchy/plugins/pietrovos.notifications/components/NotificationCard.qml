@@ -43,6 +43,7 @@ BorderSurface {
   readonly property bool summaryStartsWithGlyph: NotificationLogic.summaryStartsWithGlyph(summary)
   readonly property bool singleLineToast: sanitizedBody.length === 0
   readonly property bool collapseRedundantIcon: singleLineToast && !hasGlyph && summaryStartsWithGlyph
+  readonly property bool isOpenCodeQuestion: app === "OpenCode Question"
   readonly property string sanitizedBody: sanitizeBody(body)
   readonly property string styledBody: NotificationLogic.styledBody(body, app, appIcon)
 
@@ -50,7 +51,7 @@ BorderSurface {
   readonly property color bodyColor: Qt.darker(Color.notifications.text, 1.15)
   readonly property color criticalColor: "#ff3b4f"
   readonly property color criticalBackground: "#5a1720"
-  readonly property var cardBorderSpec: urgency === 2
+  readonly property var cardBorderSpec: isOpenCodeQuestion && urgency === 2
     ? Border.flat(criticalColor, Math.max(1, Style.space(2)))
     : Border.surfaceSpec("notifications", "border", Color.notifications.border, Math.max(1, Style.space(2)))
 
@@ -71,7 +72,7 @@ BorderSurface {
   // doesn't push content under the bottom edge.
   implicitHeight: mainColumn.implicitHeight + borderTop + borderBottom
   radius: cornerRadius
-  color: urgency === 2 ? criticalBackground : Color.notifications.background
+  color: isOpenCodeQuestion && urgency === 2 ? criticalBackground : Color.notifications.background
   borderSpec: cardBorderSpec
   clip: true
 
