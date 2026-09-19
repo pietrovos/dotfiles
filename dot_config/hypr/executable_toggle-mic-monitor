@@ -1,0 +1,21 @@
+#!/bin/sh
+
+card=Microphone
+control=3
+
+state=$(amixer -c "$card" cget numid=$control 2>/dev/null | sed -n 's/.*: values=//p')
+
+case "$state" in
+  on)
+    amixer -q -c "$card" cset numid=$control off || exit 1
+    notify-send -a "Microphone monitor" "Microphone monitoring off"
+    ;;
+  off)
+    amixer -q -c "$card" cset numid=$control on || exit 1
+    notify-send -a "Microphone monitor" "Microphone monitoring on"
+    ;;
+  *)
+    notify-send -a "Microphone monitor" -u critical "Yeti microphone not found"
+    exit 1
+    ;;
+esac

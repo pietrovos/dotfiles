@@ -36,6 +36,8 @@ from Omarchy defaults when these files can be inspected.
   and `secondary` through `~/.local/bin/codex-account`. The selected login
   also supplies the Codex usage widget's rate limits; credentials remain
   machine-local in `~/.local/share/codex-accounts/`.
+- `SUPER+SHIFT+V` toggles the Blue Yeti's zero-latency headphone monitoring
+  through `~/.config/hypr/toggle-mic-monitor`.
 
 ## Required Workflow
 
