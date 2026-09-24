@@ -58,6 +58,7 @@ for index = 1, 10 do
 end
 
 bind("mouse:275", "Dismiss last notification", "omarchy-shell notifications dismissOne")
+bind("mouse:276", "Invoke last notification", "omarchy-shell notifications invokeLast")
 
 -- Add extra bindings below.
 -- o.bind("SUPER + SHIFT + R", "SSH", "alacritty -e ssh your-server")
