@@ -38,6 +38,8 @@ from Omarchy defaults when these files can be inspected.
   machine-local in `~/.local/share/codex-accounts/`.
 - `SUPER+SHIFT+V` toggles the Blue Yeti's zero-latency headphone monitoring
   through `~/.config/hypr/toggle-mic-monitor`.
+- The rear side mouse button (`mouse:275`) dismisses the last notification,
+  matching Omarchy's `SUPER+comma` binding.
 
 ## Required Workflow
 

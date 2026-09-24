@@ -57,6 +57,8 @@ for index = 1, 10 do
   bind("ALT + SHIFT + " .. key, "Move group window to position " .. index, "/home/pietrovos/.config/hypr/reorder-group-window " .. index)
 end
 
+bind("mouse:275", "Dismiss last notification", "omarchy-shell notifications dismissOne")
+
 -- Add extra bindings below.
 -- o.bind("SUPER + SHIFT + R", "SSH", "alacritty -e ssh your-server")
 
