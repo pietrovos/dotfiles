@@ -16,8 +16,8 @@ from Omarchy defaults when these files can be inspected.
   `~/.config/omarchy/shell.json`.
 - Hyprland's in-window group bar is disabled in
   `~/.config/hypr/looknfeel.lua`.
-- New group windows append at the end because
-  `group.insert_after_current = false` is set in `looknfeel.lua`.
+- New group windows appear immediately to the right of the active member because
+  `group.insert_after_current = true` is set in `looknfeel.lua`.
 - `SUPER+G` toggles window grouping. `ALT+G` moves the active window out of a
   group. `ALT+1` through `ALT+0` select group members 1 through 10 with no
   action when the requested position is absent. `ALT+SHIFT+1` through
