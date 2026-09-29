@@ -57,6 +57,8 @@ for index = 1, 10 do
   bind("ALT + SHIFT + " .. key, "Move group window to position " .. index, "/home/pietrovos/.config/hypr/reorder-group-window " .. index)
 end
 
+bind("SUPER + ALT + N", "Name group subspace", "/home/pietrovos/.config/hypr/rename-group-subspace")
+
 bind("mouse:275", "Dismiss last notification", "omarchy-shell notifications dismissOne")
 bind("mouse:276", "Invoke last notification", "omarchy-shell notifications invokeLast")
 

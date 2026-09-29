@@ -12,7 +12,17 @@ BarWidget {
 
   property var members: []
   property int activeIndex: -1
+  property int activeWorkspaceId: -1
+  property var names: ({})
   readonly property real leadingGap: Style.spaceReal(14)
+
+  readonly property string stateDir: (Quickshell.env("XDG_STATE_HOME") || (Quickshell.env("HOME") + "/.local/state")) + "/omarchy"
+  readonly property string namesPath: stateDir + "/group-subspaces.json"
+  readonly property string subspaceName: {
+    var value = names[String(activeWorkspaceId)]
+    return value === undefined || value === null ? "" : String(value)
+  }
+  readonly property real labelGap: subspaceName !== "" ? Style.spaceReal(1.5) : 0
 
   function refresh() {
     if (!groupProbe.running) groupProbe.running = true
@@ -24,15 +34,27 @@ BarWidget {
       if (!active.address) {
         members = []
         activeIndex = -1
+        activeWorkspaceId = -1
         return
       }
 
+      activeWorkspaceId = active.workspace ? active.workspace.id : -1
       var grouped = active.grouped || []
       members = grouped
       activeIndex = grouped.indexOf(active.address)
     } catch (error) {
       members = []
       activeIndex = -1
+      activeWorkspaceId = -1
+    }
+  }
+
+  function loadNames(content) {
+    try {
+      var parsed = JSON.parse(String(content || "{}"))
+      names = parsed && typeof parsed === "object" ? parsed : ({})
+    } catch (error) {
+      names = ({})
     }
   }
 
@@ -43,7 +65,7 @@ BarWidget {
   }
 
   visible: members.length > 0 && !vertical
-  implicitWidth: visible ? leadingGap + tabGroup.implicitWidth : 0
+  implicitWidth: visible ? leadingGap + tabGroup.implicitWidth + labelGap + subspaceLabel.implicitWidth : 0
   implicitHeight: root.barSize
 
   Process {
@@ -76,6 +98,28 @@ BarWidget {
         root.refresh()
       }
     }
+  }
+
+  FileView {
+    id: namesFile
+    path: root.namesPath
+    watchChanges: true
+    printErrors: false
+    onFileChanged: reload()
+    onLoaded: root.loadNames(text())
+    onLoadFailed: root.names = ({})
+  }
+
+  Text {
+    id: subspaceLabel
+    visible: root.subspaceName !== ""
+    text: root.subspaceName
+    x: tabGroup.x + tabGroup.width + root.labelGap
+    anchors.verticalCenter: parent.verticalCenter
+    color: root.bar ? root.bar.barForeground : Color.foreground
+    opacity: 0.85
+    font.family: Style.font.family
+    font.pixelSize: Style.font.body
   }
 
   Item {
