@@ -1,6 +1,10 @@
 # School projects: resume/portfolio candidate inventory
 
-Inspected 2026-09-29 under `~/school/`. Relative paths below start at `~/school/`. This inventory is for choosing future projects, not an assertion that any candidate has been published, tested end-to-end, or finished to portfolio standard. Check current code and public repo before including one in a tailored resume. The default resume already features JobPilot, Smart Scheduler, and the published Firefighting Drone Swarm; favor them unless a school project is a better verified match.
+Inspected 2026-09-29 under `~/school/`, with the additional team GitHub repository below supplied by the user. Relative local paths below start at `~/school/`. This inventory is for choosing future projects, not an assertion that every candidate has been tested end-to-end or finished to portfolio standard. Check current code and public repo before including one in a tailored resume. The default resume already features JobPilot, Smart Scheduler, and the published Firefighting Drone Swarm; favor them unless another project is a better verified match.
+
+## Existing team repository outside `~/school/`
+
+- **[Amazin Online Bookstore](https://github.com/Oct4ve/Amazin-Online-Bookstore)** — a public, four-contributor Java/Spring Boot/Thymeleaf bookstore with book inventory, accounts, cart and checkout UI. Important candidate for Java/Spring/full-stack tailoring; this was missed by the original local-only survey and is much more substantial than the SYSC 4806 address-book lab. Pietro's `pietrovos` commits include a book-title search form and controller endpoints (`ea2bfb84`), error page/handling (`5fac8d2f`), controller/cart tests (`988daa46`), and Maven CI workflow (`e4854137`). PR #23 added a Jaccard book-recommendation feature but was reverted by merged PR #28; do **not** present recommendations as a current feature. Do not credit Pietro for other teammates' checkout, login, or inventory implementations. Current `master` compares raw passwords and the checkout code has duplicate flows and no real payment gateway; clarify that "purchase" is an in-app checkout, not payment integration. Verify a working build/tests and specific contribution paths before using a bullet; an accurate team-project bullet could focus on search, error handling, tests, and CI if still functioning. Repo README describes previous purchases although `PreviousPurchase` is absent on `master`; verify claims against current code.
 
 ## Highest return on polish
 
@@ -24,6 +28,6 @@ Inspected 2026-09-29 under `~/school/`. Relative paths below start at `~/school/
 
 ## Tailoring rules
 
-- Match to role: algorithms/optimization → DVFS or pathfinding; ML/security → intrusion classifier after reproducibility and evaluation fixes; SQL/backend → gym after repair; Java GUI → UNO with team attribution; Linux/C → FIFO app; Spring → expanded address book. Consider impact and readiness against the three existing default-resume projects before replacing one.
+- Match to role: Java/Spring/full-stack → Amazin Online Bookstore with Pietro's attributable work; algorithms/optimization → DVFS or pathfinding; ML/security → intrusion classifier after reproducibility and evaluation fixes; SQL/backend → gym after repair; Java GUI → UNO with team attribution; Linux/C → FIFO app. Consider impact and readiness against the three existing default-resume projects before replacing one.
 - For any candidate: verify source/tests and ownership, confirm repo publication and URL, and exclude passwords, personal/student details, dataset files without redistribution rights, course handouts, binaries, ZIP duplicates and virtual environments before publication. These are publication steps, not claims of work already done.
 - Never invent a URL, a passing test, a measured outcome, or a completed enhancement. If not yet ready, note the candidate and concrete improvement work in the posting record; keep the resume truthful.
