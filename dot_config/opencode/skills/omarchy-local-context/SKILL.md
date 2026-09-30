@@ -24,6 +24,13 @@ from Omarchy defaults when these files can be inspected.
   `ALT+SHIFT+0` move the active member to positions 1 through 10 via
   `~/.config/hypr/reorder-group-window`. `SUPER+SHIFT+R` opens the custom OpenCode build in the
   current terminal directory via `~/.config/hypr/opencode-duplicate`.
+- `SUPER+ALT+N` names the focused group's subspace through
+  `~/.config/hypr/rename-group-subspace`, which prompts with
+  `omarchy-menu-input`. The name is keyed to the active window's workspace and
+  persisted in `$XDG_STATE_HOME/omarchy/group-subspaces.json` (excluding the
+  name clears it; cancelling keeps it). `pietrovos.group-tabs` watches that
+  file and renders the name just right of the numbered tabs, shifted right as
+  members are added.
 - OpenCode completion notifications identify the originating workspace and
   group tab. Question notifications show only that location, remain visible
   until clicked, focus that window when clicked, and use critical urgency for

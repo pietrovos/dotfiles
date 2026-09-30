@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# Name the window-group "subspace" that the group tabs represent in the bar.
+# The name is keyed to the active window's workspace and persisted under
+# XDG_STATE_HOME so it survives shell restarts. Cancelling keeps the current
+# name; entering nothing clears it.
+
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/omarchy"
+state_file="$state_dir/group-subspaces.json"
+
+active=$(hyprctl activewindow -j) || exit 1
+address=$(printf '%s' "$active" | jq -r '.address // empty')
+members=$(printf '%s' "$active" | jq -r '(.grouped // []) | length')
+workspace=$(printf '%s' "$active" | jq -r '.workspace.id // empty')
+
+# Only a focused grouped window carries a subspace to name.
+[ -n "$address" ] && [ "$members" -gt 0 ] && [ -n "$workspace" ] || exit 0
+
+current=$(jq -r --arg w "$workspace" '.[$w] // empty' "$state_file" 2>/dev/null)
+if [ -n "$current" ]; then
+  prompt="Rename subspace on workspace $workspace ($current)"
+else
+  prompt="Name subspace on workspace $workspace"
+fi
+
+name=$(omarchy-menu-input "$prompt") || exit 0
+
+mkdir -p "$state_dir"
+[ -s "$state_file" ] || printf '{}\n' > "$state_file"
+
+tmp=$(mktemp "$state_dir/group-subspaces.XXXXXX") || exit 1
+if [ -n "$name" ]; then
+  jq --arg w "$workspace" --arg n "$name" '. + {($w): $n}' "$state_file" > "$tmp" || { rm -f "$tmp"; exit 1; }
+else
+  jq --arg w "$workspace" 'del(.[$w])' "$state_file" > "$tmp" || { rm -f "$tmp"; exit 1; }
+fi
+mv "$tmp" "$state_file"
