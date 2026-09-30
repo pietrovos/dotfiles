@@ -1,0 +1,4 @@
+#!/bin/sh
+# External links get a fresh window on the current workspace instead of
+# activating a Chromium window on another workspace.
+exec /usr/bin/chromium --new-window "$@"

@@ -10,6 +10,12 @@ from Omarchy defaults when these files can be inspected.
 
 ## Current Customizations
 
+- The user override `~/.local/share/applications/chromium.desktop` launches
+  `~/.local/bin/chromium-workspace`, which passes `--new-window` to Chromium.
+  External links (including terminal links and dev-server default-browser
+  launches) open a new window in the current workspace. Omarchy browser
+  shortcuts also use this launcher; its distinct name avoids Omarchy's
+  cross-workspace focus helper matching an older Chromium window.
 - Group controls render in the top bar through
   `~/.config/omarchy/plugins/pietrovos.group-tabs/`.
 - The widget is placed after `pietrovos.workspaces` in
