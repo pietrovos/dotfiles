@@ -10,6 +10,17 @@ from Omarchy defaults when these files can be inspected.
 
 ## Current Customizations
 
+- Custom OpenCode updates are automated by the user timer
+  `opencode-custom-update.timer` (daily 04:00, up to 30 minutes of jitter,
+  catch-up enabled). `~/.local/bin/opencode-custom-update` merges upstream
+  `origin/dev` plus the tracked local patch from `~/projects/opencode-custom`
+  in a private worktree, then checks, tests, and builds before atomically
+  installing in `~/.local/share/opencode-custom/bin/`. The source checkout
+  is not committed or modified. `~/.local/bin/opencode` uses this installed
+  binary with a fallback to the original source build and disables the
+  upstream auto-updater. Failures notify without replacing the installed
+  binary; `opencode-custom-update --rollback` restores the previous build.
+  See `~/.config/opencode-custom-updater/README.md` for commands and paths.
 - The user override `~/.local/share/applications/chromium.desktop` launches
   `~/.local/bin/chromium-workspace`, which passes `--new-window` to Chromium.
   External links (including terminal links and dev-server default-browser

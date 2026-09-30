@@ -1,2 +1,7 @@
 #!/bin/bash
-exec "${HOME}/projects/opencode-custom/packages/opencode/dist/opencode-linux-x64/bin/opencode" "$@"
+export OPENCODE_DISABLE_AUTOUPDATE=1
+binary="${XDG_DATA_HOME:-${HOME}/.local/share}/opencode-custom/bin/opencode"
+if [[ ! -x "$binary" ]]; then
+  binary="${HOME}/projects/opencode-custom/packages/opencode/dist/opencode-linux-x64/bin/opencode"
+fi
+exec "$binary" "$@"
