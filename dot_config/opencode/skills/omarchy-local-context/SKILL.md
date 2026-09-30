@@ -43,6 +43,13 @@ from Omarchy defaults when these files can be inspected.
   current terminal directory via `~/.config/hypr/opencode-duplicate`.
 - `SUPER+ESC` always switches to workspace 6 (overriding Omarchy's default
   System menu) via `~/.config/hypr/bindings.lua`.
+- `SUPER+CTRL+SHIFT+1` through `SUPER+CTRL+SHIFT+0` swap the current
+  workspace with workspaces 1 through 10 in `bindings.lua`. Native
+  `hl.dispatch(hl.dsp.workspace.change_id(...))` calls exchange whole
+  workspace IDs through an unused temporary ID, preserving layout trees,
+  window sizes and groups. Focus follows the original windows to the new
+  number. An unused destination receives the current workspace; the current
+  number and an open special workspace are no-ops.
 - `SUPER+ALT+N` names the focused group's subspace through
   `~/.config/hypr/rename-group-subspace`, which prompts with
   `omarchy-menu-input`. The name is keyed to the active window's workspace and

@@ -68,11 +68,11 @@ local function swap_workspace(target)
     while occupied[temporary] do
       temporary = temporary + 1
     end
-    hl.dsp.workspace.change_id({ workspace = tostring(target), id = temporary })()
-    hl.dsp.workspace.change_id({ workspace = tostring(source), id = target })()
-    hl.dsp.workspace.change_id({ workspace = tostring(temporary), id = source })()
+    hl.dispatch(hl.dsp.workspace.change_id({ workspace = tostring(target), id = temporary }))
+    hl.dispatch(hl.dsp.workspace.change_id({ workspace = tostring(source), id = target }))
+    hl.dispatch(hl.dsp.workspace.change_id({ workspace = tostring(temporary), id = source }))
   else
-    hl.dsp.workspace.change_id({ workspace = tostring(source), id = target })()
+    hl.dispatch(hl.dsp.workspace.change_id({ workspace = tostring(source), id = target }))
   end
 end
 
