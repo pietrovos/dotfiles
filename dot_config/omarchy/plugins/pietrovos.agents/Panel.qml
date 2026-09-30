@@ -42,7 +42,7 @@ Panel {
 
   readonly property var limits: limitWindows(provider)
   readonly property var models: modelRows(provider)
-  readonly property var headline: bindingWindow(provider)
+  readonly property var headline: fiveHourWindow(provider)
   readonly property var balance: provider ? (provider.balance || null) : null
   // A prepaid account runs low the way a subscription window fills up: the
   // last 10% of the funded credits lights the same alarm.
@@ -125,15 +125,16 @@ Panel {
     return out
   }
 
-  // The window that decides how much room is left — the fullest one, since
-  // that is what stops the next prompt.
-  function bindingWindow(p) {
-    var windows = limitWindows(p)
-    var best = null
-    for (var i = 0; i < windows.length; i++) {
-      if (!best || windows[i].percent > best.percent) best = windows[i]
+  // The bar always follows the five-hour window, regardless of weekly usage.
+  function fiveHourWindow(p) {
+    var list = p ? (p.limits || []) : []
+    for (var i = 0; i < list.length; i++) {
+      var entry = list[i] || {}
+      var percent = Number(entry.percent)
+      if (windowSpanMs(entry.label) === 5 * 3600 * 1000 && percent >= 0)
+        return limitWindow(entry.label, percent, entry.resetsAt, "5h")
     }
-    return best
+    return null
   }
 
   function resetMsFor(w) {

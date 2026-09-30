@@ -44,8 +44,9 @@ from Omarchy defaults when these files can be inspected.
 - The Agents usage widget is the clone `pietrovos.agents` (in `shell.json`,
   replacing `omarchy.agents`). Its bar control is a percentage meter instead
   of the stock robot icon: a rounded track filled to the selected provider's
-  binding usage, labelled with the rounded percent, tooltipped with the
-  provider and window. Balance-funded providers fill from remaining credit.
+  five-hour usage only, labelled with the rounded percent, tooltipped with the
+  provider and 5h window. Weekly usage never drives the bar percentage.
+  Balance-funded providers fill from remaining credit.
   With no provider chosen the bar defaults to the first provider that has rate
   limits (Codex here), not index 0.
 - `SUPER+CTRL+ALT+C` toggles the active Codex CLI account between `primary`
