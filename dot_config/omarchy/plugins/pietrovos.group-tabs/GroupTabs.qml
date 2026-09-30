@@ -22,7 +22,7 @@ BarWidget {
     var value = names[String(activeWorkspaceId)]
     return value === undefined || value === null ? "" : String(value)
   }
-  readonly property real labelGap: subspaceName !== "" ? Style.spaceReal(1.5) : 0
+  readonly property real labelGap: subspaceName !== "" ? Style.spaceReal(-1) : 0
 
   function refresh() {
     if (!groupProbe.running) groupProbe.running = true
@@ -65,7 +65,7 @@ BarWidget {
   }
 
   visible: members.length > 0 && !vertical
-  implicitWidth: visible ? leadingGap + tabGroup.implicitWidth + labelGap + subspaceLabel.implicitWidth : 0
+  implicitWidth: visible ? leadingGap + tabGroup.implicitWidth + labelGap + labelBox.implicitWidth : 0
   implicitHeight: root.barSize
 
   Process {
@@ -110,18 +110,6 @@ BarWidget {
     onLoadFailed: root.names = ({})
   }
 
-  Text {
-    id: subspaceLabel
-    visible: root.subspaceName !== ""
-    text: root.subspaceName
-    x: tabGroup.x + tabGroup.width + root.labelGap
-    anchors.verticalCenter: parent.verticalCenter
-    color: root.bar ? root.bar.barForeground : Color.foreground
-    opacity: 0.85
-    font.family: Style.font.family
-    font.pixelSize: Style.font.body
-  }
-
   Item {
     id: tabGroup
     x: root.leadingGap
@@ -160,6 +148,34 @@ BarWidget {
           onPressed: root.focusMember(index + 1)
         }
       }
+    }
+  }
+
+  Item {
+    id: labelBox
+    visible: root.subspaceName !== ""
+    x: tabGroup.x + tabGroup.width + root.labelGap
+    anchors.verticalCenter: parent.verticalCenter
+    implicitWidth: subspaceLabel.implicitWidth + Style.space(4)
+    implicitHeight: root.barSize - Style.space(2)
+    width: implicitWidth
+    height: implicitHeight
+
+    Rectangle {
+      anchors.fill: parent
+      color: root.bar ? root.bar.barForeground : Color.foreground
+      radius: Math.min(Style.cornerRadius, height / 2)
+      opacity: 0.12
+    }
+
+    Text {
+      id: subspaceLabel
+      anchors.centerIn: parent
+      text: root.subspaceName
+      color: root.bar ? root.bar.barForeground : Color.foreground
+      opacity: 0.85
+      font.family: Style.font.family
+      font.pixelSize: Style.font.body
     }
   }
 }
