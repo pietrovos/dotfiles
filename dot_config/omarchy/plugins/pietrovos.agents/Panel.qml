@@ -362,8 +362,10 @@ Panel {
     bar: root.bar
     text: root.barPercentText
     fontFamily: root.fontFamily
-    active: root.alarming
-    fixedWidth: Style.space(52)
+    // Keep the normal bar text color even when a limit is alarming, so the
+    // number matches the other bar widgets instead of switching to the urgent
+    // accent. The panel still carries the alarm styling.
+    useActiveColor: false
     tooltipText: root.barTooltip
     onPressed: function(buttonCode) {
       if (buttonCode === Qt.RightButton) root.launchAgent()
