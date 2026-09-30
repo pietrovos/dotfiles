@@ -48,6 +48,42 @@ bind("SUPER + SHIFT + ALT + X", "X Post", { webapp = "https://x.com/compose/post
 bind("SUPER + SHIFT + I", "Install Theme menu", "omarchy-launch-tui omarchy-theme-install")
 bind("SUPER + CTRL + ALT + C", "Toggle Codex account", "/home/pietrovos/.local/bin/codex-account toggle")
 
+-- Swap whole workspace IDs, preserving their layout trees, groups and sizes.
+-- Focus follows the original workspace to its new number. An unused destination
+-- simply receives the current workspace; selecting the current number is a no-op.
+local function swap_workspace(target)
+  local current = hl.get_active_workspace()
+  if not current or current.id <= 0 or current.id == target or hl.get_active_special_workspace() then
+    return
+  end
+
+  local source = current.id
+  local occupied = {}
+  for _, workspace in ipairs(hl.get_workspaces()) do
+    occupied[workspace.id] = true
+  end
+
+  if occupied[target] then
+    local temporary = 11
+    while occupied[temporary] do
+      temporary = temporary + 1
+    end
+    hl.dsp.workspace.change_id({ workspace = tostring(target), id = temporary })()
+    hl.dsp.workspace.change_id({ workspace = tostring(source), id = target })()
+    hl.dsp.workspace.change_id({ workspace = tostring(temporary), id = source })()
+  else
+    hl.dsp.workspace.change_id({ workspace = tostring(source), id = target })()
+  end
+end
+
+for index = 1, 10 do
+  local target = index
+  local key = index == 10 and "0" or tostring(index)
+  bind("SUPER + CTRL + SHIFT + " .. key, "Swap workspace with " .. index, function()
+    swap_workspace(target)
+  end)
+end
+
 -- Grouped-window tabs: Alt+1 through Alt+0 select positions 1 through 10.
 for index = 1, 10 do
   if index <= 5 then
