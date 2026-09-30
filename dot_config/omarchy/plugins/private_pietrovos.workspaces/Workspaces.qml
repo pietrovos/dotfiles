@@ -8,6 +8,26 @@ BarWidget {
   id: root
   moduleName: "omarchy.workspaces"
 
+  // Changing workspace IDs keeps focus on the same windows, so Hyprland emits
+  // changeworkspaceid without a normal workspace-switch event. Refresh the
+  // cached workspace, monitor focus and window membership after the whole swap.
+  Connections {
+    target: Hyprland
+    function onRawEvent(event) {
+      if (event.name === "changeworkspaceid") workspaceRefresh.restart()
+    }
+  }
+
+  Timer {
+    id: workspaceRefresh
+    interval: 30
+    onTriggered: {
+      Hyprland.refreshWorkspaces()
+      Hyprland.refreshMonitors()
+      Hyprland.refreshToplevels()
+    }
+  }
+
   function workspaceById(id) {
     var values = Hyprland.workspaces.values
     for (var i = 0; i < values.length; i++) {

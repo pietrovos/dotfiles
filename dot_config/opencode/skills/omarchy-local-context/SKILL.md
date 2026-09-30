@@ -43,6 +43,11 @@ from Omarchy defaults when these files can be inspected.
   current terminal directory via `~/.config/hypr/opencode-duplicate`.
 - `SUPER+ESC` always switches to workspace 6 (overriding Omarchy's default
   System menu) via `~/.config/hypr/bindings.lua`.
+- `SUPER+CTRL+SHIFT+1` through `SUPER+CTRL+SHIFT+0` swap whole workspace
+  IDs (1 through 10), preserving layouts and following the original windows,
+  via `bindings.lua`. The cloned `pietrovos.workspaces/Workspaces.qml` listens
+  for `changeworkspaceid` and debounces refreshes of Quickshell's workspace,
+  monitor and toplevel state so the bar immediately highlights the new number.
 - `SUPER+CTRL+SHIFT+1` through `SUPER+CTRL+SHIFT+0` swap the current
   workspace with workspaces 1 through 10 in `bindings.lua`. Native
   `hl.dispatch(hl.dsp.workspace.change_id(...))` calls exchange whole
