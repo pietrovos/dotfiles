@@ -1,0 +1,227 @@
+#!/usr/bin/env python3
+"""Build upstream updates in a private worktree without changing the custom branch."""
+
+import argparse
+import datetime
+import fcntl
+import hashlib
+import json
+import os
+from pathlib import Path
+import shlex
+import shutil
+import subprocess
+import sys
+
+
+HOME = Path.home()
+SOURCE = Path(os.environ.get("OPENCODE_UPDATE_SOURCE", HOME / "projects/opencode-custom")).resolve()
+STATE = Path(os.environ.get("XDG_STATE_HOME", HOME / ".local/state")) / "opencode-custom-updater"
+DATA = Path(os.environ.get("XDG_DATA_HOME", HOME / ".local/share")) / "opencode-custom/bin"
+WORK = STATE / "worktree"
+LOG = None
+
+
+def log(message):
+    print(message, flush=True)
+    if LOG:
+        LOG.write(message + "\n")
+        LOG.flush()
+
+
+def run(arguments, cwd=None, capture=False, env=None):
+    log("$ " + shlex.join(map(str, arguments)))
+    if capture:
+        result = subprocess.run(arguments, cwd=cwd, env=env, capture_output=True)
+        if result.stderr:
+            log(result.stderr.decode(errors="replace").rstrip())
+        if result.returncode:
+            log(result.stdout.decode(errors="replace").rstrip())
+            raise RuntimeError(f"Command failed ({result.returncode}): {shlex.join(map(str, arguments))}")
+        return result.stdout.decode(errors="surrogateescape")
+    with subprocess.Popen(arguments, cwd=cwd, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT) as process:
+        for line in process.stdout:
+            log(line.decode(errors="replace").rstrip())
+        if process.wait():
+            raise RuntimeError(f"Command failed ({process.returncode}): {shlex.join(map(str, arguments))}")
+
+
+def git(directory, *arguments):
+    return run(["git", "-C", str(directory), *arguments], capture=True)
+
+
+def read_json(path):
+    return json.loads(path.read_text()) if path.exists() else None
+
+
+def write_json(path, value):
+    temporary = path.with_name(path.name + ".new")
+    temporary.write_text(json.dumps(value, indent=2) + "\n")
+    temporary.replace(path)
+
+
+def snapshot():
+    if git(SOURCE, "ls-files", "--others", "--exclude-standard").strip():
+        raise RuntimeError("The source has untracked files. Track custom source files before updating.")
+    for ref in ("MERGE_HEAD", "CHERRY_PICK_HEAD", "REVERT_HEAD", "rebase-merge", "rebase-apply"):
+        path = Path(git(SOURCE, "rev-parse", "--git-path", ref).strip())
+        if not path.is_absolute():
+            path = SOURCE / path
+        if path.exists():
+            raise RuntimeError(f"The source has an unfinished Git operation ({ref}).")
+    head = git(SOURCE, "rev-parse", "HEAD").strip()
+    patch = git(SOURCE, "diff", "--binary", "--full-index", "HEAD", "--")
+    if head != git(SOURCE, "rev-parse", "HEAD").strip():
+        raise RuntimeError("Source HEAD changed while capturing customizations; retry later.")
+    return head, patch
+
+
+def notify(title, message, failed=False):
+    if not ARGS.no_notify and shutil.which("notify-send"):
+        subprocess.run(["notify-send", "--app-name=OpenCode updater", "--urgency=" + ("critical" if failed else "normal"), title, message], check=False)
+
+
+def prepare(head, patch, upstream):
+    marker = STATE / "worktree-owner.json"
+    if WORK.exists():
+        if read_json(marker) != {"source": str(SOURCE), "worktree": str(WORK)}:
+            raise RuntimeError("Refusing to reset an unrecognized updater worktree.")
+        registered = git(SOURCE, "worktree", "list", "--porcelain")
+        if f"worktree {WORK}\n" not in registered:
+            raise RuntimeError("Updater worktree is no longer registered with the custom source.")
+        if Path(git(WORK, "rev-parse", "--show-toplevel").strip()).resolve() != WORK.resolve():
+            raise RuntimeError("Updater worktree path does not match its Git root.")
+        git(WORK, "reset", "--hard", head)
+        git(WORK, "clean", "-fd")
+    else:
+        git(SOURCE, "worktree", "add", "--detach", str(WORK), head)
+        write_json(marker, {"source": str(SOURCE), "worktree": str(WORK)})
+    patch_file = STATE / "local-customizations.patch"
+    patch_file.write_bytes(patch.encode(errors="surrogateescape"))
+    # No merge commit is created: the original branch and index stay untouched.
+    run(["git", "-C", str(WORK), "-c", "core.hooksPath=/dev/null", "merge", "--no-commit", "--no-ff", upstream])
+    if patch:
+        run(["git", "-C", str(WORK), "apply", "--3way", "--index", str(patch_file)])
+    if git(WORK, "diff", "--name-only", "--diff-filter=U").strip():
+        raise RuntimeError("Merge conflicts remain in the isolated updater worktree.")
+
+
+def install(binary, metadata):
+    DATA.mkdir(parents=True, exist_ok=True)
+    current = DATA / "opencode"
+    previous = DATA / "opencode.previous"
+    old = current if current.exists() else SOURCE / "packages/opencode/dist/opencode-linux-x64/bin/opencode"
+    if not old.is_file():
+        raise RuntimeError("Cannot find the existing binary to preserve for rollback.")
+    # Copy then rename; never overwrite the executable inode used by a live session.
+    shutil.copy2(old, DATA / "opencode.previous.new")
+    (DATA / "opencode.previous.new").replace(previous)
+    write_json(DATA / "previous.json", read_json(DATA / "installed.json") or {"version": "original local build", "source": str(SOURCE)})
+    shutil.copy2(binary, DATA / "opencode.new")
+    (DATA / "opencode.new").chmod(0o755)
+    (DATA / "opencode.new").replace(current)
+    write_json(DATA / "installed.json", metadata)
+
+
+def rollback():
+    current, previous = DATA / "opencode", DATA / "opencode.previous"
+    if not current.is_file() or not previous.is_file():
+        raise RuntimeError("No installed update and previous binary are available for rollback.")
+    current_metadata = read_json(DATA / "installed.json")
+    previous_metadata = read_json(DATA / "previous.json")
+    shutil.copy2(previous, DATA / "opencode.rollback")
+    current.replace(previous)
+    (DATA / "opencode.rollback").replace(current)
+    write_json(DATA / "installed.json", previous_metadata or {})
+    write_json(DATA / "previous.json", current_metadata or {})
+    # A rollback remains in effect until the next upstream or local source change.
+    write_json(STATE / "rollback.json", {"fingerprint": (current_metadata or {}).get("fingerprint")})
+    log("Restored the previous binary. Restart OpenCode to use it.")
+
+
+def update():
+    head, patch = snapshot()
+    git(SOURCE, "fetch", "--no-tags", "origin", "dev")
+    upstream = git(SOURCE, "rev-parse", "origin/dev").strip()
+    fingerprint = hashlib.sha256((str(SOURCE) + head + upstream + patch).encode(errors="surrogateescape")).hexdigest()
+    installed = read_json(DATA / "installed.json") or {}
+    blocked = read_json(STATE / "rollback.json") or {}
+    if not ARGS.force and not ARGS.check and fingerprint in (installed.get("fingerprint"), blocked.get("fingerprint")):
+        log("No new upstream or local changes to install.")
+        return
+    log(f"Custom source {head[:12]}, upstream dev {upstream[:12]}; preserving local patch ({len(patch)} characters).")
+    prepare(head, patch, upstream)
+    if ARGS.check:
+        log("Upstream merges cleanly and local customizations apply. No build or installation performed.")
+        return
+    package = read_json(WORK / "package.json")
+    pin = package["packageManager"].removeprefix("bun@")
+    env = os.environ.copy()
+    # Dependency preparation must not reconfigure hooks in the shared source repo.
+    env["HUSKY"] = "0"
+    current_bun = run(["bun", "--version"], capture=True).strip()
+    if current_bun != pin:
+        run(["mise", "install", f"bun@{pin}"])
+        location = run(["mise", "where", f"bun@{pin}"], capture=True).strip()
+        env["PATH"] = str(Path(location) / "bin") + os.pathsep + env["PATH"]
+    env.pop("OPENCODE_RELEASE", None)
+    env.pop("OPENCODE_BUMP", None)
+    env["OPENCODE_CHANNEL"] = "custom-tui"
+    version = read_json(WORK / "packages/opencode/package.json")["version"]
+    env["OPENCODE_VERSION"] = f"{version}-custom.{upstream[:8]}.{fingerprint[:6]}"
+    run(["bun", "install", "--frozen-lockfile"], cwd=WORK, env=env)
+    for package_name in ("tui", "opencode"):
+        run(["bun", "typecheck"], cwd=WORK / "packages" / package_name, env=env)
+    run(["bun", "test", "--timeout", "30000", "--only-failures"], cwd=WORK / "packages/tui", env=env)
+    run(["bun", "run", "packages/opencode/script/build.ts", "--single", "--skip-install", "--skip-embed-web-ui"], cwd=WORK, env=env)
+    binary = WORK / "packages/opencode/dist/opencode-linux-x64/bin/opencode"
+    actual_version = run([str(binary), "--version"], capture=True, env=env).strip()
+    if actual_version != env["OPENCODE_VERSION"]:
+        raise RuntimeError(f"Built binary version mismatch: {actual_version}")
+    run([str(binary), "--help"], capture=True, env=env)
+    if snapshot() != (head, patch):
+        raise RuntimeError("Local source changed during the build. Installation skipped; retry later.")
+    install(binary, {"source": str(SOURCE), "head": head, "upstream": upstream, "fingerprint": fingerprint, "version": actual_version, "installed_at": datetime.datetime.now(datetime.timezone.utc).isoformat()})
+    log(f"Installed {actual_version}. Previous build retained; running sessions are unaffected.")
+    notify("Custom OpenCode updated", f"Installed upstream {upstream[:8]}. New sessions use the update; restart existing sessions when convenient.")
+
+
+def main():
+    global LOG
+    if ARGS.status:
+        print(json.dumps({"installed": read_json(DATA / "installed.json"), "last_run": read_json(STATE / "last-run.json"), "rollback_hold": read_json(STATE / "rollback.json"), "log": str(STATE / "latest.log")}, indent=2))
+        return 0
+    STATE.mkdir(parents=True, exist_ok=True)
+    STATE.chmod(0o700)
+    with (STATE / "update.lock").open("w") as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            print("Another custom OpenCode update is already running.")
+            return 0
+        with (STATE / "latest.log").open("w") as output:
+            LOG = output
+            try:
+                if ARGS.rollback:
+                    rollback()
+                else:
+                    update()
+                write_json(STATE / "last-run.json", {"result": "ok", "mode": "rollback" if ARGS.rollback else "check" if ARGS.check else "update", "time": datetime.datetime.now(datetime.timezone.utc).isoformat()})
+                return 0
+            except (RuntimeError, OSError, KeyError, ValueError) as error:
+                log(f"Update stopped: {error}")
+                write_json(STATE / "last-run.json", {"result": "failed", "error": str(error), "time": datetime.datetime.now(datetime.timezone.utc).isoformat()})
+                notify("Custom OpenCode update needs attention", f"{error}\nInstalled build kept. Log: {STATE / 'latest.log'}", failed=True)
+                return 1
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    modes = parser.add_mutually_exclusive_group()
+    modes.add_argument("--check", action="store_true", help="fetch and check merge/customizations without building or installing")
+    modes.add_argument("--status", action="store_true", help="show installed version and last update result")
+    modes.add_argument("--rollback", action="store_true", help="restore previous binary and hold this update until source changes")
+    parser.add_argument("--force", action="store_true", help="rebuild even if inputs are unchanged or rolled back")
+    parser.add_argument("--no-notify", action="store_true", help="suppress desktop notifications")
+    ARGS = parser.parse_args()
+    sys.exit(main())

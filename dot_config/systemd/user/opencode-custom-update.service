@@ -1,0 +1,12 @@
+[Unit]
+Description=Merge, check, and rebuild Pietro's custom OpenCode
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/opencode-custom-update
+TimeoutStartSec=45min
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+UMask=0077

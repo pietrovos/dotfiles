@@ -1,0 +1,11 @@
+[Unit]
+Description=Check for custom OpenCode updates every day
+
+[Timer]
+OnCalendar=*-*-* 04:00:00
+Persistent=true
+RandomizedDelaySec=30min
+Unit=opencode-custom-update.service
+
+[Install]
+WantedBy=timers.target
