@@ -59,11 +59,15 @@ from Omarchy defaults when these files can be inspected.
   number and an open special workspace are no-ops.
 - `SUPER+ALT+N` names the focused group's subspace through
   `~/.config/hypr/rename-group-subspace`, which prompts with
-  `omarchy-menu-input`. The name is keyed to the active window's workspace and
-  persisted in `$XDG_STATE_HOME/omarchy/group-subspaces.json` (excluding the
-  name clears it; cancelling keeps it). `pietrovos.group-tabs` watches that
-  file and renders the name just right of the numbered tabs, shifted right as
-  members are added.
+  `omarchy-menu-input`. `~/.config/hypr/group-subspace` assigns a group UUID
+  using session-scoped Hyprland stable window IDs and reconciles all groups
+  by surviving membership, so names follow moves/swaps, tab reorders and
+  member additions/removals. Names persist in the version-2
+  `$XDG_STATE_HOME/omarchy/group-subspaces.json`; old workspace names migrate
+  once to their current groups. Empty input clears a name; cancellation keeps
+  it. `pietrovos.group-tabs` reads the helper's active-group name and watches
+  the state file. On splits/merges, the largest surviving membership retains
+  the name; new compositor sessions do not reuse old window identities.
 - OpenCode completion notifications identify the originating workspace and
   group tab. Question notifications show only that location, remain visible
   until clicked, focus that window when clicked, and use critical urgency for

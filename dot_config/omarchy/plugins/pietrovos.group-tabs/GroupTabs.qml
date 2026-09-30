@@ -12,16 +12,11 @@ BarWidget {
 
   property var members: []
   property int activeIndex: -1
-  property int activeWorkspaceId: -1
-  property var names: ({})
+  property string subspaceName: ""
   readonly property real leadingGap: Style.spaceReal(14)
 
   readonly property string stateDir: (Quickshell.env("XDG_STATE_HOME") || (Quickshell.env("HOME") + "/.local/state")) + "/omarchy"
   readonly property string namesPath: stateDir + "/group-subspaces.json"
-  readonly property string subspaceName: {
-    var value = names[String(activeWorkspaceId)]
-    return value === undefined || value === null ? "" : String(value)
-  }
   readonly property real labelGap: subspaceName !== "" ? Style.spaceReal(-1) : 0
 
   function refresh() {
@@ -34,27 +29,18 @@ BarWidget {
       if (!active.address) {
         members = []
         activeIndex = -1
-        activeWorkspaceId = -1
+        subspaceName = ""
         return
       }
 
-      activeWorkspaceId = active.workspace ? active.workspace.id : -1
+      subspaceName = active.subspaceName || ""
       var grouped = active.grouped || []
       members = grouped
       activeIndex = grouped.indexOf(active.address)
     } catch (error) {
       members = []
       activeIndex = -1
-      activeWorkspaceId = -1
-    }
-  }
-
-  function loadNames(content) {
-    try {
-      var parsed = JSON.parse(String(content || "{}"))
-      names = parsed && typeof parsed === "object" ? parsed : ({})
-    } catch (error) {
-      names = ({})
+      subspaceName = ""
     }
   }
 
@@ -70,7 +56,7 @@ BarWidget {
 
   Process {
     id: groupProbe
-    command: ["hyprctl", "activewindow", "-j"]
+    command: [Quickshell.env("HOME") + "/.config/hypr/group-subspace"]
     stdout: StdioCollector {
       waitForEnd: true
       onStreamFinished: root.updateGroup(text)
@@ -79,6 +65,7 @@ BarWidget {
       if (exitCode !== 0) {
         root.members = []
         root.activeIndex = -1
+        root.subspaceName = ""
       }
     }
   }
@@ -94,7 +81,7 @@ BarWidget {
   Connections {
     target: Hyprland
     function onRawEvent(event) {
-      if (["activewindow", "activewindowv2", "closewindow", "movewindowv2", "openwindow"].indexOf(event.name) !== -1) {
+      if (["activewindow", "activewindowv2", "closewindow", "movewindowv2", "openwindow", "changeworkspaceid", "togglegroup", "moveintogroup", "moveoutofgroup"].indexOf(event.name) !== -1) {
         root.refresh()
       }
     }
@@ -105,9 +92,10 @@ BarWidget {
     path: root.namesPath
     watchChanges: true
     printErrors: false
-    onFileChanged: reload()
-    onLoaded: root.loadNames(text())
-    onLoadFailed: root.names = ({})
+    onFileChanged: {
+      reload()
+      root.refresh()
+    }
   }
 
   Rectangle {
