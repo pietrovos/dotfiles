@@ -156,7 +156,7 @@ BarWidget {
     visible: root.subspaceName !== ""
     x: tabGroup.x + tabGroup.width + root.labelGap
     anchors.verticalCenter: parent.verticalCenter
-    implicitWidth: subspaceLabel.implicitWidth + Style.space(4)
+    implicitWidth: subspaceLabel.implicitWidth + Style.space(8)
     implicitHeight: root.barSize - Style.space(2)
     width: implicitWidth
     height: implicitHeight
@@ -170,7 +170,8 @@ BarWidget {
 
     Text {
       id: subspaceLabel
-      anchors.centerIn: parent
+      anchors.verticalCenter: parent.verticalCenter
+      x: Style.space(4)
       text: root.subspaceName
       color: root.bar ? root.bar.barForeground : Color.foreground
       opacity: 0.85
