@@ -39,6 +39,13 @@ from Omarchy defaults when these files can be inspected.
 - The cloned `pietrovos.notifications` shell service renders only OpenCode
   question notifications with an explicit red background and border,
   independent of the active theme's urgent color.
+- The Agents usage widget is the clone `pietrovos.agents` (in `shell.json`,
+  replacing `omarchy.agents`). Its bar control is a percentage meter instead
+  of the stock robot icon: a rounded track filled to the selected provider's
+  binding usage, labelled with the rounded percent, tooltipped with the
+  provider and window. Balance-funded providers fill from remaining credit.
+  With no provider chosen the bar defaults to the first provider that has rate
+  limits (Codex here), not index 0.
 - `SUPER+CTRL+ALT+C` toggles the active Codex CLI account between `primary`
   and `secondary` through `~/.local/bin/codex-account`. The selected login
   also supplies the Codex usage widget's rate limits; credentials remain
