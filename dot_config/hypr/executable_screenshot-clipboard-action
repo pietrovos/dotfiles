@@ -1,0 +1,60 @@
+#!/bin/bash
+
+# Click action for the permanent "Screenshot copied" notification.
+# Offers to save the clipboard image (to Pictures or a chosen location), edit
+# it, or discard the notification. The image stays on the clipboard throughout.
+
+set -euo pipefail
+
+[[ -f ~/.config/user-dirs.dirs ]] && source ~/.config/user-dirs.dirs
+OUTPUT_DIR="${OMARCHY_SCREENSHOT_DIR:-${XDG_PICTURES_DIR:-$HOME/Pictures}}"
+
+tmp=$(mktemp --suffix=.png /tmp/omarchy-clipboard-shot.XXXXXX)
+trap 'rm -f "$tmp"' EXIT
+
+# Snapshot the clipboard into a file so every branch works off the same bytes,
+# even if something replaces the clipboard while the menu is open.
+wl-paste --type image/png > "$tmp" 2>/dev/null || {
+  omarchy-notification-send -u critical "Screenshot no longer on the clipboard" "Nothing to save" || true
+  exit 1
+}
+
+[[ -s "$tmp" ]] || {
+  omarchy-notification-send -u critical "Screenshot no longer on the clipboard" "Nothing to save" || true
+  exit 1
+}
+
+filename="screenshot-$(date +'%Y-%m-%d_%H-%M-%S').png"
+
+save_to() {
+  local dest="$1"
+  mkdir -p "$dest"
+  local path="$dest/$filename"
+  cp "$tmp" "$path"
+  omarchy-notification-send -u normal --image "$path" \
+    "Screenshot saved" "$path" --exec tensaku-edit "$path" || true
+}
+
+choice=$(omarchy-menu-select "Screenshot" \
+  "Save to Pictures" "Save to…" "Edit" "Discard" -- --width 320) || exit 0
+
+case "$choice" in
+  "Save to Pictures")
+    save_to "$OUTPUT_DIR"
+    ;;
+  "Save to…")
+    dir=$(omarchy file select --directory --title "Save screenshot to folder") || exit 0
+    [[ -n "$dir" ]] || exit 0
+    save_to "$dir"
+    ;;
+  "Edit")
+    # tensaku-edit works on a real path; hand it a copy that outlives this
+    # script's cleanup so the editor keeps its file for the session.
+    edit_path=$(mktemp --suffix=.png /tmp/omarchy-clipboard-shot-edit.XXXXXX)
+    cp "$tmp" "$edit_path"
+    exec tensaku-edit "$edit_path"
+    ;;
+  *)
+    exit 0
+    ;;
+esac

@@ -56,6 +56,13 @@ from Omarchy defaults when these files can be inspected.
   (Omarchy's `SUPER+comma`). The front side button (`mouse:276`) invokes the
   last notification — the same default action and dismissal as clicking it
   (Omarchy's `SUPER+ALT+comma`).
+- `PRINT` runs `~/.config/hypr/screenshot-to-clipboard` instead of the stock
+  command: it takes a smart-region screenshot to the clipboard only (via
+  `omarchy-capture-screenshot smart copy`), writing no file, and posts a
+  permanent (critical urgency) notification. Clicking that notification runs
+  `~/.config/hypr/screenshot-clipboard-action`, a menu offering Save to
+  Pictures, Save to… (folder chooser), Edit (tensaku-edit), or Discard. The
+  image stays on the clipboard; nothing is saved to disk until chosen.
 
 ## Required Workflow
 

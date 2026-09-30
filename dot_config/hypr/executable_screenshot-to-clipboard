@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# PRINT screenshot flow: copy to the clipboard only, then post a permanent
+# notification whose click offers to save, save elsewhere, edit, or discard.
+# Nothing touches disk unless the user chooses to save from the notification.
+
+set -euo pipefail
+
+clip_sum() {
+  wl-paste --type image/png 2>/dev/null | sha256sum | cut -d' ' -f1
+}
+
+# Remember the clipboard before capturing so a cancelled region picker (which
+# leaves the old contents in place) does not announce a stale image. A failure
+# to read counts as "nothing there", which the post-check below handles.
+before=$(clip_sum || true)
+
+# `copy` grabs the smart region and pipes straight to the clipboard, leaving no
+# file behind.
+omarchy-capture-screenshot smart copy || exit 0
+
+after=$(clip_sum || true)
+
+# Only announce when the clipboard actually changed; a cancelled picker leaves
+# it untouched and grim failing leaves it empty.
+[[ -n "$after" && "$after" != "$before" ]] || exit 0
+
+# Critical urgency keeps the toast on screen indefinitely and survives a shell
+# restart; the clone's durationFor maps critical to "never expire". The exec
+# action opens the save/edit/discard menu.
+omarchy-notification-send \
+  -u critical \
+  -g 󰹑 \
+  --app-name omarchy-action \
+  "Screenshot copied" \
+  "Click to save, edit, or discard" \
+  --exec /home/pietrovos/.config/hypr/screenshot-clipboard-action || true
