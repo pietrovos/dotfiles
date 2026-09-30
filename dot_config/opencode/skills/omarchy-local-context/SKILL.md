@@ -24,6 +24,8 @@ from Omarchy defaults when these files can be inspected.
   `ALT+SHIFT+0` move the active member to positions 1 through 10 via
   `~/.config/hypr/reorder-group-window`. `SUPER+SHIFT+R` opens the custom OpenCode build in the
   current terminal directory via `~/.config/hypr/opencode-duplicate`.
+- `SUPER+ESC` always switches to workspace 6 (overriding Omarchy's default
+  System menu) via `~/.config/hypr/bindings.lua`.
 - `SUPER+ALT+N` names the focused group's subspace through
   `~/.config/hypr/rename-group-subspace`, which prompts with
   `omarchy-menu-input`. The name is keyed to the active window's workspace and

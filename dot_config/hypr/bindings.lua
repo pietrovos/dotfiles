@@ -4,7 +4,9 @@ local function bind(keys, description, command)
   o.bind(keys, description, command)
 end
 
-bind("SUPER + ESCAPE", nil, "hyprctl dispatch focuscurrentorlast")
+-- SUPER + ESC previously: Omarchy default "System menu", then locally overridden to
+-- focuscurrentorlast. Now always switches to workspace 6.
+bind("SUPER + ESCAPE", "Switch to workspace 6", hl.dsp.focus({ workspace = "6" }))
 bind("SUPER + G", "Toggle window grouping", hl.dsp.group.toggle())
 hl.unbind("SUPER + ALT + G")
 bind("ALT + G", "Move active window out of group", hl.dsp.window.move({ out_of_group = true }))
