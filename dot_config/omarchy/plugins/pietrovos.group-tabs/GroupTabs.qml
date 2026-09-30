@@ -42,6 +42,7 @@ BarWidget {
       var grouped = active.grouped || []
       members = grouped
       activeIndex = grouped.indexOf(active.address)
+      console.warn("GROUP-TABS DEBUG state ws=" + activeWorkspaceId + " members=" + members.length + " name=" + JSON.stringify(names[String(activeWorkspaceId)]) + " visible=" + visible)
     } catch (error) {
       members = []
       activeIndex = -1
@@ -56,6 +57,7 @@ BarWidget {
     } catch (error) {
       names = ({})
     }
+    console.warn("GROUP-TABS DEBUG loadNames:", JSON.stringify(names))
   }
 
   function focusMember(index) {
