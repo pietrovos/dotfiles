@@ -57,8 +57,11 @@ from Omarchy defaults when these files can be inspected.
 2. Never edit `/usr/share/omarchy/`; it is package-owned.
 3. After Hyprland Lua changes, run `hyprctl reload` followed by
    `hyprctl configerrors`.
-4. After shell plugin changes, run `qmllint` on changed QML and restart the
-   shell if hot reload does not visibly apply the change.
+4. After shell plugin changes, run `qmllint` on changed QML. Hot reload
+   re-reads plugin code but does NOT re-instantiate bar widgets already
+   mounted on the bar, so a changed widget keeps running its old code until
+   `omarchy restart shell` (this is the usual reason a widget edit "doesn't
+   show up").
 5. Add every changed portable target to chezmoi with `chezmoi add <target>`.
    Do not assume scheduled automation captures an unadded target.
 6. When adding or materially changing a persistent customization, update this
