@@ -110,6 +110,18 @@ BarWidget {
     onLoadFailed: root.names = ({})
   }
 
+  Rectangle {
+    x: tabGroup.x
+    anchors.verticalCenter: parent.verticalCenter
+    width: tabGroup.width + (labelBox.visible ? root.labelGap + labelBox.width : 0)
+    height: tabGroup.height
+    color: "transparent"
+    radius: Math.min(Style.cornerRadius, height / 2)
+    border.width: 1
+    border.color: root.bar ? root.bar.barForeground : Color.foreground
+    opacity: 0.5
+  }
+
   Item {
     id: tabGroup
     x: root.leadingGap

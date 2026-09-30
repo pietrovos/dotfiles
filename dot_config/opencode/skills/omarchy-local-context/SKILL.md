@@ -29,6 +29,8 @@ from Omarchy defaults when these files can be inspected.
   cross-workspace focus helper matching an older Chromium window.
 - Group controls render in the top bar through
   `~/.config/omarchy/plugins/pietrovos.group-tabs/`.
+- The subspace widget has a single rounded, 1px border around its numbered
+  tabs and optional name, using the bar foreground color at 50% opacity.
 - The widget is placed after `pietrovos.workspaces` in
   `~/.config/omarchy/shell.json`.
 - Hyprland's in-window group bar is disabled in
