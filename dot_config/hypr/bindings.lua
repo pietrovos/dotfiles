@@ -19,8 +19,7 @@ bind("SUPER + SHIFT + ALT + B", "Browser (private)", { omarchy = "browser --priv
 bind("SUPER + SHIFT + M", "Music", { omarchy = "or-focus spotify" })
 bind("SUPER + SHIFT + ALT + M", "Music TUI", { tui = "cliamp", focus = true })
 bind("SUPER + SHIFT + N", "Editor", { omarchy = "editor" })
-bind("SUPER + SHIFT + R", "Open OpenCode (cwd)", "/home/pietrovos/.config/hypr/opencode-duplicate")
-bind("SUPER + SHIFT + T", "Activity", { tui = "btop" })
+bind("SUPER + SHIFT + R", "Open OpenCode (cwd)", "/home/pietrovos/.config/hypr/opencode-duplicate")bind("SUPER + SHIFT + T", "Activity", { tui = "btop" })
 bind("SUPER + SHIFT + D", "Docker", { tui = "lazydocker" })
 hl.unbind("SUPER + SHIFT + G")
 bind("SUPER + SHIFT + O", "Obsidian", { launch = "obsidian", focus = "^obsidian$" })
@@ -34,6 +33,11 @@ bind("SUPER + SHIFT + C", "Calendar", { webapp = "https://app.hey.com/calendar/w
 bind("SUPER + SHIFT + E", "Email", { webapp = "https://mail.google.com/mail/u/0/#inbox" })
 bind("SUPER + SHIFT + Y", "YouTube", { webapp = "https://youtube.com/" })
 bind("SUPER + SHIFT + V", "Toggle microphone monitoring", "/home/pietrovos/.config/hypr/toggle-mic-monitor")
+
+-- PRINT takes a region screenshot to the clipboard only, with a permanent
+-- notification offering save/edit/discard. Nothing is written to disk unless
+-- you choose to save from that notification.
+bind("PRINT", "Screenshot to clipboard", "/home/pietrovos/.config/hypr/screenshot-to-clipboard")
 bind("SUPER + SHIFT + ALT + G", "WhatsApp", { webapp = "https://web.whatsapp.com/", focus = true })
 bind("SUPER + SHIFT + CTRL + G", "Google Messages", { webapp = "https://messages.google.com/web/conversations", focus = true })
 bind("SUPER + SHIFT + P", "Paint", { webapp = "https://jspaint.app" })
