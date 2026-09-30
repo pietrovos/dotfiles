@@ -1,0 +1,129 @@
+#!/usr/bin/env python3
+"""Track group names by stable window membership, independent of workspaces."""
+
+import fcntl
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+import tempfile
+import uuid
+
+
+STATE = Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local/state")) / "omarchy"
+SESSION = os.environ.get("HYPRLAND_INSTANCE_SIGNATURE", "")
+
+
+def hypr(query):
+    return json.loads(subprocess.check_output(["hyprctl", "-j", query], text=True))
+
+
+def reconcile(state, clients, session):
+    """Keep a group's identity through moves, reorders and membership changes.
+
+    Match all groups at once: a removed tab cannot steal its former group's name.
+    On splits/merges, the largest surviving membership retains the identity.
+    """
+    by_address = {client["address"]: client for client in clients}
+    live = {}
+    for client in clients:
+        addresses = client.get("grouped", [])
+        if not addresses:
+            continue
+        members = tuple(sorted(
+            str(by_address[address].get("stableId") or address)
+            for address in addresses if address in by_address
+        ))
+        if members:
+            live[members] = client.get("workspace", {}).get("id")
+
+    legacy = state if state.get("version") != 2 else None
+    previous = state.get("groups", {}) if not legacy and state.get("session") == session else {}
+    candidates = []
+    for group_id, group in previous.items():
+        old = set(group["members"])
+        for members in live:
+            overlap = len(old.intersection(members))
+            if overlap:
+                candidates.append((overlap, overlap / len(old), group_id, members))
+    assigned = {}
+    used = set()
+    for _, _, group_id, members in sorted(candidates, reverse=True):
+        if group_id not in used and members not in assigned:
+            assigned[members] = group_id
+            used.add(group_id)
+
+    groups = {}
+    unmatched = dict(legacy or state.get("unmatchedLegacyNames", {}))
+    for members, workspace in live.items():
+        group_id = assigned.get(members, uuid.uuid4().hex)
+        name = previous.get(group_id, {}).get("name", "")
+        if legacy:
+            name = unmatched.pop(str(workspace), "")
+        groups[group_id] = {"members": list(members), "name": name}
+    result = {"version": 2, "session": session, "groups": groups}
+    if unmatched:
+        # Preserve legacy names without attaching them to future workspace occupants.
+        result["unmatchedLegacyNames"] = unmatched
+    return result
+
+
+def save(path, state):
+    fd, temporary = tempfile.mkstemp(prefix="group-subspaces.", dir=STATE)
+    try:
+        with os.fdopen(fd, "w") as output:
+            json.dump(state, output, indent=2)
+            output.write("\n")
+        os.replace(temporary, path)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+
+
+def snapshot(rename_id=None, name=None):
+    STATE.mkdir(parents=True, exist_ok=True)
+    path = STATE / "group-subspaces.json"
+    with (STATE / "group-subspaces.lock").open("w") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        try:
+            state = json.loads(path.read_text())
+        except FileNotFoundError:
+            state = {}
+        clients = hypr("clients")
+        active = hypr("activewindow")
+        updated = reconcile(state, clients, SESSION)
+        if rename_id in updated["groups"]:
+            updated["groups"][rename_id]["name"] = name
+        if updated != state:
+            save(path, updated)
+        active_client = next((c for c in clients if c["address"] == active.get("address")), {})
+        active_id = str(active_client.get("stableId") or active.get("address", ""))
+        active["subspaceId"] = ""
+        active["subspaceName"] = ""
+        if active_client.get("grouped"):
+            for group_id, group in updated["groups"].items():
+                if active_id in group["members"]:
+                    active["subspaceId"] = group_id
+                    active["subspaceName"] = group["name"]
+                    break
+        return active
+
+
+def main():
+    active = snapshot()
+    if len(sys.argv) > 1 and sys.argv[1] == "rename":
+        group_id = active["subspaceId"]
+        if not group_id:
+            return
+        current = active["subspaceName"]
+        prompt = "Rename group subspace" + (f" ({current})" if current else "")
+        result = subprocess.run(["omarchy-menu-input", prompt], capture_output=True, text=True)
+        if result.returncode == 0:
+            snapshot(group_id, result.stdout.rstrip("\n"))
+    else:
+        print(json.dumps(active))
+
+
+if __name__ == "__main__":
+    main()
