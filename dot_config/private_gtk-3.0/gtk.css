@@ -3,24 +3,24 @@
  * omarchy-theme-set-templates and delivered to ~/.config/gtk-3.0/gtk.css by
  * the theme-set hook. Edit the template, not the delivered file. */
 
-@define-color background     #060d1f;
-@define-color foreground     #E0F7FA;
-@define-color black          #060d1f;
-@define-color red            #e95c4b;
-@define-color green          #6488EA;
-@define-color yellow         #d5edeb;
-@define-color blue           #f7c3c6;
-@define-color magenta        #85cec4;
-@define-color cyan           #fff6d2;
-@define-color white          #E0F7FA;
-@define-color bright_black   #51688E;
-@define-color bright_red     #ed7b6d;
-@define-color bright_green   #819fee;
-@define-color bright_yellow  #d7ebe9;
-@define-color bright_blue    #f2c8cb;
-@define-color bright_magenta #8cc7bf;
-@define-color bright_cyan    #fef4d7;
-@define-color bright_white   #c8cbd0;
+@define-color background     #1C1E26;
+@define-color foreground     #CBCED0;
+@define-color black          #1C1E26;
+@define-color red            #E95678;
+@define-color green          #29D398;
+@define-color yellow         #FAC29A;
+@define-color blue           #26BBD9;
+@define-color magenta        #EE64AC;
+@define-color cyan           #59E1E3;
+@define-color white          #CBCED0;
+@define-color bright_black   #6F6F70;
+@define-color bright_red     #EC6A88;
+@define-color bright_green   #3FDAA4;
+@define-color bright_yellow  #FBC3A7;
+@define-color bright_blue    #3FC4DE;
+@define-color bright_magenta #F075B5;
+@define-color bright_cyan    #6BE4E6;
+@define-color bright_white   #E3E6EE;
 
 @define-color accent_bg_color @blue;
 @define-color accent_fg_color @background;
@@ -167,9 +167,9 @@ toast button.circular.flat.image-button:hover {
 
 /* Nautilus: transparent file manager with theme foreground text. */
 window.nautilus-window {
-    background: rgba(6,13,31, 0.75);
-    background-color: rgba(6,13,31, 0.75);
-    color: #E0F7FA;
+    background: rgba(28,30,38, 0.75);
+    background-color: rgba(28,30,38, 0.75);
+    color: #CBCED0;
 }
 
 window.nautilus-window .background,
@@ -186,7 +186,7 @@ window.nautilus-window sidebar,
 window.nautilus-window .sidebar {
     background: transparent;
     background-color: transparent;
-    color: #E0F7FA;
+    color: #CBCED0;
 }
 
 window.nautilus-window label,
@@ -196,22 +196,22 @@ window.nautilus-window row,
 window.nautilus-window cell,
 window.nautilus-window .view label,
 window.nautilus-window placessidebar label {
-    color: #E0F7FA;
+    color: #CBCED0;
 }
 
 window.nautilus-window headerbar,
 window.nautilus-window .toolbar {
-    background: rgba(6,13,31, 0.75);
-    background-color: rgba(6,13,31, 0.75);
-    color: #E0F7FA;
+    background: rgba(28,30,38, 0.75);
+    background-color: rgba(28,30,38, 0.75);
+    color: #CBCED0;
 }
 
 window.nautilus-window selection,
 window.nautilus-window row:selected,
 window.nautilus-window iconview:selected,
 window.nautilus-window treeview:selected {
-    background-color: rgba(224,247,250, 0.25);
-    color: #E0F7FA;
+    background-color: rgba(203,206,208, 0.25);
+    color: #CBCED0;
 }
 
 window.nautilus-window .sidebar-pane,
@@ -228,7 +228,7 @@ window.nautilus-window placessidebar .navigation-sidebar row,
 window.nautilus-window placessidebar .navigation-sidebar > row > box {
     background: transparent;
     background-color: transparent;
-    color: #E0F7FA;
+    color: #CBCED0;
 }
 
 window.nautilus-window .sidebar-pane,
