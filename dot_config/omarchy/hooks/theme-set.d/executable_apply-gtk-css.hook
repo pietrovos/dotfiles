@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Deliver the theme-rendered GTK/Nautilus CSS from the staged theme into the
+# GTK user config directories. The templates live in ~/.config/omarchy/themed/
+# and are rendered per theme by omarchy-theme-set-templates.
+
+theme="$HOME/.local/state/omarchy/current/theme"
+
+for version in 3 4; do
+  source="$theme/gtk-user-$version.css"
+  target="$HOME/.config/gtk-$version.0/gtk.css"
+
+  [[ -f $source ]] || continue
+
+  mkdir -p "$(dirname "$target")"
+  cp "$source" "$target"
+done
+
+# GTK reads its user CSS at startup, so recolor a running Nautilus immediately.
+if pgrep -x nautilus >/dev/null; then
+  nautilus -q >/dev/null 2>&1 || true
+fi

@@ -1,0 +1,22 @@
+[font]
+base-size = 14
+
+[bar]
+size-horizontal = 28
+size-vertical = 30
+
+# Colors intentionally omitted so the Omarchy menu and launcher follow the
+# active theme's generated shell.toml. Only the alpha/glass values are pinned.
+[menu]
+background-alpha = 0.82
+border-alpha = 0.75
+scrim-alpha = 0.25
+selected-background-alpha = 0.18
+selected-border-alpha = 0.35
+
+[launcher]
+background-alpha = 0.82
+border-alpha = 0.75
+scrim-alpha = 0.25
+selected-background-alpha = 0.18
+selected-border-alpha = 0.35

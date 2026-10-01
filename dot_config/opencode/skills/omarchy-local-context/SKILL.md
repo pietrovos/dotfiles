@@ -33,6 +33,18 @@ from Omarchy defaults when these files can be inspected.
   tabs and optional name, using the bar foreground color at 50% opacity.
 - The widget is placed after `pietrovos.workspaces` in
   `~/.config/omarchy/shell.json`.
+- `~/.config/omarchy/shell.toml` pins only `[font]`/`[bar]` and the menu and
+  launcher alpha/glass values; it deliberately omits `[menu]`/`[launcher]`
+  colors so the Omarchy menu (`SUPER+SPACE`) and launcher (`SUPER+ALT+SPACE`)
+  follow the active theme's generated `shell.toml`.
+- GTK/Nautilus CSS is theme-generated. Templates
+  `~/.config/omarchy/themed/gtk-user-{3,4}.css.tpl` are rendered per theme by
+  `omarchy-theme-set-templates` (placeholders from `colors.toml`) and delivered
+  to `~/.config/gtk-{3,4}.0/gtk.css` by
+  `~/.config/omarchy/hooks/theme-set.d/apply-gtk-css.hook`, which also quits a
+  running Nautilus to recolor it. Nautilus text/selection use the theme
+  foreground. The delivered `gtk.css` files are generated, so they are not
+  chezmoi-managed; the templates and hook are.
 - Hyprland's in-window group bar is disabled in
   `~/.config/hypr/looknfeel.lua`.
 - New group windows appear immediately to the right of the active member because

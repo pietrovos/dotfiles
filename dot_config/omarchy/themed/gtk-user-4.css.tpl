@@ -1,26 +1,26 @@
-/* Theme-generated GTK3 CSS with a transparent Nautilus.
- * Rendered from ~/.config/omarchy/themed/gtk-user-3.css.tpl by
- * omarchy-theme-set-templates and delivered to ~/.config/gtk-3.0/gtk.css by
+/* Theme-generated GTK4 CSS with a transparent Nautilus.
+ * Rendered from ~/.config/omarchy/themed/gtk-user-4.css.tpl by
+ * omarchy-theme-set-templates and delivered to ~/.config/gtk-4.0/gtk.css by
  * the theme-set hook. Edit the template, not the delivered file. */
 
-@define-color background     #1C1E26;
-@define-color foreground     #CBCED0;
-@define-color black          #1C1E26;
-@define-color red            #E95678;
-@define-color green          #29D398;
-@define-color yellow         #FAC29A;
-@define-color blue           #26BBD9;
-@define-color magenta        #EE64AC;
-@define-color cyan           #59E1E3;
-@define-color white          #CBCED0;
-@define-color bright_black   #6F6F70;
-@define-color bright_red     #EC6A88;
-@define-color bright_green   #3FDAA4;
-@define-color bright_yellow  #FBC3A7;
-@define-color bright_blue    #3FC4DE;
-@define-color bright_magenta #F075B5;
-@define-color bright_cyan    #6BE4E6;
-@define-color bright_white   #E3E6EE;
+@define-color background     {{ background }};
+@define-color foreground     {{ foreground }};
+@define-color black          {{ color0 }};
+@define-color red            {{ color1 }};
+@define-color green          {{ color2 }};
+@define-color yellow         {{ color3 }};
+@define-color blue           {{ color4 }};
+@define-color magenta        {{ color5 }};
+@define-color cyan           {{ color6 }};
+@define-color white          {{ color7 }};
+@define-color bright_black   {{ color8 }};
+@define-color bright_red     {{ color9 }};
+@define-color bright_green   {{ color10 }};
+@define-color bright_yellow  {{ color11 }};
+@define-color bright_blue    {{ color12 }};
+@define-color bright_magenta {{ color13 }};
+@define-color bright_cyan    {{ color14 }};
+@define-color bright_white   {{ color15 }};
 
 @define-color accent_bg_color @blue;
 @define-color accent_fg_color @background;
@@ -167,18 +167,19 @@ toast button.circular.flat.image-button:hover {
 
 /* Nautilus: transparent file manager with theme foreground text. */
 window.nautilus-window {
-    background: rgba(28,30,38, 0.75);
-    background-color: rgba(28,30,38, 0.75);
-    color: #CBCED0;
+    background: rgba({{ background_rgb }}, 0.75);
+    background-color: rgba({{ background_rgb }}, 0.75);
+    color: {{ foreground }};
 }
 
 window.nautilus-window .background,
+window.nautilus-window navigation-view,
 window.nautilus-window overlay,
 window.nautilus-window scrolledwindow,
 window.nautilus-window viewport,
-window.nautilus-window list,
-window.nautilus-window iconview,
-window.nautilus-window treeview,
+window.nautilus-window listview,
+window.nautilus-window gridview,
+window.nautilus-window columnview,
 window.nautilus-window .view,
 window.nautilus-window placessidebar,
 window.nautilus-window placessidebar row,
@@ -186,7 +187,7 @@ window.nautilus-window sidebar,
 window.nautilus-window .sidebar {
     background: transparent;
     background-color: transparent;
-    color: #CBCED0;
+    color: {{ foreground }};
 }
 
 window.nautilus-window label,
@@ -196,22 +197,23 @@ window.nautilus-window row,
 window.nautilus-window cell,
 window.nautilus-window .view label,
 window.nautilus-window placessidebar label {
-    color: #CBCED0;
+    color: {{ foreground }};
 }
 
 window.nautilus-window headerbar,
+window.nautilus-window toolbarview,
 window.nautilus-window .toolbar {
-    background: rgba(28,30,38, 0.75);
-    background-color: rgba(28,30,38, 0.75);
-    color: #CBCED0;
+    background: rgba({{ background_rgb }}, 0.75);
+    background-color: rgba({{ background_rgb }}, 0.75);
+    color: {{ foreground }};
 }
 
 window.nautilus-window selection,
 window.nautilus-window row:selected,
-window.nautilus-window iconview:selected,
-window.nautilus-window treeview:selected {
-    background-color: rgba(203,206,208, 0.25);
-    color: #CBCED0;
+window.nautilus-window gridview child:selected,
+window.nautilus-window listview row:selected {
+    background-color: rgba({{ foreground_rgb }}, 0.25);
+    color: {{ foreground }};
 }
 
 window.nautilus-window .sidebar-pane,
@@ -228,7 +230,7 @@ window.nautilus-window placessidebar .navigation-sidebar row,
 window.nautilus-window placessidebar .navigation-sidebar > row > box {
     background: transparent;
     background-color: transparent;
-    color: #CBCED0;
+    color: {{ foreground }};
 }
 
 window.nautilus-window .sidebar-pane,
