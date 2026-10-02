@@ -10,6 +10,9 @@ from Omarchy defaults when these files can be inspected.
 
 ## Current Customizations
 
+- The lock screen uses `~/.config/omarchy/plugins/pietrovos.lock/`, replacing
+  `omarchy.lock` in `shell.json`. Its display-blanking timer is 120 seconds
+  of inactivity while locked, including after hibernation, instead of 5 seconds.
 - Custom OpenCode updates are automated by the user timer
   `opencode-custom-update.timer` (daily 04:00, up to 30 minutes of jitter,
   catch-up enabled). `~/.local/bin/opencode-custom-update` merges upstream

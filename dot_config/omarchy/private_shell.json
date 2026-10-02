@@ -67,13 +67,18 @@
   "plugins": [
     {
       "id": "pietrovos.notifications"
+    },
+    {
+      "id": "pietrovos.lock"
     }
   ],
   "version": 1,
   "disabledPlugins": [
-    "omarchy.notifications"
+    "omarchy.notifications",
+    "omarchy.lock"
   ],
   "cloneSourceRestores": [
-    "pietrovos.notifications"
+    "pietrovos.notifications",
+    "pietrovos.lock"
   ]
 }
