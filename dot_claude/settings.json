@@ -37,5 +37,5 @@
     ]
   },
   "theme": "custom:lucent-orng",
-  "preferredNotifChannel": "auto"
+  "preferredNotifChannel": "notifications_disabled"
 }
