@@ -62,9 +62,16 @@ from Omarchy defaults when these files can be inspected.
   System menu) via `~/.config/hypr/bindings.lua`.
 - `SUPER+CTRL+SHIFT+1` through `SUPER+CTRL+SHIFT+0` swap whole workspace
   IDs (1 through 10), preserving layouts and following the original windows,
-  via `bindings.lua`. The cloned `pietrovos.workspaces/Workspaces.qml` listens
-  for `changeworkspaceid` and debounces refreshes of Quickshell's workspace,
-  monitor and toplevel state so the bar immediately highlights the new number.
+  via `bindings.lua`. Quickshell's Hyprland cache cannot follow `change_id`:
+  on `changeworkspaceid` its `HyprlandWorkspace` keeps the old ID and old
+  toplevel associations, and `refreshWorkspaces()`/`refreshToplevels()` cannot
+  repair that (IDs are fixed after creation and a refresh never un-homes a
+  toplevel). The cloned `pietrovos.workspaces/Workspaces.qml` therefore ignores
+  that cache and reads occupancy (`windows > 0` per workspace) and the focused
+  ID straight from `hyprctl -j activeworkspace` plus `hyprctl -j workspaces`,
+  refreshed on occupancy/focus Hyprland events (including `changeworkspaceid`)
+  and a 5s safety poll, so the bar greys out the emptied source number the
+  moment a swap lands.
 - `SUPER+CTRL+SHIFT+1` through `SUPER+CTRL+SHIFT+0` swap the current
   workspace with workspaces 1 through 10 in `bindings.lua`. Native
   `hl.dispatch(hl.dsp.workspace.change_id(...))` calls exchange whole
