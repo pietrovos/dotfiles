@@ -1,5 +1,4 @@
 {
-  "theme": "dark",
   "hooks": {
     "Stop": [
       {
@@ -36,5 +35,6 @@
         ]
       }
     ]
-  }
+  },
+  "theme": "custom:lucent-orng"
 }
