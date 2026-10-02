@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cwd=$(omarchy-cmd-terminal-cwd)
+
+exec setsid uwsm-app -- xdg-terminal-exec --app-id=org.omarchy.claude --working-directory="$cwd" -e /home/pietrovos/.local/bin/claude

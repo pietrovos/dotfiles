@@ -58,6 +58,8 @@ from Omarchy defaults when these files can be inspected.
   `ALT+SHIFT+0` move the active member to positions 1 through 10 via
   `~/.config/hypr/reorder-group-window`. `SUPER+SHIFT+R` opens the custom OpenCode build in the
   current terminal directory via `~/.config/hypr/opencode-duplicate`.
+  `SUPER+SHIFT+L` opens Claude Code in the current terminal directory via
+  `~/.config/hypr/claude-code`.
 - `SUPER+ESC` always switches to workspace 6 (overriding Omarchy's default
   System menu) via `~/.config/hypr/bindings.lua`.
 - `SUPER+CTRL+SHIFT+1` through `SUPER+CTRL+SHIFT+0` swap whole workspace
