@@ -1,0 +1,19 @@
+#!/bin/sh
+
+unit=chezmoi-sync.timer
+
+if systemctl --user is-enabled --quiet "$unit"; then
+  if systemctl --user disable --now "$unit"; then
+    notify-send -a "Chezmoi sync" "Automatic chezmoi sync off"
+  else
+    notify-send -a "Chezmoi sync" -u critical "Could not disable automatic chezmoi sync"
+    exit 1
+  fi
+else
+  if systemctl --user enable --now "$unit"; then
+    notify-send -a "Chezmoi sync" "Automatic chezmoi sync on"
+  else
+    notify-send -a "Chezmoi sync" -u critical "Could not enable automatic chezmoi sync"
+    exit 1
+  fi
+fi

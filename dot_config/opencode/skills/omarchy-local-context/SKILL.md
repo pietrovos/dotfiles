@@ -113,6 +113,9 @@ from Omarchy defaults when these files can be inspected.
   `~/.config/hypr/screenshot-clipboard-action`, a menu offering Save to
   Pictures, Save to… (folder chooser), Edit (tensaku-edit), or Discard. The
   image stays on the clipboard; nothing is saved to disk until chosen.
+- `SUPER+CTRL+ALT+S` toggles the user `chezmoi-sync.timer` through
+  `~/.config/hypr/toggle-chezmoi-sync`, with a desktop notification. The timer's
+  enabled state is machine-local.
 
 ## Required Workflow
 
