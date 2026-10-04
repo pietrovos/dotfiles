@@ -10,6 +10,8 @@ from Omarchy defaults when these files can be inspected.
 
 ## Current Customizations
 
+- PDF files open with the default Chromium browser through the
+  `application/pdf=chromium.desktop` association in `~/.config/mimeapps.list`.
 - The lock screen uses `~/.config/omarchy/plugins/pietrovos.lock/`, replacing
   `omarchy.lock` in `shell.json`. Its display-blanking timer is 120 seconds
   of inactivity while locked, including after hibernation, instead of 5 seconds.
