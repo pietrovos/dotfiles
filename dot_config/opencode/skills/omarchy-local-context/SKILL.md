@@ -65,7 +65,8 @@ from Omarchy defaults when these files can be inspected.
   current terminal directory via `~/.config/hypr/opencode-duplicate`.
   `SUPER+SHIFT+L` opens Claude Code in the current terminal directory via
   `~/.config/hypr/claude-code`.
-- `SUPER+ESC` always switches to workspace 6 (overriding Omarchy's default
+- `SUPER+ESC` switches to workspace 6, or back to the previous workspace when
+  already on 6 (overriding Omarchy's default
   System menu) via `~/.config/hypr/bindings.lua`.
 - `SUPER+CTRL+SHIFT+1` through `SUPER+CTRL+SHIFT+0` swap whole workspace
   IDs (1 through 10), preserving layouts and following the original windows,
