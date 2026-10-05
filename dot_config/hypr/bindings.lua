@@ -5,8 +5,13 @@ local function bind(keys, description, command)
 end
 
 -- SUPER + ESC previously: Omarchy default "System menu", then locally overridden to
--- focuscurrentorlast. Now always switches to workspace 6.
-bind("SUPER + ESCAPE", "Switch to workspace 6", hl.dsp.focus({ workspace = "6" }))
+-- focuscurrentorlast. Now switches to workspace 6, or back to the previous workspace
+-- when already on 6.
+bind("SUPER + ESCAPE", "Toggle workspace 6", function()
+  local current = hl.get_active_workspace()
+  local target = (current and current.id == 6) and "previous" or "6"
+  hl.dispatch(hl.dsp.focus({ workspace = target }))
+end)
 bind("SUPER + G", "Toggle window grouping", hl.dsp.group.toggle())
 hl.unbind("SUPER + ALT + G")
 bind("ALT + G", "Move active window out of group", hl.dsp.window.move({ out_of_group = true }))
