@@ -3,5 +3,8 @@
   "attention": {
     "notifications": false
   },
+  "keybinds": {
+    "app_toggle_paste_summary": "<leader>v"
+  },
   "theme": "lucent-orng"
 }
