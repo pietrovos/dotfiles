@@ -1,7 +1,7 @@
 require("config.remote_clipboard").setup()
 local opt = vim.opt
 opt.number = true
-opt.relativenumber = true
+opt.relativenumber = false
 opt.clipboard = "unnamedplus"
 
 opt.confirm = true

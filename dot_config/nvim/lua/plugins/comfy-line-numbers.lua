@@ -1,5 +1,7 @@
 return {
 	"mluders/comfy-line-numbers.nvim",
+	-- Disabled: it forces relative numbers on. Absolute numbers only.
+	enabled = false,
 	event = "BufReadPost",
 	opts = {
 		labels = {
