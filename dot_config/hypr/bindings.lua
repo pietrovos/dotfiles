@@ -88,6 +88,9 @@ for index = 1, 10 do
 end
 
 -- Grouped-window tabs: Alt+1 through Alt+0 select positions 1 through 10.
+bind("ALT + mouse_down", "Next window in subspace", hl.dsp.group.next())
+bind("ALT + mouse_up", "Previous window in subspace", hl.dsp.group.prev())
+
 for index = 1, 10 do
   if index <= 5 then
     hl.unbind("SUPER + ALT + code:" .. tostring(index + 9))

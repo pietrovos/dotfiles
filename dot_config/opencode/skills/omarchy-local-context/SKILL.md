@@ -56,7 +56,10 @@ from Omarchy defaults when these files can be inspected.
   `group.insert_after_current = true` is set in `looknfeel.lua`.
 - `SUPER+G` toggles window grouping. `ALT+G` moves the active window out of a
   group. `ALT+1` through `ALT+0` select group members 1 through 10 with no
-  action when the requested position is absent. `ALT+SHIFT+1` through
+  action when the requested position is absent. `ALT+mouse_down` and
+  `ALT+mouse_up` cycle to the next and previous window in the active subspace
+  (group), alongside `SUPER+ALT+TAB` and `SUPER+ALT+SHIFT+TAB`.
+  `ALT+SHIFT+1` through
   `ALT+SHIFT+0` move the active member to positions 1 through 10 via
   `~/.config/hypr/reorder-group-window`. `SUPER+SHIFT+R` opens the custom OpenCode build in the
   current terminal directory via `~/.config/hypr/opencode-duplicate`.
