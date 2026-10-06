@@ -41,7 +41,24 @@
           "id": "jankeesvw.notification-center"
         },
         {
-          "id": "quickshell.spotify"
+          "id": "quickshell.spotify",
+          "deviceName": "Omarchy Spotify",
+          "idleShutdownMinutes": 15,
+          "showMiniPlayer": "On",
+          "showVinylRecord": "Off",
+          "shortcutPlayer": "Omarchy Music app",
+          "shortcutHints": "On",
+          "showLyrics": "On",
+          "showArtwork": "On",
+          "showTrackTitle": "On",
+          "showArtistName": "Off",
+          "showPausedTrack": "On",
+          "scrollBarText": "Off",
+          "scrollSpeed": "1",
+          "maxBarTextWidth": "240",
+          "fixedBarWidth": "Off",
+          "audioQuality": "320 kbps",
+          "clientId": ""
         },
         {
           "id": "pietrovos.agents"

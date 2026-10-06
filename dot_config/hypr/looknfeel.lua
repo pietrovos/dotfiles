@@ -53,3 +53,14 @@ hl.config({
 --     column_width = 0.97,
 --   },
 -- })
+
+-- >>> omaland managed block >>>
+-- Written by Omaland. Safe to hand-edit: Omaland re-reads this block
+-- every time it opens, and only ever rewrites what's between the fences.
+hl.config({
+  general = {
+    gaps_in = 0,
+    gaps_out = 1,
+  },
+})
+-- <<< omaland managed block <<<
