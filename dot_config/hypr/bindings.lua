@@ -115,6 +115,11 @@ bind("SUPER + ALT + N", "Name group subspace", "/home/pietrovos/.config/hypr/ren
 bind("mouse:275", "Dismiss last notification", "omarchy-shell notifications dismissOne")
 bind("mouse:276", "Invoke last notification", "omarchy-shell notifications invokeLast")
 
+-- TEMP TEST (remove)
+o.bind("CONTROL_L", "TEST ctrl bind", "touch /tmp/ctrl-test")
+o.bind("CONTROL_R", "TEST ctrl bind R", "touch /tmp/ctrl-test-r")
+o.bind("F13", "TEST f13 bind", "touch /tmp/f13-test")
+
 -- Add extra bindings below.
 -- o.bind("SUPER + SHIFT + R", "SSH", "alacritty -e ssh your-server")
 
