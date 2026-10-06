@@ -58,9 +58,23 @@ hl.config({
 -- Written by Omaland. Safe to hand-edit: Omaland re-reads this block
 -- every time it opens, and only ever rewrites what's between the fences.
 hl.config({
+  decoration = {
+    active_opacity = 1,
+    border_part_of_window = true,
+    dim_inactive = true,
+    dim_strength = 1,
+    fullscreen_opacity = 1,
+    inactive_opacity = 1,
+  },
+
   general = {
     gaps_in = 0,
     gaps_out = 1,
+    layout = "dwindle",
+
+    snap = {
+      enabled = false,
+    },
   },
 })
 -- <<< omaland managed block <<<
