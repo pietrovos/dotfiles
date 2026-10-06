@@ -226,3 +226,13 @@ _copy_last_command_block() {
 
 zle -N copy-last-command-block _copy_last_command_block
 bindkey '^G' copy-last-command-block
+
+# Claude Code: relaunch and resume the session when /relaunch asks for it
+claude() {
+  local marker="${XDG_RUNTIME_DIR:-/tmp}/claude-relaunch-$$"
+  command claude "$@"
+  while [[ -e $marker ]]; do
+    rm -f "$marker"
+    command claude -c
+  done
+}
