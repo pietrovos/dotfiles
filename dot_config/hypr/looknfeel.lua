@@ -61,10 +61,21 @@ hl.config({
   decoration = {
     active_opacity = 1,
     border_part_of_window = true,
-    dim_inactive = true,
-    dim_strength = 1,
     fullscreen_opacity = 1,
     inactive_opacity = 1,
+
+    glow = {
+      enabled = true,
+      range = 26,
+      render_power = 4,
+    },
+
+    shadow = {
+      enabled = false,
+      range = 44,
+      render_power = 2,
+      scale = 0.92,
+    },
   },
 
   general = {
