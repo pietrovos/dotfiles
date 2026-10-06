@@ -10,11 +10,20 @@ from Omarchy defaults when these files can be inspected.
 
 ## Current Customizations
 
+- Kitty's `CTRL+SHIFT+A` copies the active terminal's screen and retained
+  scrollback to the clipboard as plain text through `launch --type=clipboard
+  --stdin-source=@screen_scrollback` in `~/.config/kitty/kitty.conf`.
+  The scrollback limit is 20,000 lines.
 - The KT USB headphone adapter uses software volume via
   `~/.config/wireplumber/wireplumber.conf.d/kt-usb-audio-software-volume.conf`.
   Full-level digital input caused screechy distortion on Discord sounds and
   videos despite reduced hardware volume; a 12 dB digital reduction cleared it.
-  A 16-bit playback test did not help. The rule matches only this USB device.
+  A 16-bit playback test did not help. Raising hardware playback from raw 66
+  (-17 dB) to raw 90 (-5 dB), with software volume around 61–63%, restored
+  approximately the original loudness and remained clean. This supports a
+  full-level digital playback/volume-handling issue. The rule matches only
+  this USB device. System ALSA-state saving requires authentication; the
+  hardware setting was applied live but not saved to the system state file.
 - PDF files open with the default Chromium browser through the
   `application/pdf=chromium.desktop` association in `~/.config/mimeapps.list`.
 - The lock screen uses `~/.config/omarchy/plugins/pietrovos.lock/`, replacing
