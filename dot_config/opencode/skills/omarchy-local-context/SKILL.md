@@ -115,6 +115,10 @@ from Omarchy defaults when these files can be inspected.
   With no provider chosen the bar defaults to the first provider that has rate
   limits (Codex here), not index 0.
 - `SUPER+CTRL+ALT+C` toggles the active Codex CLI account between `primary`
+- The Agents widget invokes `~/.local/bin/omarchy-agent-usage-update` explicitly.
+  It delegates other providers to Omarchy and Codex to a local collector wrapper
+  that fixes buffered RPC reads, allows 12 seconds per request, retries once,
+  and sets `retryAdvised` for the widget's 30-second retry on repeated failure.
   and `secondary` through `~/.local/bin/codex-account`. The selected login
   also supplies the Codex usage widget's rate limits; credentials remain
   machine-local in `~/.local/share/codex-accounts/`.

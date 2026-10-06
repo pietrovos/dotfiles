@@ -1,0 +1,57 @@
+#!/usr/bin/python3
+"""Delegate collectors to Omarchy, routing Codex through the local RPC fix."""
+
+import concurrent.futures
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+import tempfile
+
+
+def update_codex(flags):
+    collector = Path(__file__).with_name("omarchy-agent-usage-codex")
+    result = subprocess.run([str(collector), *flags], capture_output=True, text=True)
+    if result.stderr:
+        print(result.stderr, end="", file=sys.stderr)
+    if result.returncode:
+        return result.returncode
+    record = json.loads(result.stdout)
+    if record.get("id") != "codex":
+        raise ValueError("Unexpected Codex usage record")
+    root = Path(os.environ.get("XDG_STATE_HOME") or Path.home() / ".local/state") / "omarchy/agents/usage"
+    root.mkdir(parents=True, exist_ok=True)
+    fd, name = tempfile.mkstemp(dir=root, prefix=".codex.")
+    try:
+        with os.fdopen(fd, "w") as handle:
+            json.dump(record, handle, separators=(",", ":"))
+            handle.write("\n")
+        os.replace(name, root / "codex.json")
+    finally:
+        Path(name).unlink(missing_ok=True)
+    return 0
+
+
+def main():
+    args = sys.argv[1:]
+    only, excluded, flags = [], [], []
+    iterator = iter(args)
+    for arg in iterator:
+        if arg == "--except":
+            excluded.append(next(iterator))
+        elif arg in ("--force", "--limits-only"):
+            flags.append(arg)
+        else:
+            only.append(arg)
+    packaged = str(Path(os.environ.get("OMARCHY_PATH") or "/usr/share/omarchy") / "bin/omarchy-agent-usage-update")
+    wanted = "codex" not in excluded and (not only or "codex" in only)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+        jobs = [pool.submit(subprocess.call, [packaged, *args, "--except", "codex"])]
+        if wanted:
+            jobs.append(pool.submit(update_codex, flags))
+        return int(any(job.result() != 0 for job in jobs))
+
+
+if __name__ == "__main__":
+    sys.exit(main())

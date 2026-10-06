@@ -1,0 +1,67 @@
+#!/usr/bin/python3
+"""Use the packaged collector with unbuffered RPC framing and transient retries."""
+
+import json
+import os
+import runpy
+import select
+import time
+
+
+def rpc_request(proc, request_id, method, params=None, timeout=8):
+    proc.stdin.write(json.dumps({"id": request_id, "method": method, "params": params or {}}) + "\n")
+    proc.stdin.flush()
+    deadline = time.monotonic() + max(timeout, 12)
+    pending = getattr(proc, "_usage_rpc_pending", b"")
+    while True:
+        # Drain complete messages before select: notifications and replies can
+        # arrive in one read. TextIOWrapper.readline() can hide a reply in its
+        # userspace buffer while select waits for bytes that will never arrive.
+        while b"\n" in pending:
+            line, pending = pending.split(b"\n", 1)
+            proc._usage_rpc_pending = pending
+            try:
+                message = json.loads(line)
+            except (ValueError, UnicodeDecodeError):
+                continue
+            if isinstance(message, dict) and message.get("id") == request_id:
+                if "error" in message:
+                    error = message["error"]
+                    raise RuntimeError(error.get("message", method) if isinstance(error, dict) else str(error))
+                return message
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise TimeoutError(method)
+        ready, _, _ = select.select([proc.stdout], [], [], remaining)
+        if not ready:
+            raise TimeoutError(method)
+        chunk = os.read(proc.stdout.fileno(), 65536)
+        if not chunk:
+            raise RuntimeError("Codex app-server exited during " + method)
+        pending += chunk
+        proc._usage_rpc_pending = pending
+
+
+def load_collector():
+    path = os.path.join(os.environ.get("OMARCHY_PATH") or "/usr/share/omarchy", "bin", "omarchy-agent-usage-codex")
+    collector = runpy.run_path(path, run_name="omarchy_codex_collector")
+    fetch = collector["fetch_codex_rpc"]
+    # runpy's returned namespace can differ from the functions' globals.
+    namespace = fetch.__globals__
+    namespace["rpc_request"] = rpc_request
+
+    def fetch_with_retry():
+        result = fetch()
+        if result.get("usageStatusText") == "Codex limits unavailable":
+            time.sleep(0.5)
+            result = fetch()
+        if result.get("usageStatusText") == "Codex limits unavailable":
+            result["retryAdvised"] = True
+        return result
+
+    namespace["fetch_codex_rpc"] = fetch_with_retry
+    return collector
+
+
+if __name__ == "__main__":
+    load_collector()["main"]()

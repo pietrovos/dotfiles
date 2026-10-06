@@ -144,7 +144,7 @@ Item {
   }
 
   function updateCommand(kind, agentIds) {
-    var command = ["omarchy-agent-usage-update"]
+    var command = [root.home + "/.local/bin/omarchy-agent-usage-update"]
     if (kind === "force") command.push("--force")
     if (kind === "limits") command.push("--limits-only")
     var providers = settings && settings.providers ? settings.providers : {}
