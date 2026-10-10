@@ -87,8 +87,6 @@ end
 
 -- Visual mode mapping using mode "x" (for visual selections).
 vim.keymap.set("x", "<leader>cy", ":CopyOilContents<CR>", { desc = "Copy selected file contents" })
--- Normal mode mapping to open Oil (parent directory)
-vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
 local function copy_selected_file_paths(start_line, end_line)
 	local oil = require("oil")
 	local oil_dir = oil.get_current_dir(0)
