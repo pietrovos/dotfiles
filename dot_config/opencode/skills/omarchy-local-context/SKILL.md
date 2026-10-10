@@ -116,6 +116,9 @@ from Omarchy defaults when these files can be inspected.
   group tab. Completions are silent on the current workspace when the session's
   window is ungrouped or its group tab is selected, even if another window has
   keyboard focus; hidden group tabs and other workspaces still notify.
+  Claude Code mirrors this completion suppression through
+  `~/.claude/hooks/notify.sh`, a separate hook script rather than a shared
+  OpenCode plugin; both must be updated when changing notification behavior.
   Question notifications show only that location, remain visible
   until clicked, focus that window when clicked, and use critical urgency for
   red attention styling. OpenCode's built-in TUI desktop notifications are
