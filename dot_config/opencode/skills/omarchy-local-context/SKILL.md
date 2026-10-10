@@ -155,6 +155,14 @@ from Omarchy defaults when these files can be inspected.
   `~/.config/hypr/screenshot-clipboard-action`, a menu offering Save to
   Pictures, Save to… (folder chooser), Edit (tensaku-edit), or Discard. The
   image stays on the clipboard; nothing is saved to disk until chosen.
+- File-chooser dialogs (browsers, Electron, GTK apps) use
+  `xdg-desktop-portal-termfilechooser` (AUR, hunkyburrito fork) with yazi in
+  kitty instead of the GTK picker. `~/.config/xdg-desktop-portal/hyprland-portals.conf`
+  routes `FileChooser` to `termfilechooser`; the backend config is
+  `~/.config/xdg-desktop-portal-termfilechooser/config` (both machine-local
+  portal settings, not chezmoi-managed). Kitty runs with class
+  `termfilechooser`, floated and centered by a rule in `hyprland.lua`. Inside
+  yazi, `z` jumps via zoxide; remove the `FileChooser` line to revert to GTK.
 - `SUPER+CTRL+ALT+S` toggles the user `chezmoi-sync.timer` through
   `~/.config/hypr/toggle-chezmoi-sync`, with a desktop notification. The timer's
   enabled state is machine-local.
