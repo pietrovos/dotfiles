@@ -113,7 +113,10 @@ from Omarchy defaults when these files can be inspected.
   the state file. On splits/merges, the largest surviving membership retains
   the name; new compositor sessions do not reuse old window identities.
 - OpenCode completion notifications identify the originating workspace and
-  group tab. Question notifications show only that location, remain visible
+  group tab. Completions are silent on the current workspace when the session's
+  window is ungrouped or its group tab is selected, even if another window has
+  keyboard focus; hidden group tabs and other workspaces still notify.
+  Question notifications show only that location, remain visible
   until clicked, focus that window when clicked, and use critical urgency for
   red attention styling. OpenCode's built-in TUI desktop notifications are
   disabled so the custom notification is the only alert.
