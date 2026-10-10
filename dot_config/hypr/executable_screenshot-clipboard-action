@@ -48,11 +48,12 @@ case "$choice" in
     save_to "$dir"
     ;;
   "Edit")
-    # tensaku-edit works on a real path; hand it a copy that outlives this
-    # script's cleanup so the editor keeps its file for the session.
+    # tensaku-edit works on a real path and blocks until the editor closes,
+    # so give it its own copy and remove both files once it exits.
     edit_path=$(mktemp --suffix=.png /tmp/omarchy-clipboard-shot-edit.XXXXXX)
+    trap 'rm -f "$tmp" "$edit_path"' EXIT
     cp "$tmp" "$edit_path"
-    exec tensaku-edit "$edit_path"
+    tensaku-edit "$edit_path" || true
     ;;
   *)
     exit 0
