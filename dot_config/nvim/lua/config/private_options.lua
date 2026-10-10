@@ -7,9 +7,10 @@ opt.clipboard = "unnamedplus"
 opt.confirm = true
 
 opt.scrolloff = 0
-opt.wrap = false -- optional, turns off line wrapping
+opt.wrap = true -- wrap long lines to the window width
 opt.sidescrolloff = 0
-opt.linebreak = false
+opt.linebreak = true -- wrap at word boundaries, not mid-word
+opt.breakindent = true -- keep wrapped lines at the same indent
 opt.jumpoptions = "view"
 
 opt.splitbelow = true
