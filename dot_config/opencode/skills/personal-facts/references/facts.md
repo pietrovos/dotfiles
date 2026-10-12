@@ -9,3 +9,12 @@
 - Source for CGPA: Pietro explicitly stated, "My CGPA was 8.66", on 2026-10-12 during job application assistance.
 - Source for degree context: `~/work/Resume/Default/Pietro_Adamvoski_Resume.md`, read on 2026-10-12.
 - Grading scale/denominator: Carleton's 12-point scale. Pietro confirmed on 2026-10-12 that his CGPA was 8.66 out of 12. Do not convert to another scale without an authoritative conversion.
+
+### Transcript and 4.0-scale calculations
+
+- Transcript: `~/work/Transcript/Pietro_Adamvoski_Transcript.pdf`, dated 2026-09-29; read on 2026-10-12 after Pietro asked to retain this information. Read this file before asking Pietro to supply his transcript or grades again.
+- The transcript lists course grades, credit weights, and Carleton's 12-point legend; it does not print a cumulative 4.0 GPA.
+- Calculated conventional 4.0 equivalent: **3.20/4.0**, credit-weighting passed letter-graded courses, with A+/A = 4.0, A- = 3.7, B+ = 3.3, B = 3.0, B- = 2.7, C+ = 2.3, C = 2.0, C- = 1.7, D+ = 1.3, D = 1.0, D- = 0.7. This is a calculated estimate, not a university-issued GPA or a user-confirmed prior conversion.
+- Calculation scope: 19.5 passed letter-graded credits; excludes three F attempts and SAT/WDN/CTN entries. This scope yields 8.6667/12.0, matching Pietro's stated 8.66 to truncation. Do not claim the transcript establishes an official exclusion policy.
+- Using the authoritative OUAC Scale 7 course conversion (A = 3.9 rather than 4.0), the same passed-course scope yields **3.19/4.0** (unrounded 3.185897). Including all F attempts yields **2.96/4.0** under OUAC. Use the receiving institution's required inclusion rules for formal applications.
+- Conversion source: https://www.ouac.on.ca/guide/undergraduate-grade-conversion-table/ (read 2026-10-12; Carleton uses Scale 7). Source for course calculations: transcript above, recalculated by the assistant on 2026-10-12.
