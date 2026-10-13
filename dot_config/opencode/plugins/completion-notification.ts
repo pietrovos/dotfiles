@@ -5,7 +5,6 @@ type HyprClient = {
   pid: number
   workspace: { id: number; name: string }
   grouped: string[]
-  hidden: boolean
 }
 
 async function output(command: string[]) {
@@ -33,16 +32,6 @@ async function isFocused(window: HyprClient | undefined) {
   if (!window) return false
   const active = JSON.parse(await output(["hyprctl", "activewindow", "-j"])) as { address?: string }
   return active.address === window.address
-}
-
-async function isOnCurrentSubspace(window: HyprClient | undefined) {
-  if (!window) return false
-  const workspace = JSON.parse(await output(["hyprctl", "activeworkspace", "-j"])) as { id?: number }
-  if (workspace.id !== window.workspace.id) return false
-
-  // Inactive group tabs are hidden even when their workspace is current.
-  // A selected tab need not have keyboard focus to suppress completion alerts.
-  return window.grouped.length === 0 || window.hidden === false
 }
 
 async function notify(window: HyprClient | undefined, title: string, body?: string, isQuestion = false) {
@@ -82,8 +71,7 @@ export const CompletionNotification: Plugin = async ({ client }) => ({
       if (!result.data || result.data.parentID) return
 
       const window = await windowForProcess()
-      if (await isFocused(window)) return
-      if (event.type === "session.idle" && await isOnCurrentSubspace(window)) return
+      if (event.type === "question.asked" && await isFocused(window)) return
 
       const workspace = window?.workspace.name || String(window?.workspace.id || "unknown")
       const tab = window && window.grouped.length > 1

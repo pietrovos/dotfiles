@@ -30,10 +30,10 @@
           "id": "omarchy.menu"
         },
         {
-          "id": "pietrovos.workspaces"
+          "id": "pietrovos.group-tabs"
         },
         {
-          "id": "pietrovos.group-tabs"
+          "id": "pietrovos.workspaces"
         }
       ],
       "right": [
