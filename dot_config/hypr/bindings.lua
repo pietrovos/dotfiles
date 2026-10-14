@@ -26,6 +26,7 @@ bind("SUPER + SHIFT + ALT + B", "Browser (private)", { omarchy = "browser --priv
 bind("SUPER + SHIFT + M", "Music", { omarchy = "or-focus spotify" })
 bind("SUPER + SHIFT + ALT + M", "Music TUI", { tui = "cliamp", focus = true })
 bind("SUPER + SHIFT + N", "Editor", { omarchy = "editor" })
+bind("SUPER + N", "Quick note", "/home/pietrovos/.config/hypr/quick-note")
 bind("SUPER + SHIFT + R", "Open OpenCode (cwd)", "/home/pietrovos/.config/hypr/opencode-duplicate")
 bind("SUPER + SHIFT + L", "Open Claude Code (cwd)", "/home/pietrovos/.config/hypr/claude-code")
 bind("SUPER + SHIFT + T", "Activity", { tui = "btop" })
