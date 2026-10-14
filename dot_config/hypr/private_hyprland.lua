@@ -28,4 +28,5 @@ require("default.hypr.toggles")
 o.window({ title = "discord%.com is sharing your screen%.", class = "^$" }, { workspace = "special silent" })
 o.window("org.gnome.Nautilus", { opacity = "0.85 0.75" })
 o.window("^termfilechooser$", { float = true, center = true, size = "1200 750" })
-o.window("^quicknote$", { float = true, center = true, size = "1000 650" })
+-- SUPER+N quick notes: Typora titles them "YYYY-MM-DD.md - Typora".
+o.window({ class = "^typora$", title = "^[0-9]{4}-[0-9]{2}-[0-9]{2}\\.md - Typora$" }, { float = true, center = true, size = "1000 650" })
