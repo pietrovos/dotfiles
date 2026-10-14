@@ -162,6 +162,12 @@ from Omarchy defaults when these files can be inspected.
   portal settings, not chezmoi-managed). Kitty runs with class
   `termfilechooser`, floated and centered by a rule in `hyprland.lua`. Inside
   yazi, `z` jumps via zoxide; remove the `FileChooser` line to revert to GTK.
+- `SUPER+N` runs `~/.config/hypr/quick-note`: a new blank note
+  `~/Obsidian/Quick Notes/YYYY-MM-DD HH-MM.md` in GNOME Text Editor, floated and
+  centered (900x600) by a class rule for `org.gnome.TextEditor` in `hyprland.lua`.
+  If an editor window is open it is focused instead; empty quick notes are deleted
+  on the next launch. Text Editor's `restore-session` gsetting is off so old
+  windows don't reopen. Typora was rejected for its license nag and nvim by preference.
 - `SUPER+CTRL+ALT+S` toggles the user `chezmoi-sync.timer` through
   `~/.config/hypr/toggle-chezmoi-sync`, with a desktop notification. The timer's
   enabled state is machine-local.

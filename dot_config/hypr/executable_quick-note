@@ -1,0 +1,19 @@
+#!/bin/bash
+# Open a new blank note in a floating GNOME Text Editor window, ready to type.
+# If a Text Editor window is already open, focus it instead of opening another.
+
+notes_dir="$HOME/Obsidian/Quick Notes"
+
+address=$(hyprctl clients -j | jq -r '.[] | select(.class == "org.gnome.TextEditor") | .address' | head -n1)
+if [[ -n $address ]]; then
+  exec hyprctl dispatch "hl.dsp.focus({ window = \"address:$address\" })" >/dev/null
+fi
+
+# Drop quick notes that were opened but never written in.
+mkdir -p "$notes_dir"
+find "$notes_dir" -maxdepth 1 -name '*.md' -empty -delete
+
+note="$notes_dir/$(date '+%F %H-%M').md"
+touch "$note"
+
+exec setsid uwsm-app -- gnome-text-editor --new-window "$note" >/dev/null 2>&1
