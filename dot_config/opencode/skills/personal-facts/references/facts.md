@@ -9,6 +9,15 @@
 
 - Comfortable asking for CAD $80,000 total annual compensation for the PolicyMe Remote Junior Software Engineer application. Source: Pietro explicitly confirmed, 2026-10-14. This is role-specific, not a general salary preference.
 
+## Application preferences and availability
+
+- Canadian citizen; has lived in Canada since birth. Has unrestricted authorization to work for any employer in Canada on the basis of citizenship. Source: Pietro explicitly confirmed during Motorola Solutions application assistance, 2026-10-14.
+
+- Available to start immediately as of 2026-10-14. Source: Pietro stated "I could start today" during Motorola Solutions application assistance.
+- Preferred contact method: email. Source: Pietro confirmed during Motorola Solutions application assistance, 2026-10-14.
+- Open to relocating to Montreal or Toronto. Source: Pietro confirmed during Motorola Solutions application assistance, 2026-10-14.
+- Reports no non-compete agreements or other employer agreements or commitments that would restrict accepting employment or the work performed. Source: Pietro explicitly confirmed during Motorola Solutions application assistance, 2026-10-14.
+
 ## Education
 
 ### Bachelor's cumulative GPA
