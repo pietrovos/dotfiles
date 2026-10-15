@@ -2,7 +2,7 @@
 # Open a new blank note in nvim inside a floating terminal, ready to type.
 # If a quick note is already open, focus it instead of opening another.
 
-notes_dir="$HOME/Obsidian/Quick Notes"
+notes_dir="$HOME/Quick Notes"
 
 address=$(hyprctl clients -j | jq -r '.[] | select(.class == "quicknote") | .address' | head -n1)
 if [[ -n $address ]]; then
