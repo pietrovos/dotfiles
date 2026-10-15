@@ -6,7 +6,9 @@
   "keybinds": {
     "app.toggle.paste_summary": "<leader>v",
     "session.new": "<leader>n,ctrl+t",
-    "variant.cycle": "none"
+    "variant.cycle": "none",
+    "input.delete.word.backward": "ctrl+backspace,alt+backspace",
+    "session.tab.close": "ctrl+w"
   },
   "attention": {
     "notifications": false
