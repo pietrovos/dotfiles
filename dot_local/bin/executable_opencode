@@ -8,7 +8,7 @@ server=http://100.117.174.8:4096
 env_file="${XDG_CONFIG_HOME:-${HOME}/.config}/opencode/server.env"
 if [[ $# -eq 0 || $1 == -c || $1 == --continue || $1 == -s || $1 == --session ]] && [[ -r $env_file ]]; then
   set -a; . "$env_file"; set +a
-  if curl -fs -o /dev/null --max-time 1 -u "opencode:${OPENCODE_SERVER_PASSWORD}" "${server}/api/session"; then
+  if curl -fs -o /dev/null --max-time 1 -u "${OPENCODE_SERVER_USERNAME:-opencode}:${OPENCODE_SERVER_PASSWORD}" "${server}/api/session"; then
     exec "$bin" attach "$server" --dir "$PWD" "$@"
   fi
 fi
