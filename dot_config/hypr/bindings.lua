@@ -31,6 +31,7 @@ bind("SUPER + SHIFT + R", "Open OpenCode (cwd)", "/home/pietrovos/.config/hypr/o
 bind("SUPER + SHIFT + L", "Open Claude Code (cwd)", "/home/pietrovos/.config/hypr/claude-code")
 bind("SUPER + SHIFT + T", "Activity", { tui = "btop" })
 bind("SUPER + SHIFT + D", "Docker", { tui = "lazydocker" })
+bind("SUPER + Y", "Yazi", { tui = "yazi" })
 hl.unbind("SUPER + SHIFT + G")
 bind("SUPER + SHIFT + O", "Obsidian", { launch = "obsidian", focus = "^obsidian$" })
 bind("SUPER + SHIFT + W", "Typora", { launch = "typora --enable-wayland-ime" })
