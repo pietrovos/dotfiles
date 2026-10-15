@@ -4,7 +4,9 @@
     "name": "opencode"
   },
   "keybinds": {
-    "app.toggle.paste_summary": "<leader>v"
+    "app.toggle.paste_summary": "<leader>v",
+    "session.new": "<leader>n,ctrl+t",
+    "variant.cycle": "none"
   },
   "attention": {
     "notifications": false

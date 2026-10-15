@@ -4,7 +4,9 @@
     "notifications": false
   },
   "keybinds": {
-    "app_toggle_paste_summary": "<leader>v"
+    "app_toggle_paste_summary": "<leader>v",
+    "session_new": "<leader>n,ctrl+t",
+    "variant_cycle": "none"
   },
   "theme": "lucent-orng"
 }
