@@ -9,6 +9,12 @@
 
 - French: first language, native speaker. English: used for his Carleton degree and resume; proficiency level not separately stated. Source for French: Pietro stated "French is my first language i speak it natively" during CSIS IT Analyst application assistance, 2026-10-15. No formal second-language evaluation (e.g. PSC/CSIS SLE results) recorded.
 
+## Work history details
+
+- uBreakiFix (June 2020 to September 2021): part time during the school year, full time during the summer. Hours per week not recorded. Source: Pietro, CSIS IT Analyst application assistance, 2026-10-15.
+- Kanata Flyers (FlyerForce): summers, delivered flyers and helped with trucking; school year, helped with trucking. Source: Pietro, 2026-10-15. The default resume says he gave up the route from 2022 to run the trucking; exact summer months, hours per week, and the year school-year trucking began are not recorded.
+- No co-op work terms, although his Carleton program is listed as co-operative education. Source: Pietro, 2026-10-15.
+
 ## Compensation
 
 - Comfortable asking for CAD $80,000 total annual compensation for the PolicyMe Remote Junior Software Engineer application. Source: Pietro explicitly confirmed, 2026-10-14. This is role-specific, not a general salary preference.
