@@ -25,5 +25,5 @@
     "thinking": "hide"
   },
   "animations": true,
-  "plugins": ["./cli-plugins/completion-notification", "./cli-plugins/restart"]
+  "plugins": ["./cli-plugins/completion-notification", "./cli-plugins/restart", "./cli-plugins/keybinds"]
 }
