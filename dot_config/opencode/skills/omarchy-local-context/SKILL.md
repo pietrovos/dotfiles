@@ -163,11 +163,12 @@ from Omarchy defaults when these files can be inspected.
   `termfilechooser`, floated and centered by a rule in `hyprland.lua`. Inside
   yazi, `z` jumps via zoxide; remove the `FileChooser` line to revert to GTK.
 - `SUPER+N` runs `~/.config/hypr/quick-note`: a new blank note
-  `~/Obsidian/Quick Notes/YYYY-MM-DD HH-MM.md` in micro (soft/word wrap) inside a
-  kitty window with class `quicknote`, floated and centered (900x600) by a rule in
-  `hyprland.lua`. If one is open it is focused instead; empty quick notes are
-  deleted on the next launch. Rejected: nvim (preference), Typora (license nag),
-  GNOME Text Editor (opens with keyboard focus off the text area).
+  `~/Obsidian/Quick Notes/YYYY-MM-DD HH-MM.md` in nvim (`wrap linebreak`, starts
+  in insert mode) inside a kitty window with class `quicknote`, floated and
+  centered (900x600) by a rule in `hyprland.lua`. If one is open it is focused
+  instead; empty quick notes are deleted on the next launch. nvim replaced micro
+  at the user's request (2026-10-14). Rejected: Typora (license nag), GNOME Text
+  Editor (opens with keyboard focus off the text area).
 - `SUPER+CTRL+ALT+S` toggles the user `chezmoi-sync.timer` through
   `~/.config/hypr/toggle-chezmoi-sync`, with a desktop notification. The timer's
   enabled state is machine-local.

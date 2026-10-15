@@ -1,5 +1,5 @@
 #!/bin/bash
-# Open a new blank note in micro inside a floating terminal, ready to type.
+# Open a new blank note in nvim inside a floating terminal, ready to type.
 # If a quick note is already open, focus it instead of opening another.
 
 notes_dir="$HOME/Obsidian/Quick Notes"
@@ -17,4 +17,4 @@ note="$notes_dir/$(date '+%F %H-%M').md"
 touch "$note"
 
 exec setsid uwsm-app -- kitty --class=quicknote --title="Quick note" \
-  micro -softwrap true -wordwrap true "$note" >/dev/null 2>&1
+  nvim -c "setlocal wrap linebreak" +startinsert "$note" >/dev/null 2>&1

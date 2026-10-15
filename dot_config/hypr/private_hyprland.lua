@@ -28,5 +28,5 @@ require("default.hypr.toggles")
 o.window({ title = "discord%.com is sharing your screen%.", class = "^$" }, { workspace = "special silent" })
 o.window("org.gnome.Nautilus", { opacity = "0.85 0.75" })
 o.window("^termfilechooser$", { float = true, center = true, size = "1200 750" })
--- SUPER+N quick notes: micro in a floating kitty window.
+-- SUPER+N quick notes: nvim in a floating kitty window.
 o.window("^quicknote$", { float = true, center = true, size = "900 600" })
