@@ -5,6 +5,7 @@ type HyprClient = {
   pid: number
   workspace: { id: number; name: string }
   grouped: string[]
+  visible: boolean
 }
 
 async function output(command: string[]) {
@@ -32,6 +33,13 @@ async function isFocused(window: HyprClient | undefined) {
   if (!window) return false
   const active = JSON.parse(await output(["hyprctl", "activewindow", "-j"])) as { address?: string }
   return active.address === window.address
+}
+
+// True when the window is the shown tab of its group on the focused workspace.
+async function isOnScreen(window: HyprClient | undefined) {
+  if (!window?.visible) return false
+  const active = JSON.parse(await output(["hyprctl", "activeworkspace", "-j"])) as { id?: number }
+  return active.id === window.workspace.id
 }
 
 async function notify(window: HyprClient | undefined, title: string, body?: string, isQuestion = false) {
@@ -72,6 +80,7 @@ export const CompletionNotification: Plugin = async ({ client }) => ({
 
       const window = await windowForProcess()
       if (event.type === "question.asked" && await isFocused(window)) return
+      if (event.type === "session.idle" && await isOnScreen(window)) return
 
       const workspace = window?.workspace.name || String(window?.workspace.id || "unknown")
       const tab = window && window.grouped.length > 1

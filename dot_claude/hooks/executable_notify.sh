@@ -19,9 +19,13 @@ done
 address=
 if [[ -n $window ]]; then
   address=$(jq -r '.address' <<<"$window")
-  # Questions are silent when focused; completions always notify.
+  # Questions are silent when focused; completions are silent while the window is the
+  # shown tab of its group on the focused workspace.
   if [[ $kind == question ]]; then
     [[ $(hyprctl activewindow -j 2>/dev/null | jq -r '.address // empty') == "$address" ]] && exit 0
+  elif [[ $(jq -r '.visible' <<<"$window") == true &&
+          $(hyprctl activeworkspace -j 2>/dev/null | jq -r '.id') == $(jq -r '.workspace.id' <<<"$window") ]]; then
+    exit 0
   fi
   workspace=$(jq -r '.workspace.name // (.workspace.id | tostring)' <<<"$window")
   group_index=$(jq -r '.address as $a | (.grouped | index($a)) as $i | if $i == null then 0 else $i + 1 end' <<<"$window")
