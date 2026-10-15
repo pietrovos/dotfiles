@@ -12,7 +12,7 @@
 ## Work history details
 
 - uBreakiFix (June 2020 to September 2021): part time during the school year (6 to 12 hours per week, varying by week), full time during the summer. Source: Pietro, CSIS IT Analyst application assistance, 2026-10-15.
-- Kanata Flyers (FlyerForce), summers 2015 to 2026: delivered flyers (about 4 hours per week) and helped with trucking (6 to 12 hours per week); during the school year, helped with trucking (6 to 12 hours per week). Summer months: June to August during high school, May to September during university. Source: Pietro, 2026-10-15. Unresolved: the default resume says he gave up the route from 2022 to run the trucking, which conflicts with delivering every summer; the year school-year trucking began is not separately confirmed.
+- Kanata Flyers (FlyerForce), summers 2015 to 2026 (June to August during high school, May to September during university). 2015 to 2021: delivered a flyer route (about 4 hours per week) and helped with trucking (6 to 12 hours per week). 2022 to 2026: stopped delivering; trucking only, taking on a much larger share with the area manager, every summer and during the school year (6 to 12 hours per week). Source: Pietro, 2026-10-15.
 - At uBreakiFix, explained problems and repair options to customers. Source: Pietro, 2026-10-15.
 - No co-op work terms, although his Carleton program is listed as co-operative education. Source: Pietro, 2026-10-15.
 
@@ -26,7 +26,8 @@
 
 - Available to start immediately as of 2026-10-14. Source: Pietro stated "I could start today" during Motorola Solutions application assistance.
 - Preferred contact method: email. Source: Pietro confirmed during Motorola Solutions application assistance, 2026-10-14.
-- Can work flexible hours. Source: Pietro, CSIS IT Analyst application, 2026-10-15. Willingness to work 24/7 rotational shifts not separately confirmed.
+- Can work flexible hours and rotational shifts. Source: Pietro, CSIS IT Analyst application, 2026-10-15.
+- Wants roles related to software engineering; does not want a support job (IT support, helpdesk, end user support). When an application asks for areas of interest, choose engineering-related ones. Source: Pietro, 2026-10-15.
 - Open to relocating to Montreal or Toronto. Source: Pietro confirmed during Motorola Solutions application assistance, 2026-10-14.
 - Reports no non-compete agreements or other employer agreements or commitments that would restrict accepting employment or the work performed. Source: Pietro explicitly confirmed during Motorola Solutions application assistance, 2026-10-14.
 
