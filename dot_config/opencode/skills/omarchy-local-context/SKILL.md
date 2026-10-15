@@ -113,8 +113,9 @@ from Omarchy defaults when these files can be inspected.
   the state file. On splits/merges, the largest surviving membership retains
   the name; new compositor sessions do not reuse old window identities.
 - OpenCode completion notifications identify the originating workspace and
-  group tab. Completions always notify, including when the session's window
-  has focus or is visible on the current workspace.
+  group tab. Completions are suppressed only while the session's window is
+  on the focused workspace and is the shown tab of its subspace (Hyprland
+  `visible`); otherwise they notify.
   Claude Code mirrors this completion behavior through
   `~/.claude/hooks/notify.sh`, a separate hook script rather than a shared
   OpenCode plugin; both must be updated when changing notification behavior.
