@@ -230,9 +230,14 @@ bindkey '^G' copy-last-command-block
 # Claude Code: relaunch and resume the session when /relaunch asks for it
 claude() {
   local marker="${XDG_RUNTIME_DIR:-/tmp}/claude-relaunch-$$"
-  command claude "$@"
+  # Enable Remote Control for interactive sessions, but not for subcommands or -p/--print
+  local -a rc=(--remote-control)
+  if [[ $1 == (agents|attach|auth|auto-mode|doctor|gateway|import|install|logs|mcp|plugin|plugins|purge|respawn|rm|sessions|setup-token|stop|kill|ultrareview|update|upgrade) ]] || (( ${@[(I)-p|--print]} )); then
+    rc=()
+  fi
+  command claude "${rc[@]}" "$@"
   while [[ -e $marker ]]; do
     rm -f "$marker"
-    command claude -c
+    command claude --remote-control -c
   done
 }

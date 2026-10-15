@@ -1,7 +1,3 @@
 #!/bin/bash
-export OPENCODE_DISABLE_AUTOUPDATE=1
-binary="${XDG_DATA_HOME:-${HOME}/.local/share}/opencode-custom/bin/opencode"
-if [[ ! -x "$binary" ]]; then
-  binary="${HOME}/projects/opencode-custom/packages/opencode/dist/opencode-linux-x64/bin/opencode"
-fi
-exec "$binary" "$@"
+# Launchers outside an activated shell (e.g. the Hyprland duplicate binding) reach mise's OpenCode through this shim.
+exec "${XDG_DATA_HOME:-${HOME}/.local/share}/mise/shims/opencode" "$@"
