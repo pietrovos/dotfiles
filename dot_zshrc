@@ -241,6 +241,3 @@ claude() {
     command claude --remote-control -c
   done
 }
-
-# OpenCode: go through the shim so interactive sessions attach to opencode-server.service
-opencode() { ~/.local/bin/opencode "$@"; }
