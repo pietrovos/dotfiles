@@ -31,4 +31,4 @@ o.window("^termfilechooser$", { float = true, center = true, size = "1200 750" }
 -- SUPER+N quick notes: nvim in a floating kitty window.
 o.window("^quicknote$", { float = true, center = true, size = "900 600" })
 -- Bitwarden opens tiled like normal windows (Omarchy defaults it to floating).
-o.window("^(Bitwarden)$", { tile = true })
+o.window("^(Bitwarden)$", { tag = "-floating-window" })
