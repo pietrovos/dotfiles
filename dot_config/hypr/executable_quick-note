@@ -9,12 +9,23 @@ if [[ -n $address ]]; then
   exec hyprctl dispatch "hl.dsp.focus({ window = \"address:$address\" })" >/dev/null
 fi
 
-# Drop quick notes that were opened but never written in.
+# Drop quick notes that were opened but never written in (autosave can leave a
+# lone newline, so whitespace-only counts as empty).
 mkdir -p "$notes_dir"
-find "$notes_dir" -maxdepth 1 -name '*.md' -empty -delete
+find "$notes_dir" -maxdepth 1 -name '*.md' -type f ! -exec grep -q '[^[:space:]]' {} \; -delete
 
-note="$notes_dir/$(date '+%F %H-%M').md"
+# Seconds keep two notes in the same minute apart; a counter covers the rest.
+note="$notes_dir/$(date '+%F %H-%M-%S').md"
+n=2
+while [[ -e $note ]]; do
+  note="$notes_dir/$(date '+%F %H-%M-%S') $((n++)).md"
+done
 touch "$note"
 
-exec setsid uwsm-app -- kitty --class=quicknote --title="Quick note" \
-  nvim -c "setlocal wrap linebreak" +startinsert "$note" >/dev/null 2>&1
+# Closing the window kills nvim, so save on every change instead of keeping a
+# swap file (-n) that would be left behind and warn on the next open.
+# Start in the notes folder so ":w name" and ":saveas" land there too.
+exec setsid uwsm-app -- kitty --class=quicknote --title="Quick note" --directory="$notes_dir" \
+  nvim -n -c "setlocal wrap linebreak" \
+  -c "autocmd TextChanged,TextChangedI,InsertLeave <buffer> silent! update" \
+  +startinsert "$note" >/dev/null 2>&1
