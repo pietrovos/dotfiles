@@ -5,6 +5,10 @@
 - React: 2 years; Python: 5+ years; Node.js: 2 years. Source: Pietro explicitly confirmed during PolicyMe application assistance, 2026-10-14. Django/Flask experience is not confirmed.
 - Extensive experience using OpenCode and Claude Code. Source: Pietro stated he has "lots of experience" with both, 2026-10-14. Duration and specific workflows are not confirmed.
 
+## Languages
+
+- French: first language, native speaker. English: used for his Carleton degree and resume; proficiency level not separately stated. Source for French: Pietro stated "French is my first language i speak it natively" during CSIS IT Analyst application assistance, 2026-10-15. No formal second-language evaluation (e.g. PSC/CSIS SLE results) recorded.
+
 ## Compensation
 
 - Comfortable asking for CAD $80,000 total annual compensation for the PolicyMe Remote Junior Software Engineer application. Source: Pietro explicitly confirmed, 2026-10-14. This is role-specific, not a general salary preference.
