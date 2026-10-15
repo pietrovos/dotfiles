@@ -174,6 +174,8 @@ from Omarchy defaults when these files can be inspected.
   on the next launch. nvim replaced micro and `~/Quick Notes` replaced
   `~/Obsidian/Quick Notes` at the user's request (2026-10-14). Rejected: Typora (license nag), GNOME Text
   Editor (opens with keyboard focus off the text area).
+- Bitwarden opens tiled like normal windows: `o.window("^(Bitwarden)$", { tile = true })`
+  in `hyprland.lua` overrides Omarchy's `+floating-window` tag default.
 - `SUPER+Y` opens yazi in a new terminal window (`{ tui = "yazi" }`, i.e.
   `omarchy-launch-tui yazi`) via `bindings.lua`. `SUPER+SHIFT+Y` stays YouTube.
 - `SUPER+CTRL+ALT+S` toggles the user `chezmoi-sync.timer` through
