@@ -27,8 +27,9 @@
 - "i used to have yogurt in the morning, but it hurts my stomach (even lactose free)" (2026-10-16). Which brands/flavours not recorded.
 
 ### Revolution Nutrition High Whey Protein, Vanilla Cake (2.7 kg bag)
-- "this kind hurts my stomach" (2026-10-16, photo of the bag front)
-- Front label: 147 Cal, 25 g protein, 0 g added sugar, gluten free, "naturally and artificially flavoured". Ingredient list not seen (back of bag not photographed), so the whey type and sweeteners are unknown.
+- "this kind hurts my stomach" (2026-10-16, photos of the bag front and back)
+- Ingredients: protein blend (whey protein concentrate, whey protein isolate), milk protein concentrate, natural and/or artificial flavours, medium chain triglycerides (from coconut oil), soy lecithin, sucralose, digestive enzymes (proteases, bromelain, lactase), stevia extract. Contains milk and soy; may contain fish, nuts.
+- Per 1 scoop (37 g): 147 Cal, 3 g fat (1 g saturated), 5 g carbohydrate, 0 g fibre, 2 g sugars, 25 g protein, 27 mg cholesterol, 108 mg sodium, 247 mg potassium, 244 mg calcium, 0.2 mg iron.
 - Unclear whether he means this product only or whey powders in general.
 
 ### Peanut butter
@@ -62,4 +63,4 @@ Tolerated (source in brackets):
 Bothers:
 - yogurt, including lactose-free (cause unknown: not just lactose)
 - peanut butter
-- Revolution Nutrition High Whey, Vanilla Cake (ingredients unknown)
+- Revolution Nutrition High Whey, Vanilla Cake. Which ingredient is the cause is unknown; suspects to avoid or test one at a time: whey/milk protein (dairy, shared with yogurt), sucralose, stevia, MCT oil.
