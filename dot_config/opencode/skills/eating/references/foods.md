@@ -13,6 +13,11 @@
 - Chicken breast, rice, frozen veggies, eggs, egg whites.
 - Not specified: which rice, which frozen veggie mix, or how they're cooked.
 
+### Bread from Superstore (probably Promise, gluten-free)
+- "there's also a bread i get from superstore that doesn't hurt my stomach. I dont remember the name tho. It starts with a P" (2026-10-16)
+- "I think its promise yeah" (2026-10-16): probably Promise Gluten Free; not confirmed from the bag. Which loaf and its ingredients not known yet.
+- Open question, not a conclusion: whether regular wheat bread bothers him has not been recorded.
+
 ## Bothers my stomach
 
 (none recorded)
@@ -37,5 +42,6 @@ Tolerated (source in brackets):
 - xanthan gum, maltodextrin, mono- and diglycerides [Taco Bell Hot sauce]
 - potassium chloride, sodium benzoate [Taco Bell Hot sauce]
 - chicken breast, rice, frozen veggies, whole eggs, egg whites [staples]
+- (Superstore bread, probably Promise Gluten Free: ingredients unknown, add from the label)
 
 Bothers: (none recorded)
