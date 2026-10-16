@@ -1,5 +1,8 @@
 # Food and supplement record
 
+## Health context
+- "i have IBS" (2026-10-16). Subtype (IBS-C / IBS-D / mixed), known triggers, and whether he follows a diet such as low-FODMAP not recorded.
+
 ## Doesn't hurt my stomach
 
 ### Taco Bell sauces, all varieties (glass bottles, Kraft Heinz Canada)
@@ -20,7 +23,11 @@
 
 ## Bothers my stomach
 
-(none recorded)
+### Yogurt, including lactose-free
+- "i used to have yogurt in the morning, but it hurts my stomach (even lactose free)" (2026-10-16). Which brands/flavours not recorded.
+
+### Peanut butter
+- "Peanut butter also doesnt work" (2026-10-16). Brand and amount not recorded.
 
 ## Unsure
 
@@ -32,7 +39,10 @@
 
 ## Preferences and diet
 
-(none recorded)
+### Current daily routine (2026-10-16)
+- Twice a day: chicken breast with rice and frozen veggies.
+- Once a day: 2 eggs + 1/3 cup egg whites + 2 slices of bread.
+- Dropped the morning yogurt because it hurts his stomach; looking for a replacement.
 
 ## Ingredient index
 
@@ -44,4 +54,6 @@ Tolerated (source in brackets):
 - chicken breast, rice, frozen veggies, whole eggs, egg whites [staples]
 - (Superstore bread, probably Promise Gluten Free: ingredients unknown, add from the label)
 
-Bothers: (none recorded)
+Bothers:
+- yogurt, including lactose-free (cause unknown: not just lactose)
+- peanut butter
