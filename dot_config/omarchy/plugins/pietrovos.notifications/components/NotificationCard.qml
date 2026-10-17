@@ -32,6 +32,11 @@ BorderSurface {
 
   readonly property bool hovered: hoverTracker.hovered
 
+  // Shrinks the whole card (width, padding, icon, text); borders stay as-is.
+  readonly property real sizeScale: 0.8
+  function sz(px) { return Math.max(1, Math.round(Style.spaceReal(px) * sizeScale)) }
+  function fontSz(px) { return Math.max(1, Math.round(px * sizeScale)) }
+
   signal closeRequested()
   signal cardClicked()
   // Prefer per-notification media/avatar data, then fall back to the app icon.
@@ -67,7 +72,7 @@ BorderSurface {
     return Quickshell.iconPath(value, true)
   }
 
-  implicitWidth: Style.space(380)
+  implicitWidth: root.sz(380)
   // Add vertical border insets so mainColumn (inset by border on top/left/right)
   // doesn't push content under the bottom edge.
   implicitHeight: mainColumn.implicitHeight + borderTop + borderBottom
@@ -106,16 +111,16 @@ BorderSurface {
     // Text content.
     RowLayout {
       Layout.fillWidth: true
-      Layout.leftMargin: Style.space(12)
-      Layout.rightMargin: Style.space(12)
-      Layout.topMargin: root.singleLineToast ? Style.space(7) : Style.space(10)
-      Layout.bottomMargin: root.singleLineToast ? Style.space(7) : Style.space(10)
-      spacing: root.collapseRedundantIcon ? 0 : (root.compactGlyph ? Style.space(8) : Style.space(12))
+      Layout.leftMargin: root.sz(12)
+      Layout.rightMargin: root.sz(12)
+      Layout.topMargin: root.singleLineToast ? root.sz(7) : root.sz(10)
+      Layout.bottomMargin: root.singleLineToast ? root.sz(7) : root.sz(10)
+      spacing: root.collapseRedundantIcon ? 0 : (root.compactGlyph ? root.sz(8) : root.sz(12))
 
       Item {
         id: smallIconSlot
-        Layout.preferredWidth: visible ? Style.space(40) : 0
-        Layout.preferredHeight: visible ? Style.space(40) : 0
+        Layout.preferredWidth: visible ? root.sz(40) : 0
+        Layout.preferredHeight: visible ? root.sz(40) : 0
         Layout.alignment: Qt.AlignVCenter
         // Hide the slot when the icon failed to resolve (themed-icon name
         // not in the user's icon theme) AND we don't have a glyph fallback
@@ -143,7 +148,7 @@ BorderSurface {
           text: root.glyph
           color: Color.notifications.text
           font.family: root.fontFamily
-          font.pixelSize: Style.font.displayLarge
+          font.pixelSize: root.fontSz(Style.font.displayLarge)
         }
       }
 
@@ -154,13 +159,13 @@ BorderSurface {
         text: root.glyph
         color: Color.notifications.text
         font.family: root.fontFamily
-        font.pixelSize: Style.font.icon
+        font.pixelSize: root.fontSz(Style.font.icon)
       }
 
       ColumnLayout {
         Layout.fillWidth: true
         Layout.alignment: Qt.AlignVCenter
-        spacing: Style.space(2)
+        spacing: root.sz(2)
 
         Text {
           // The spec defines the summary as a single line of plain text, so
@@ -173,7 +178,7 @@ BorderSurface {
           text: root.summary
           font.family: "Liberation Sans"
           color: Color.notifications.text
-          font.pixelSize: Style.font.title
+          font.pixelSize: root.fontSz(Style.font.title)
           font.bold: true
           wrapMode: Text.WordWrap
           elide: Text.ElideRight
@@ -182,13 +187,13 @@ BorderSurface {
 
         Text {
           Layout.fillWidth: true
-          Layout.topMargin: Style.space(2)
+          Layout.topMargin: root.sz(2)
           visible: root.sanitizedBody.length > 0
           text: root.styledBody
           textFormat: Text.StyledText
           font.family: "Liberation Sans"
           color: root.bodyColor
-          font.pixelSize: Style.font.title
+          font.pixelSize: root.fontSz(Style.font.title)
           wrapMode: Text.WordWrap
           elide: Text.ElideRight
           maximumLineCount: 3

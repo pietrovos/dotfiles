@@ -983,7 +983,7 @@ Item {
         anchors.top: parent.top
         anchors.topMargin: popupWindow.popupPlacement.margins.top
         anchors.rightMargin: popupWindow.popupPlacement.margins.right
-        spacing: Style.space(8)
+        spacing: Style.space(6)
 
         Repeater {
           model: popupModel

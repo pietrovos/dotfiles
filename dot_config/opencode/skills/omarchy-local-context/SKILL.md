@@ -182,6 +182,10 @@ from Omarchy defaults when these files can be inspected.
 - Mouse wheel scrolling is 3x faster via `input.scroll_factor = 3.0` in
   `~/.config/hypr/input.lua` (machine-local input setting; touchpad keeps
   its own `scroll_factor = 0.8`).
+- Notification cards are 20% smaller: `sizeScale: 0.8` in
+  `pietrovos.notifications/components/NotificationCard.qml` scales width,
+  padding, icon and font sizes (borders unchanged); popup spacing is
+  `Style.space(6)` in its `Service.qml`. Adjust `sizeScale` to resize.
 - `SUPER+CTRL+ALT+S` toggles the user `chezmoi-sync.timer` through
   `~/.config/hypr/toggle-chezmoi-sync`, with a desktop notification. The timer's
   enabled state is machine-local.
