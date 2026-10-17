@@ -179,6 +179,9 @@ from Omarchy defaults when these files can be inspected.
   lost to the tag-based float rule).
 - `SUPER+Y` opens yazi in a new terminal window (`{ tui = "yazi" }`, i.e.
   `omarchy-launch-tui yazi`) via `bindings.lua`. `SUPER+SHIFT+Y` stays YouTube.
+- Mouse wheel scrolling is 3x faster via `input.scroll_factor = 3.0` in
+  `~/.config/hypr/input.lua` (machine-local input setting; touchpad keeps
+  its own `scroll_factor = 0.8`).
 - `SUPER+CTRL+ALT+S` toggles the user `chezmoi-sync.timer` through
   `~/.config/hypr/toggle-chezmoi-sync`, with a desktop notification. The timer's
   enabled state is machine-local.
