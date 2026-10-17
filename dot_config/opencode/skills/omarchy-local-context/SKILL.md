@@ -164,9 +164,11 @@ from Omarchy defaults when these files can be inspected.
   `termfilechooser`, floated and centered by a rule in `hyprland.lua`. Inside
   yazi, `z` jumps via zoxide; remove the `FileChooser` line to revert to GTK.
   The backend `cmd` is a user copy of the yazi wrapper at
-  `~/.config/xdg-desktop-portal-termfilechooser/yazi-wrapper.sh`: when saving,
-  picking a folder instead of the placeholder file saves there under the
-  suggested name (stock backend rejects it: "selected SaveFile is a directory").
+  `~/.config/xdg-desktop-portal-termfilechooser/yazi-wrapper.sh`. When saving,
+  `q` saves into the folder yazi is in (via `--cwd-file`), picking a folder
+  saves into it, both under the suggested name, and `Q` cancels. The stock
+  backend rejects a picked folder ("selected SaveFile is a directory") and
+  gives no way to save into the current folder.
   Yazi adds every visited directory to zoxide (`~/.config/yazi/init.lua`).
 - `SUPER+N` runs `~/.config/hypr/quick-note`: a new blank note
   `~/Quick Notes/YYYY-MM-DD HH-MM-SS.md` (a counter is appended if the
