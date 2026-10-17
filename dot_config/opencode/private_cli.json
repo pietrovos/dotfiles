@@ -25,10 +25,15 @@
     "thinking": "hide"
   },
   "tabs": {
-    "mode": "on",
+    "mode": "off",
     "layout": "horizontal",
     "indicators": "status"
   },
   "animations": true,
-  "plugins": ["./cli-plugins/completion-notification", "./cli-plugins/restart", "./cli-plugins/keybinds", "./cli-plugins/toggle-tabs"]
+  "plugins": [
+    "./cli-plugins/completion-notification",
+    "./cli-plugins/restart",
+    "./cli-plugins/keybinds",
+    "./cli-plugins/toggle-tabs"
+  ]
 }
