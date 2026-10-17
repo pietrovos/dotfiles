@@ -163,6 +163,11 @@ from Omarchy defaults when these files can be inspected.
   portal settings, not chezmoi-managed). Kitty runs with class
   `termfilechooser`, floated and centered by a rule in `hyprland.lua`. Inside
   yazi, `z` jumps via zoxide; remove the `FileChooser` line to revert to GTK.
+  The backend `cmd` is a user copy of the yazi wrapper at
+  `~/.config/xdg-desktop-portal-termfilechooser/yazi-wrapper.sh`: when saving,
+  picking a folder instead of the placeholder file saves there under the
+  suggested name (stock backend rejects it: "selected SaveFile is a directory").
+  Yazi adds every visited directory to zoxide (`~/.config/yazi/init.lua`).
 - `SUPER+N` runs `~/.config/hypr/quick-note`: a new blank note
   `~/Quick Notes/YYYY-MM-DD HH-MM-SS.md` (a counter is appended if the
   name exists) in nvim (`wrap linebreak`, starts in insert mode) inside a kitty
