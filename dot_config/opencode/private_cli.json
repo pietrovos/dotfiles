@@ -24,6 +24,11 @@
     "scrollbar": true,
     "thinking": "hide"
   },
+  "tabs": {
+    "mode": "on",
+    "layout": "vertical",
+    "indicators": "numbers"
+  },
   "animations": true,
   "plugins": ["./cli-plugins/completion-notification", "./cli-plugins/restart", "./cli-plugins/keybinds"]
 }
