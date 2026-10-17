@@ -37,5 +37,6 @@
     ]
   },
   "theme": "custom:omarchy",
-  "preferredNotifChannel": "notifications_disabled"
+  "preferredNotifChannel": "notifications_disabled",
+  "agentPushNotifEnabled": true
 }
