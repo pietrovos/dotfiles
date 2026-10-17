@@ -8,20 +8,6 @@
       "type": "local",
       "command": ["npx", "-y", "@playwright/mcp@0.0.83", "--headless", "--executable-path", "/usr/bin/chromium"],
       "enabled": true
-    },
-    "servers": {
-      "comfy": {
-        "type": "local",
-        "command": [
-          "/home/pietrovos/.local/share/comfy-tools/venv/bin/comfy-mcp"
-        ],
-        "environment": {
-          "COMFY_BIN": "/home/pietrovos/.local/share/comfy-tools/venv/bin/comfy",
-          "DO_NOT_TRACK": "1",
-          "COMFY_NO_TELEMETRY": "1",
-          "COMFY_KNOWLEDGE_DISABLE": "1"
-        }
-      }
     }
   }
 }
