@@ -30,5 +30,5 @@
     "indicators": "status"
   },
   "animations": true,
-  "plugins": ["./cli-plugins/completion-notification", "./cli-plugins/restart", "./cli-plugins/keybinds"]
+  "plugins": ["./cli-plugins/completion-notification", "./cli-plugins/restart", "./cli-plugins/keybinds", "./cli-plugins/toggle-tabs"]
 }
