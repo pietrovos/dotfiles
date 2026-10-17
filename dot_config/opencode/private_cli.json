@@ -26,8 +26,8 @@
   },
   "tabs": {
     "mode": "on",
-    "layout": "vertical",
-    "indicators": "numbers"
+    "layout": "horizontal",
+    "indicators": "status"
   },
   "animations": true,
   "plugins": ["./cli-plugins/completion-notification", "./cli-plugins/restart", "./cli-plugins/keybinds"]
