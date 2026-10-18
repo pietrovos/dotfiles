@@ -7,7 +7,7 @@ mkdir -p "$state_dir"
 
 if [[ -e "$flag" ]]; then
   rm -- "$flag"
-  message="LG TV: independent display · 150% scaling · workspace 11"
+  message="LG TV: independent display · 1080p/60 · 150% scaling · workspace 11"
 else
   touch "$flag"
   message="LG TV: mirroring MSI monitor"

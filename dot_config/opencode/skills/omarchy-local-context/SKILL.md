@@ -19,6 +19,10 @@ from Omarchy defaults when these files can be inspected.
   at 1080p/60, via `~/.config/hypr/toggle-tv-mirror`. The machine-local flag
   `$XDG_STATE_HOME/omarchy/tv-mirror` (default `~/.local/state/omarchy/tv-mirror`)
   remembers mirror mode across reloads/logins; absent means independent.
+  Enabling HDMI ULTRA HD Deep Color on TV HDMI 1 exposed 4K/60 modes,
+  but 4K/60 caused repeated brief blackouts over the current long HDMI run.
+  Restored 1080p/60 pending confirmation; cable/link instability is suspected,
+  not confirmed.
   Monitor settings stay machine-local.
 
 - Kitty's `CTRL+SHIFT+A` copies the active terminal's screen and retained
