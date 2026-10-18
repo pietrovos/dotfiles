@@ -10,9 +10,12 @@ from Omarchy defaults when these files can be inspected.
 
 ## Current Customizations
 
-- The LG TV (`HDMI-A-1`, 1920x1080@60) always mirrors the main MSI
-  monitor (`DP-2`, 2560x1440@240) via `~/.config/hypr/monitors.lua`.
-  The ASUS (`DP-3`) remains independent. Monitor settings stay machine-local.
+- The LG TV (`HDMI-A-1`, 1920x1080@60) is independent at 150% scale,
+  to the right of the ASUS, with persistent default workspace 11 via
+  `~/.config/hypr/monitors.lua`. MSI (`DP-2`) keeps workspaces 1–5 and 7–10;
+  ASUS (`DP-3`) keeps workspace 6. `SUPER+CTRL+T` focuses TV workspace 11;
+  `SUPER+CTRL+SHIFT+T` moves the active window there and follows it.
+  Monitor settings stay machine-local.
 
 - Kitty's `CTRL+SHIFT+A` copies the active terminal's screen and retained
   scrollback to the clipboard as plain text through `launch --type=clipboard

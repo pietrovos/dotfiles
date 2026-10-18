@@ -145,6 +145,9 @@ o.bind("CTRL + Control_L", "Search files (double-tap Ctrl)", ctrl_tap, { release
 o.bind("CTRL + Control_R", "Search files (double-tap Ctrl)", ctrl_tap, { release = true })
 
 -- Add extra bindings below.
+bind("SUPER + CTRL + T", "Focus LG TV workspace", hl.dsp.focus({ workspace = "11" }))
+bind("SUPER + CTRL + SHIFT + T", "Move window to LG TV", hl.dsp.window.move({ workspace = "11", follow = true }))
+
 -- o.bind("SUPER + SHIFT + R", "SSH", "alacritty -e ssh your-server")
 
 -- Overwrite existing bindings with hl.unbind() first if needed.
