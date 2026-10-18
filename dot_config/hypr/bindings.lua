@@ -147,6 +147,7 @@ o.bind("CTRL + Control_R", "Search files (double-tap Ctrl)", ctrl_tap, { release
 -- Add extra bindings below.
 bind("SUPER + CTRL + T", "Focus LG TV workspace", hl.dsp.focus({ workspace = "11" }))
 bind("SUPER + CTRL + SHIFT + T", "Move window to LG TV", hl.dsp.window.move({ workspace = "11", follow = true }))
+bind("SUPER + CTRL + ALT + T", "Toggle LG TV mirroring", "/home/pietrovos/.config/hypr/toggle-tv-mirror")
 
 -- o.bind("SUPER + SHIFT + R", "SSH", "alacritty -e ssh your-server")
 

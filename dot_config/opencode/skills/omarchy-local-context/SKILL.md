@@ -15,6 +15,10 @@ from Omarchy defaults when these files can be inspected.
   `~/.config/hypr/monitors.lua`. MSI (`DP-2`) keeps workspaces 1–5 and 7–10;
   ASUS (`DP-3`) keeps workspace 6. `SUPER+CTRL+T` focuses TV workspace 11;
   `SUPER+CTRL+SHIFT+T` moves the active window there and follows it.
+  `SUPER+CTRL+ALT+T` toggles between this independent setup and mirroring MSI
+  at 1080p/60, via `~/.config/hypr/toggle-tv-mirror`. The machine-local flag
+  `$XDG_STATE_HOME/omarchy/tv-mirror` (default `~/.local/state/omarchy/tv-mirror`)
+  remembers mirror mode across reloads/logins; absent means independent.
   Monitor settings stay machine-local.
 
 - Kitty's `CTRL+SHIFT+A` copies the active terminal's screen and retained

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/omarchy"
+flag="$state_dir/tv-mirror"
+mkdir -p "$state_dir"
+
+if [[ -e "$flag" ]]; then
+  rm -- "$flag"
+  message="LG TV: independent display · 150% scaling · workspace 11"
+else
+  touch "$flag"
+  message="LG TV: mirroring MSI monitor"
+fi
+
+hyprctl reload
+notify-send "TV display mode" "$message"
