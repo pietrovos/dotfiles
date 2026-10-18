@@ -10,6 +10,10 @@ from Omarchy defaults when these files can be inspected.
 
 ## Current Customizations
 
+- The LG TV (`HDMI-A-1`, 1920x1080@60) always mirrors the main MSI
+  monitor (`DP-2`, 2560x1440@240) via `~/.config/hypr/monitors.lua`.
+  The ASUS (`DP-3`) remains independent. Monitor settings stay machine-local.
+
 - Kitty's `CTRL+SHIFT+A` copies the active terminal's screen and retained
   scrollback to the clipboard as plain text through `launch --type=clipboard
   --stdin-source=@screen_scrollback` in `~/.config/kitty/kitty.conf`.
