@@ -225,6 +225,16 @@ from Omarchy defaults when these files can be inspected.
 - `SUPER+CTRL+ALT+S` toggles the user `chezmoi-sync.timer` through
   `~/.config/hypr/toggle-chezmoi-sync`, with a desktop notification. The timer's
   enabled state is machine-local.
+- Greenify replicas: `~/.local/bin/theme-replica` makes themes that are
+  Greenify recoloured. A replica is a theme dir with `replica.toml`
+  (`colour`/`hue`, optional `vibrancy`, `saturation`, `lightness`, `icons`).
+  Everything except its `backgrounds/` and `replica.toml` is regenerated from
+  `themes/greenify` by rotating Greenify's greens in OKLCH (the default
+  vibrancy 0.5 balances brightness against vividness; a vivid blue is darker
+  than a vivid green). It skips the files Omarchy ignores in Greenify because
+  that theme is a git clone (terminal configs, `*.lua`), so replicas render the
+  same way. `theme-replica new <name> <colour>`, `theme-replica sync` after
+  changing Greenify, `theme-replica list`.
 
 ## Required Workflow
 

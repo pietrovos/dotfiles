@@ -67,3 +67,49 @@ end)
 ps.sub("delete", function(body)
 	record("delete", "paths", urls(body))
 end)
+
+-- Reopen in the directory yazi was last closed in, unless a path was passed on the command line.
+local last_dir = (os.getenv("XDG_STATE_HOME") or (os.getenv("HOME") .. "/.local/state")) .. "/yazi/last-dir"
+
+local function save_dir()
+	local f = io.open(last_dir, "w")
+	if not f then
+		os.execute("mkdir -p " .. string.format("%q", last_dir:match("^(.*)/")))
+		f = io.open(last_dir, "w")
+	end
+	if f then
+		f:write(tostring(cx.active.current.cwd))
+		f:close()
+	end
+end
+
+ps.sub("cd", save_dir)
+ps.sub("tab", save_dir)
+
+local function has_path_arg()
+	local f = io.open("/proc/self/cmdline", "rb")
+	if not f then
+		return true
+	end
+	local args = f:read("*a")
+	f:close()
+	local first = true
+	for arg in args:gmatch("[^%z]+") do
+		if not first and arg:sub(1, 1) ~= "-" then
+			return true
+		end
+		first = false
+	end
+	return false
+end
+
+if not has_path_arg() then
+	local f = io.open(last_dir, "r")
+	local dir = f and f:read("*l")
+	if f then
+		f:close()
+	end
+	if dir and dir ~= "" then
+		ya.emit("cd", { dir })
+	end
+end

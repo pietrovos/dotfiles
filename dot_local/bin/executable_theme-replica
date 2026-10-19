@@ -1,0 +1,269 @@
+#!/usr/bin/env python3
+"""Make recoloured copies of the Greenify Omarchy theme.
+
+A replica is a theme directory containing a replica.toml, for example:
+
+    colour = "#4da6ff"   # any colour of the hue you want (or: hue = 250, OKLCH degrees)
+    saturation = 1.0     # optional multiplier
+    lightness = 1.0      # optional multiplier
+    vibrancy = 0.5       # optional: 0 keeps Greenify's brightness, 1 its vividness
+    icons = "Yaru-blue-dark"  # optional, picked from the hue otherwise
+
+Everything except backgrounds/ and replica.toml is regenerated from Greenify by
+rotating its greens to the replica's hue in OKLCH, balancing
+Greenify's brightness against its vividness. Backgrounds belong to the replica.
+
+    theme-replica new <name> <colour|hue>   create a replica
+    theme-replica sync [name...]            regenerate replicas (all by default)
+    theme-replica list                      show replicas and their colours
+"""
+
+import colorsys
+import math
+import re
+import shutil
+import subprocess
+import sys
+import tomllib
+from pathlib import Path
+
+THEMES = Path.home() / ".config/omarchy/themes"
+SOURCE = THEMES / "greenify"
+SPEC = "replica.toml"
+KEEP = {SPEC, "backgrounds"}
+
+# Greenify ships these, but it is a git clone, so omarchy-theme-set ignores
+# them and generates them from colors.toml. Leaving them out keeps replicas
+# rendering exactly like Greenify does.
+SKIP = {".git", "README.md", "preview.png", "backgrounds",
+        "alacritty.toml", "foot.ini", "ghostty.conf", "kitty.conf", "vscode.json"}
+TEXT_SUFFIXES = {".toml", ".conf", ".css", ".ini", ".theme", ".jsonc", ".json",
+                 ".qml", ".xml", ".rgb", ""}
+
+SOURCE_GREEN = "#59CF77"  # Greenify's main green
+GREEN_BAND = (60, 200)  # hues treated as Greenify's greens; others stay put
+MIN_SAT = 0.08  # greys and blacks stay put
+
+ICON_HUES = {"Yaru-red-dark": 25, "Yaru-wartybrown-dark": 60, "Yaru-yellow-dark": 95,
+             "Yaru-olive-dark": 148, "Yaru-prussiangreen-dark": 200,
+             "Yaru-blue-dark": 255, "Yaru-purple-dark": 300, "Yaru-magenta-dark": 345}
+
+
+def to_linear(c):
+    return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
+
+
+def from_linear(c):
+    return 12.92 * c if c <= 0.0031308 else 1.055 * c ** (1 / 2.4) - 0.055
+
+
+def to_oklch(r, g, b):
+    r, g, b = (to_linear(c / 255) for c in (r, g, b))
+    l = (0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b) ** (1 / 3)
+    m = (0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b) ** (1 / 3)
+    s = (0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b) ** (1 / 3)
+    L = 0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s
+    a = 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s
+    bb = 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s
+    return L, math.hypot(a, bb), math.degrees(math.atan2(bb, a)) % 360
+
+
+def from_oklch(L, C, H):
+    a, b = C * math.cos(math.radians(H)), C * math.sin(math.radians(H))
+    l = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3
+    m = (L - 0.1055613458 * a - 0.0638541728 * b) ** 3
+    s = (L - 0.0894841775 * a - 1.2914855480 * b) ** 3
+    return (4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+            -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+            -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s)
+
+
+def oklch_to_rgb(L, C, H):
+    # Keep lightness and hue; reduce chroma until the colour fits in sRGB
+    lo, hi = 0.0, C
+    if all(-1e-6 <= c <= 1 + 1e-6 for c in from_oklch(L, C, H)):
+        lo = C
+    else:
+        for _ in range(30):
+            mid = (lo + hi) / 2
+            if all(-1e-6 <= c <= 1 + 1e-6 for c in from_oklch(L, mid, H)):
+                lo = mid
+            else:
+                hi = mid
+    return tuple(round(min(1, max(0, from_linear(max(0, c)))) * 255) for c in from_oklch(L, lo, H))
+
+
+def in_gamut(L, C, H):
+    return all(-1e-6 <= c <= 1 + 1e-6 for c in from_oklch(L, C, H))
+
+
+def cusp(H):
+    """Lightness and chroma of the most vivid sRGB colour at hue H."""
+    best = (0.5, 0.0)
+    for i in range(1, 100):
+        L = i / 100
+        lo, hi = 0.0, 0.5
+        for _ in range(20):
+            mid = (lo + hi) / 2
+            lo, hi = (mid, hi) if in_gamut(L, mid, H) else (lo, mid)
+        if lo > best[1]:
+            best = (L, lo)
+    return best
+
+
+def hex_rgb(value):
+    value = value.lstrip("#")
+    return tuple(int(value[i:i + 2], 16) for i in (0, 2, 4))
+
+
+def hex_hue(value):
+    return to_oklch(*hex_rgb(value))[2]
+
+
+class Recolour:
+    def __init__(self, spec):
+        if "hue" in spec:
+            target = float(spec["hue"])
+        else:
+            target = hex_hue(spec["colour"])
+        self.target = target % 360
+        self.shift = self.target - hex_hue(SOURCE_GREEN)
+        self.sat = float(spec.get("saturation", 1.0))
+        self.light = float(spec.get("lightness", 1.0))
+        self.vibrancy = float(spec.get("vibrancy", 0.5))
+        self.cusps = {}
+
+    def rgb(self, r, g, b):
+        h, _, s = colorsys.rgb_to_hls(r / 255, g / 255, b / 255)
+        if s < MIN_SAT or not GREEN_BAND[0] <= h * 360 <= GREEN_BAND[1]:
+            return r, g, b
+        L, C, H = to_oklch(r, g, b)
+        target = (H + self.shift) % 360
+        # Place the colour at the same spot in the target hue's gamut triangle
+        # (black, white, most vivid colour), then blend that with simply
+        # keeping its lightness: vivid blues are darker than vivid greens.
+        (ls, cs), (lt, ct) = self.cusp(H), self.cusp(target)
+        t = min(1, C / cs) if cs else 0
+        axis = (L - t * ls) / (1 - t) if t < 1 else ls
+        v = self.vibrancy
+        L = (1 - v) * L + v * ((1 - t) * axis + t * lt)
+        C = (1 - v) * C + v * t * ct
+        return oklch_to_rgb(min(1, L * self.light), C * self.sat, target)
+
+    def cusp(self, hue):
+        key = round(hue) % 360
+        if key not in self.cusps:
+            self.cusps[key] = cusp(key)
+        return self.cusps[key]
+
+    def hex6(self, value, upper):
+        out = "".join(f"{c:02x}" for c in self.rgb(*(int(value[i:i + 2], 16) for i in (0, 2, 4))))
+        return out.upper() if upper else out
+
+    def text(self, content):
+        # #RRGGBB / #RRGGBBAA
+        content = re.sub(
+            r"#([0-9A-Fa-f]{6})(?=[0-9A-Fa-f]{2}\b|\b)",
+            lambda m: "#" + self.hex6(m[1], m[1].isupper()),
+            content)
+        # Hyprland rgba(RRGGBBAA)
+        content = re.sub(
+            r"rgba\(([0-9A-Fa-f]{6})([0-9A-Fa-f]{2})\)",
+            lambda m: f"rgba({self.hex6(m[1], False)}{m[2]})", content)
+        # rgba(r,g,b,a)
+        def decimal(m):
+            r, g, b = self.rgb(int(m[1]), int(m[2]), int(m[3]))
+            return f"rgba({r},{g},{b},{m[4]})"
+        return re.sub(r"rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)", decimal, content)
+
+    def icons(self):
+        def distance(hue):
+            d = abs(hue - self.target) % 360
+            return min(d, 360 - d)
+        return min(ICON_HUES, key=lambda name: distance(ICON_HUES[name]))
+
+
+def copy_tree(src, dst, recolour):
+    dst.mkdir(parents=True, exist_ok=True)
+    for entry in sorted(src.iterdir()):
+        if entry.name in SKIP or entry.name.endswith(".lua"):
+            continue
+        target = dst / entry.name
+        if entry.is_dir():
+            copy_tree(entry, target, recolour)
+        elif entry.suffix in TEXT_SUFFIXES:
+            target.write_text(recolour.text(entry.read_text()))
+        else:
+            shutil.copy2(entry, target)
+
+
+def build(name):
+    theme = THEMES / name
+    spec = tomllib.loads((theme / SPEC).read_text())
+    recolour = Recolour(spec)
+
+    for entry in theme.iterdir():
+        if entry.name not in KEEP:
+            shutil.rmtree(entry) if entry.is_dir() else entry.unlink()
+
+    copy_tree(SOURCE, theme, recolour)
+    (theme / "icons.theme").write_text(spec.get("icons", recolour.icons()) + "\n")
+
+    # Greenify's preview, rotated the same way (ImageMagick hue is 0-200, 100 = none)
+    preview = SOURCE / "preview.png"
+    if preview.exists():
+        hue = 100 + recolour.shift / 180 * 100
+        hue %= 200
+        subprocess.run(["magick", str(preview), "-modulate", f"100,100,{hue:.1f}",
+                        str(theme / "preview.png")], check=True)
+
+    (theme / "backgrounds").mkdir(exist_ok=True)
+    print(f"{name}: hue {recolour.target:.0f}, icons {spec.get('icons', recolour.icons())}")
+
+
+def replicas():
+    return sorted(p.parent.name for p in THEMES.glob(f"*/{SPEC}"))
+
+
+def main(args):
+    if not args or args[0] in {"-h", "--help"}:
+        print(__doc__.strip())
+        return 0
+
+    command, rest = args[0], args[1:]
+
+    if command == "new":
+        if len(rest) != 2:
+            print("Usage: theme-replica new <name> <colour|hue>", file=sys.stderr)
+            return 1
+        name = rest[0].lower().replace(" ", "-")
+        theme = THEMES / name
+        if theme.exists() and not (theme / SPEC).exists():
+            print(f"{theme} exists and is not a replica", file=sys.stderr)
+            return 1
+        colour = rest[1]
+        line = f'hue = {float(colour):g}' if re.fullmatch(r"\d+(\.\d+)?", colour) \
+            else f'colour = "#{colour.lstrip("#")}"'
+        theme.mkdir(exist_ok=True)
+        if not (theme / SPEC).exists():
+            (theme / SPEC).write_text(line + "\n")
+        build(name)
+        print(f"Add wallpapers to {theme / 'backgrounds'}, then: omarchy theme set {name}")
+        return 0
+
+    if command == "sync":
+        for name in rest or replicas():
+            build(name)
+        return 0
+
+    if command == "list":
+        for name in replicas():
+            print(f"{name}: {(THEMES / name / SPEC).read_text().strip()}")
+        return 0
+
+    print(f"Unknown command: {command}", file=sys.stderr)
+    return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))
