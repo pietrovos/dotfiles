@@ -188,6 +188,8 @@ from Omarchy defaults when these files can be inspected.
   returned save path and fails ("failed to stat … No such file or directory",
   Chrome's save silently does nothing) if it is missing, so the wrapper
   creates an empty placeholder at the final path; the app overwrites it.
+  `create_help_file=0` in the backend config stops the stock instructions
+  file ("Opening a file OVERWRITES it!"), which contradicted this flow.
   Yazi adds every visited directory to zoxide (`~/.config/yazi/init.lua`).
 - `SUPER+N` runs `~/.config/hypr/quick-note`: a new blank note
   `~/Quick Notes/YYYY-MM-DD HH-MM-SS.md` (a counter is appended if the
