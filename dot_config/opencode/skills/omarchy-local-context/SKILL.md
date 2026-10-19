@@ -180,9 +180,9 @@ from Omarchy defaults when these files can be inspected.
   yazi, `z` jumps via zoxide; remove the `FileChooser` line to revert to GTK.
   The backend `cmd` is a user copy of the yazi wrapper at
   `~/.config/xdg-desktop-portal-termfilechooser/yazi-wrapper.sh`. When saving,
-  `q` saves into the folder yazi is in (via `--cwd-file`), picking a folder
-  saves into it, picking a file saves beside it (never overwrites it), all
-  under the suggested name, and `Q` cancels. The stock
+  `q` and `Q` cancel without saving; an explicit selection is required.
+  Picking a folder saves into it, picking a file saves beside it (never
+  overwrites it), all under the suggested name. The stock
   backend rejects a picked folder ("selected SaveFile is a directory") and
   gives no way to save into the current folder. The backend also stats the
   returned save path and fails ("failed to stat … No such file or directory",
