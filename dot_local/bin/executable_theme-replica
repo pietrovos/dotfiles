@@ -28,6 +28,7 @@ import tomllib
 from pathlib import Path
 
 THEMES = Path.home() / ".config/omarchy/themes"
+CUSTOM_THEMES = Path.home() / ".config/omarchy/custom-themes"
 SOURCE = THEMES / "greenify"
 SPEC = "replica.toml"
 KEEP = {SPEC, "backgrounds"}
@@ -197,8 +198,13 @@ def copy_tree(src, dst, recolour):
             shutil.copy2(entry, target)
 
 
+def theme_path(name):
+    custom = CUSTOM_THEMES / name
+    return custom if custom.exists() or not (THEMES / name).exists() else THEMES / name
+
+
 def build(name):
-    theme = THEMES / name
+    theme = theme_path(name)
     spec = tomllib.loads((theme / SPEC).read_text())
     recolour = Recolour(spec)
 
@@ -222,7 +228,8 @@ def build(name):
 
 
 def replicas():
-    return sorted(p.parent.name for p in THEMES.glob(f"*/{SPEC}"))
+    return sorted({p.parent.name for root in (THEMES, CUSTOM_THEMES)
+                   for p in root.glob(f"*/{SPEC}")})
 
 
 def main(args):
@@ -237,17 +244,20 @@ def main(args):
             print("Usage: theme-replica new <name> <colour|hue>", file=sys.stderr)
             return 1
         name = rest[0].lower().replace(" ", "-")
-        theme = THEMES / name
+        theme = theme_path(name)
         if theme.exists() and not (theme / SPEC).exists():
             print(f"{theme} exists and is not a replica", file=sys.stderr)
             return 1
         colour = rest[1]
         line = f'hue = {float(colour):g}' if re.fullmatch(r"\d+(\.\d+)?", colour) \
             else f'colour = "#{colour.lstrip("#")}"'
-        theme.mkdir(exist_ok=True)
+        theme.mkdir(parents=True, exist_ok=True)
         if not (theme / SPEC).exists():
             (theme / SPEC).write_text(line + "\n")
         build(name)
+        link = THEMES / name
+        if theme.parent == CUSTOM_THEMES and not link.exists() and not link.is_symlink():
+            link.symlink_to(Path("../custom-themes") / name, target_is_directory=True)
         print(f"Add wallpapers to {theme / 'backgrounds'}, then: omarchy theme set {name}")
         return 0
 
@@ -258,7 +268,7 @@ def main(args):
 
     if command == "list":
         for name in replicas():
-            print(f"{name}: {(THEMES / name / SPEC).read_text().strip()}")
+            print(f"{name}: {(theme_path(name) / SPEC).read_text().strip()}")
         return 0
 
     print(f"Unknown command: {command}", file=sys.stderr)

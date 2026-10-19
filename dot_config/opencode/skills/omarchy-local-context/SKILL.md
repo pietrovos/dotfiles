@@ -226,7 +226,14 @@ from Omarchy defaults when these files can be inspected.
   `~/.config/hypr/toggle-chezmoi-sync`, with a desktop notification. The timer's
   enabled state is machine-local.
 - Greenify replicas: `~/.local/bin/theme-replica` makes themes that are
-  Greenify recoloured. A replica is a theme dir with `replica.toml`
+  Greenify recoloured. The seven custom `*iffy` themes live in
+  `~/.config/omarchy/custom-themes/`, with relative symlinks at
+  `~/.config/omarchy/themes/<name>` for Omarchy discovery and switching.
+  New replicas are created in `custom-themes/` with compatibility symlinks;
+  listing/syncing supports both locations without duplicates. Downloaded
+  themes, including Greenify, remain in `themes/`. Theme files and these
+  symlinks stay machine-local, not chezmoi-managed.
+  A replica is a theme dir with `replica.toml`
   (`colour`/`hue`, optional `vibrancy`, `saturation`, `lightness`, `icons`).
   Everything except its `backgrounds/` and `replica.toml` is regenerated from
   `themes/greenify` by rotating Greenify's greens in OKLCH (the default
