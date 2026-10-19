@@ -1,0 +1,5 @@
+[mgr]
+prepend_keymap = [
+  { on = "u", run = "plugin undo", desc = "Undo last rename, move or trash" },
+  { on = "y", run = [ 'shell -- for path in %s; do echo "file://$path"; done | wl-copy -t text/uri-list', "yank" ], desc = "Yank and copy files to Wayland clipboard" },
+]

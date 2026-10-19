@@ -191,6 +191,14 @@ from Omarchy defaults when these files can be inspected.
   `create_help_file=0` in the backend config stops the stock instructions
   file ("Opening a file OVERWRITES it!"), which contradicted this flow.
   Yazi adds every visited directory to zoxide (`~/.config/yazi/init.lua`).
+- Yazi has undo on `u` (`~/.config/yazi/plugins/undo.yazi`). `init.lua`
+  subscribes to the `rename`, `bulk`, `move`, `trash` and `delete` DDS events
+  and appends them to `$XDG_STATE_HOME/yazi/undo.jsonl` (last 200 kept, shared
+  by all yazi instances including the file picker). `u` runs `undo.py`, which
+  pops the newest entry: renames/moves are moved back, trashed items are
+  restored from `~/.local/share/Trash` by matching `.trashinfo` paths, and a
+  permanent delete (`D`) reports that it can't be undone. Copies (`y`/`p`)
+  aren't journaled. An entry is dropped even if undoing it fails.
 - `SUPER+N` runs `~/.config/hypr/quick-note`: a new blank note
   `~/Quick Notes/YYYY-MM-DD HH-MM-SS.md` (a counter is appended if the
   name exists) in nvim (`wrap linebreak`, starts in insert mode) inside a kitty
