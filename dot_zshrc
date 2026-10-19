@@ -91,6 +91,7 @@ eval "$(zoxide init zsh)"
 # User configuration
 
 export PATH="$HOME/.cargo/bin:$HOME/.local/scripts:$HOME/.local/bin:$PATH"
+export OPENCODE_ENABLE_EXA=1
 alias tc='tmux-config-sessionizer'
 
 tmux() {

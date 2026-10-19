@@ -8,6 +8,16 @@
       "type": "local",
       "command": ["npx", "-y", "@playwright/mcp@0.0.83", "--headless", "--executable-path", "/usr/bin/chromium"],
       "enabled": true
+    },
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "enabled": true
+    },
+    "chrome-devtools": {
+      "type": "local",
+      "command": ["npx", "-y", "chrome-devtools-mcp@latest", "--headless", "--executablePath", "/usr/bin/chromium"],
+      "enabled": true
     }
   }
 }
