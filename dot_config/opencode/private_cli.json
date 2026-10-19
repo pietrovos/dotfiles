@@ -17,19 +17,23 @@
     "wrap": "word"
   },
   "prompt": {
-    "paste": "full"
+    "paste": "full",
+    "image_preview": true
   },
   "session": {
     "sidebar": "auto",
     "scrollbar": true,
     "thinking": "hide",
     "markdown": "rendered",
-    "image_preview": true
+    "image_preview": true,
+    "new_location": "launch",
+    "permissions": "prompt"
   },
   "tabs": {
     "mode": "off",
     "layout": "horizontal",
-    "indicators": "status"
+    "indicators": "status",
+    "scope": "cwd"
   },
   "animations": true,
   "plugins": [
@@ -37,5 +41,8 @@
     "./cli-plugins/restart",
     "./cli-plugins/keybinds",
     "./cli-plugins/toggle-tabs"
-  ]
+  ],
+  "scroll": {
+    "acceleration": true
+  }
 }
