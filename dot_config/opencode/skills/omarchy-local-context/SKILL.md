@@ -190,6 +190,10 @@ from Omarchy defaults when these files can be inspected.
   creates an empty placeholder at the final path; the app overwrites it.
   `create_help_file=0` in the backend config stops the stock instructions
   file ("Opening a file OVERWRITES it!"), which contradicted this flow.
+  After choosing files for upload, the wrapper returns the selection and opens
+  a separate regular Yazi window on the first selected file for manual cleanup.
+  It never auto-deletes; wait for the upload to finish before trashing the file.
+  Save and directory-selection dialogs do not open this cleanup window.
   Yazi adds every visited directory to zoxide (`~/.config/yazi/init.lua`).
 - Yazi has undo on `u` (`~/.config/yazi/plugins/undo.yazi`). `init.lua`
   subscribes to the `rename`, `bulk`, `move`, `trash` and `delete` DDS events
