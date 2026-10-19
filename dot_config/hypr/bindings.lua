@@ -117,33 +117,6 @@ bind("SUPER + ALT + N", "Name group subspace", "/home/pietrovos/.config/hypr/ren
 bind("mouse:275", "Dismiss last notification", "omarchy-shell notifications dismissOne")
 bind("mouse:276", "Invoke last notification", "omarchy-shell notifications invokeLast")
 
--- Double-tap Ctrl toggles the Omarchy Find file search overlay.
--- Hyprland can only bind a lone modifier with the modifier in the modmask plus
--- the release flag, so each Ctrl release is counted; two within 300 ms toggle.
-local ctrl_tap_generation = 0
-local ctrl_tap_armed = false
-
-local function ctrl_tap()
-  ctrl_tap_generation = ctrl_tap_generation + 1
-  if ctrl_tap_armed then
-    ctrl_tap_armed = false
-    hl.exec_cmd("omarchy-shell shell toggle jesseburlamaque.omarchy-find '{}'")
-    return
-  end
-  ctrl_tap_armed = true
-  local generation = ctrl_tap_generation
-  hl.timer(function()
-    if ctrl_tap_generation == generation then
-      ctrl_tap_armed = false
-    end
-  end, { timeout = 300, type = "oneshot" })
-end
-
-hl.unbind("CTRL + Control_L")
-hl.unbind("CTRL + Control_R")
-o.bind("CTRL + Control_L", "Search files (double-tap Ctrl)", ctrl_tap, { release = true })
-o.bind("CTRL + Control_R", "Search files (double-tap Ctrl)", ctrl_tap, { release = true })
-
 -- Add extra bindings below.
 bind("SUPER + CTRL + T", "Focus LG TV workspace", hl.dsp.focus({ workspace = "11" }))
 bind("SUPER + CTRL + SHIFT + T", "Move window to LG TV", hl.dsp.window.move({ workspace = "11", follow = true }))
