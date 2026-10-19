@@ -183,7 +183,10 @@ from Omarchy defaults when these files can be inspected.
   `q` saves into the folder yazi is in (via `--cwd-file`), picking a folder
   saves into it, both under the suggested name, and `Q` cancels. The stock
   backend rejects a picked folder ("selected SaveFile is a directory") and
-  gives no way to save into the current folder.
+  gives no way to save into the current folder. The backend also stats the
+  returned save path and fails ("failed to stat … No such file or directory",
+  Chrome's save silently does nothing) if it is missing, so the wrapper
+  creates an empty placeholder at the final path; the app overwrites it.
   Yazi adds every visited directory to zoxide (`~/.config/yazi/init.lua`).
 - `SUPER+N` runs `~/.config/hypr/quick-note`: a new blank note
   `~/Quick Notes/YYYY-MM-DD HH-MM-SS.md` (a counter is appended if the
