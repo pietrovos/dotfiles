@@ -14,6 +14,7 @@
 - uBreakiFix (June 2020 to September 2021): part time during the school year (6 to 12 hours per week, varying by week), full time during the summer. Source: Pietro, CSIS IT Analyst application assistance, 2026-10-15.
 - Kanata Flyers (FlyerForce), summers 2015 to 2026 (June to August during high school, May to September during university). 2015 to 2021: delivered a flyer route (about 4 hours per week) and helped with trucking (6 to 12 hours per week). 2022 to 2026: stopped delivering; trucking only, taking on a much larger share with the area manager, every summer and during the school year (6 to 12 hours per week). Source: Pietro, 2026-10-15.
 - At uBreakiFix, explained problems and repair options to customers. Source: Pietro, 2026-10-15.
+- The flyer delivery/trucking assistant work was part of a family business. Source: Pietro, resume update request, 2026-10-19. This does not establish that FlyerForce itself was family-owned.
 - No co-op work terms, although his Carleton program is listed as co-operative education. Source: Pietro, 2026-10-15.
 
 ## Compensation
