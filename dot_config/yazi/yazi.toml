@@ -1,0 +1,10 @@
+[opener]
+browser = [
+  { run = 'chromium %S1', orphan = true, desc = "Open in browser", for = "linux" }
+]
+
+[open]
+prepend_rules = [
+  { mime = "application/pdf", use = "browser" },
+  { mime = "text/html", use = [ "browser", "edit" ] }
+]
