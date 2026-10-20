@@ -1,5 +1,9 @@
 # Pietro's personal facts
 
+## Devices
+
+- His laptop previously ran Linux, but he has replaced it with Windows and now uses Moonlight on it. Source: Pietro, 2026-10-19 (wrote "moolight"). Treat the laptop as Windows, not Linux, in future advice.
+
 ## Development experience
 
 - React: 2 years; Python: 5+ years; Node.js: 2 years. Source: Pietro explicitly confirmed during PolicyMe application assistance, 2026-10-14. Django/Flask experience is not confirmed.
