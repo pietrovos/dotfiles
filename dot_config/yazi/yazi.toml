@@ -5,6 +5,5 @@ browser = [
 
 [open]
 prepend_rules = [
-  { mime = "application/pdf", use = "browser" },
-  { mime = "text/html", use = [ "browser", "edit" ] }
+  { mime = "application/pdf", use = "browser" }
 ]
