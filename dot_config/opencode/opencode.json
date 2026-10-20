@@ -18,6 +18,28 @@
       "type": "local",
       "command": ["npx", "-y", "chrome-devtools-mcp@latest", "--headless", "--executablePath", "/usr/bin/chromium"],
       "enabled": true
+    },
+    "servers": {
+      "gmail": {
+        "type": "local",
+        "command": [
+          "mise",
+          "exec",
+          "uv@0.12.23",
+          "--",
+          "uvx",
+          "workspace-mcp==2.1.1",
+          "--single-user",
+          "--tools",
+          "gmail",
+          "--read-only",
+          "--tool-tier",
+          "core"
+        ],
+        "environment": {
+          "GOOGLE_CLIENT_SECRET_PATH": "/home/pietrovos/.config/gmail-mcp/client_secret.json"
+        }
+      }
     }
   }
 }
