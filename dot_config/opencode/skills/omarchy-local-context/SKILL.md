@@ -188,6 +188,10 @@ from Omarchy defaults when these files can be inspected.
   returned save path and fails ("failed to stat … No such file or directory",
   Chrome's save silently does nothing) if it is missing, so the wrapper
   creates an empty placeholder at the final path; the app overwrites it.
+  In save dialogs, Enter runs `save-chooser.yazi` and explicitly returns the
+  current folder (including empty folders) through `YAZI_SAVE_CHOOSER_FILE`;
+  Right/`l` enters folders and `q`/`Q` cancels. Outside save dialogs, Enter
+  retains normal open/choose behavior.
   `create_help_file=0` in the backend config stops the stock instructions
   file ("Opening a file OVERWRITES it!"), which contradicted this flow.
   After choosing files for upload, the wrapper returns the selection and opens
