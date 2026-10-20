@@ -1,6 +1,13 @@
 -- Add every directory entered in yazi to zoxide.
 require("zoxide"):setup { update_db = true }
 
+-- Keep pending cuts visibly dimmed until pasted or cancelled.
+local entity_style = Entity.style
+function Entity:style()
+	local style = entity_style(self)
+	return self._file:is_yanked() == 2 and style:dim() or style
+end
+
 -- Journal renames, moves and trashing so `u` (plugins/undo.yazi) can reverse them.
 local journal = (os.getenv("XDG_STATE_HOME") or (os.getenv("HOME") .. "/.local/state")) .. "/yazi/undo.jsonl"
 local escapes = { ['"'] = '\\"', ["\\"] = "\\\\", ["\n"] = "\\n", ["\r"] = "\\r", ["\t"] = "\\t" }
