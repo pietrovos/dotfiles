@@ -36,7 +36,7 @@
       }
     ]
   },
-  "theme": "custom:omarchy",
+  "theme": "custom:lucent-orng",
   "preferredNotifChannel": "notifications_disabled",
   "agentPushNotifEnabled": true
 }
