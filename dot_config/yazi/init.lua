@@ -1,11 +1,13 @@
 -- Add every directory entered in yazi to zoxide.
 require("zoxide"):setup { update_db = true }
 
--- Keep pending cuts visibly dimmed until pasted or cancelled.
-local entity_style = Entity.style
-function Entity:style()
-	local style = entity_style(self)
-	return self._file:is_yanked() == 2 and style:dim() or style
+-- Darken only the far-left marker for pending cuts, not the filename or row.
+local marker_style = Marker.style
+function Marker:style(file)
+	if file:is_yanked() == 2 then
+		return ui.Style():fg("#286b42"):bg("#286b42")
+	end
+	return marker_style(self, file)
 end
 
 -- Journal renames, moves and trashing so `u` (plugins/undo.yazi) can reverse them.
