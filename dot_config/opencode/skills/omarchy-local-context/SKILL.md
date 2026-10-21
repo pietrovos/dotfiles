@@ -36,6 +36,11 @@ from Omarchy defaults when these files can be inspected.
   opening the preview. A plain `stop` followed later by `stop --wait` breaks:
   the second call sees the daemon idle and returns "empty", so nothing was
   typed. Whisper can hallucinate short text (“Thank you.”) on silence.
+  Voxtype's `pause_media = true` pauses MPRIS players while dictating, which
+  froze the webcam overlay (Omarchy's mpv) on one frame until dictation
+  stopped. The worker exports `MPV_HOME` to a session dir whose `mpv.conf` has
+  `load-scripts=no`, so F10's mpv never loads `/etc/mpv/scripts/mpris.so`;
+  `pause_media` stays on for F9 and other players (2026-10-21).
   The transcript is temporary in the same RAM
   directory and is discarded with the video. Existing F9 hold-to-dictate
   bindings are unchanged, and an already-active F9 dictation is not taken over.
