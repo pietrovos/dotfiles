@@ -131,8 +131,18 @@ anchor=$(jq -r '[((.width / .scale) | floor), ((.height / .scale) | floor), .x, 
 printf '#!/bin/bash\nprintf "%%s\\n" %q\n' "$monitor_name" \
   >"$session/bin/omarchy-hyprland-monitor-focused"
 real_resize=$(command -v omarchy-capture-webcam-resize)
-printf '#!/bin/bash\nprintf "%%s\\n" %q >"${XDG_RUNTIME_DIR:-/tmp}/omarchy-screenrecord-region"\nexec %q "$@"\n' \
-  "$anchor" "$real_resize" >"$session/bin/omarchy-capture-webcam-resize"
+# The overlay maps on the focused monitor. Moving it only by pixels leaves it
+# owned by that monitor while drawn on the MSI, and its picture froze for the
+# whole recording; hand it to the MSI first, then let Omarchy size/place it.
+cat >"$session/bin/omarchy-capture-webcam-resize" <<EOF
+#!/bin/bash
+printf '%s\n' $(printf %q "$anchor") >"\${XDG_RUNTIME_DIR:-/tmp}/omarchy-screenrecord-region"
+address=\$(hyprctl clients -j | jq -r 'first(.[] | select(.title == "WebcamOverlay") | .address) // empty')
+if [[ -n \$address ]]; then
+  hyprctl dispatch "hl.dsp.window.move({ window = \\"address:\$address\\", monitor = \\"$monitor_name\\" })" >/dev/null 2>&1
+fi
+exec $(printf %q "$real_resize") "\$@"
+EOF
 chmod +x "$session/bin/omarchy-hyprland-monitor-focused" "$session/bin/omarchy-capture-webcam-resize"
 
 omarchy screenrecord --fullscreen --resolution=0x0 --with-microphone-audio --with-webcam 9>&- || exit 1
