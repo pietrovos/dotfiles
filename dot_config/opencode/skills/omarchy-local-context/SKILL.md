@@ -17,16 +17,26 @@ from Omarchy defaults when these files can be inspected.
   regardless of focused monitor; the second stops/finalizes through
   Omarchy and opens mpv. Closing the preview (or Q) deletes the clip and its
   private `/dev/shm/omarchy-disposable-<uid>/clip.*` directory. F10 during preview
-  focuses it. Only “Recording started.” and “Recording ended.” notifications
-  are shown; native toasts, preview/deletion messages and error toasts are
-  suppressed for this wrapper, without affecting normal recording notifications.
-  The started notification waits for actual muxed media plus a 600ms safety
-  margin, rather than mere MP4 file creation, so speech after the cue is beyond
-  native finalization's first-400ms audio mute/fade. The webcam still appears
-  during native startup; the notification is the cue to begin speaking.
-  F10 also starts Voxtype dictation (without its OSD or extra notifications).
-  Stopping F10 waits for transcription and types it into the currently focused
-  app before opening the preview. The transcript is temporary in the same RAM
+  focuses it. Own toasts: “Recording started.” (normal urgency, 3s), replaced
+  in place by “Recording ended.”, or by a critical “Recording failed.” if the
+  worker dies without finishing (not shown when F10 cancels during startup).
+  Native toasts and preview/deletion messages are suppressed for this wrapper,
+  without affecting normal recording notifications.
+  The started cue fires 600ms after the MP4 exists: gpu-screen-recorder creates
+  the file with its first frame (file age matched clip duration within ~30ms),
+  so this clears the finalizer's 0.1s trim and 400ms mute/50ms fade. Do NOT wait
+  on file size: the file grows in 256KB buffer flushes that track bitrate, which
+  made the cue 2–15s late and sometimes timed out silently (2026-10-21 fix).
+  Measured: cue ~0.7s after capture start, ~4.5s after the keypress (mostly
+  Omarchy's webcam startup). The webcam appears first; the toast is the cue.
+  F10 also starts Voxtype dictation (without its OSD or extra notifications),
+  just before the 600ms wait. Stopping issues a single background
+  `voxtype record stop --wait --json` (overlapping native finalization), then
+  waits for it and types the text with wtype into the focused app before
+  opening the preview. A plain `stop` followed later by `stop --wait` breaks:
+  the second call sees the daemon idle and returns "empty", so nothing was
+  typed. Whisper can hallucinate short text (“Thank you.”) on silence.
+  The transcript is temporary in the same RAM
   directory and is discarded with the video. Existing F9 hold-to-dictate
   bindings are unchanged, and an already-active F9 dictation is not taken over.
   Voxtype's `audio.max_duration_secs` is 3600 to cover longer recording sessions.
