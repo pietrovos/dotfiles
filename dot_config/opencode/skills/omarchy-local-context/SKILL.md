@@ -10,6 +10,17 @@ from Omarchy defaults when these files can be inspected.
 
 ## Current Customizations
 
+- `F10` toggles disposable OBS webcam + default-microphone recording via
+  `~/.local/bin/obs-disposable`. It launches an isolated OBS profile/scene
+  collection under private `/dev/shm/obs-disposable-<uid>/session-*` storage,
+  with no screen or desktop-audio capture and no changes to normal OBS settings.
+  After a camera warm-up, a notification marks recording readiness; pressing
+  F10 again stops recording, releases the devices, and opens an mpv preview.
+  Closing the preview (or Q) deletes the clip and the isolated OBS configuration.
+  F10 during preview focuses it. Storage is temporary, not a strict no-swap or
+  no-hibernation guarantee. `obs-disposable --status` reports lifecycle state;
+  failure diagnostics, without media, may remain in the private RAM directory.
+
 - The LG TV (`HDMI-A-1`, 1920x1080@60) is independent at 150% scale,
   to the right of the ASUS, with persistent default workspace 11 via
   `~/.config/hypr/monitors.lua`. MSI (`DP-2`) keeps workspaces 1–5 and 7–10;
