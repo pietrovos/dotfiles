@@ -17,7 +17,9 @@ from Omarchy defaults when these files can be inspected.
   regardless of focused monitor; the second stops/finalizes through
   Omarchy and opens mpv. Closing the preview (or Q) deletes the clip and its
   private `/dev/shm/omarchy-disposable-<uid>/clip.*` directory. F10 during preview
-  focuses it. Omarchy's normal saved-file toast is suppressed for this wrapper;
+  focuses it. Only “Recording started.” and “Recording ended.” notifications
+  are shown; native toasts, preview/deletion messages and error toasts are
+  suppressed for this wrapper, without affecting normal recording notifications.
   the normal capture indicator/overlay/finalization remain native. It refuses
   to interfere with an existing normal recording. No desktop audio is requested.
   Scoped helper overrides select the connected MSI by model and anchor its

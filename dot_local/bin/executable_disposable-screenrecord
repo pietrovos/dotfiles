@@ -9,7 +9,8 @@ mkdir -p "$root"
 [[ -d $root && -O $root ]] || exit 1
 chmod 700 "$root"
 
-notify() { omarchy-notification-send "Disposable recording" "$1"; }
+real_notify=$(command -v omarchy-notification-send)
+notify() { "$real_notify" "Disposable recording" "$1"; }
 active() { pgrep -f '^gpu-screen-recorder' >/dev/null; }
 owned_session() { [[ $1 == "$root"/clip.* && ${1#"$root"/} != */* ]]; }
 
@@ -26,7 +27,6 @@ if [[ ${1:-} != --worker ]]; then
     exit 0
   fi
   if active; then
-    notify 'Another screen recording is running. Stop that before using F10.'
     exit 1
   fi
   # Only leftovers belonging to this wrapper are eligible for cleanup.
@@ -46,11 +46,9 @@ player=
 recording=
 export OMARCHY_SCREENRECORD_DIR="$session"
 
-# Keep Omarchy's errors, but replace its normal "saved" toast with our preview.
-real_notify=$(command -v omarchy-notification-send)
+# This flow has exactly two toasts: our recording-started and recording-ended.
 mkdir "$session/bin"
-printf '#!/bin/bash\n[[ ${1:-} == "Screen recording saved" ]] && exit 0\nexec %q "$@"\n' \
-  "$real_notify" >"$session/bin/omarchy-notification-send"
+printf '#!/bin/bash\nexit 0\n' >"$session/bin/omarchy-notification-send"
 chmod +x "$session/bin/omarchy-notification-send"
 export PATH="$session/bin:$PATH"
 
@@ -68,7 +66,6 @@ trap cleanup EXIT
 trap 'exit 0' INT TERM HUP
 
 if active; then
-  notify 'Another screen recording is running. Stop that before using F10.'
   exit 1
 fi
 
@@ -76,7 +73,6 @@ fi
 # modifying Omarchy. Its native recorder/overlay/finalizer still do the work.
 monitor=$(hyprctl monitors -j | jq -cer 'first(.[] | select(.model | test("MSI"; "i"))) // empty')
 if [[ -z $monitor ]]; then
-  notify 'MSI monitor is not connected. Nothing was recorded.'
   exit 1
 fi
 monitor_name=$(jq -r '.name' <<<"$monitor")
@@ -94,12 +90,11 @@ if [[ $recording != "$session"/screenrecording-*.mp4 || ! -f $recording ]]; then
   exit 1 # Picker cancelled or native recorder failed to start.
 fi
 printf 'recording\n' >"$root/phase"
-notify 'MSI screen + microphone + webcam recording. Press F10 to stop and preview.'
+notify 'Recording started.'
 
 while active && [[ ! -e $session/stop ]]; do
   available=$(df -Pk "$session" | awk 'NR == 2 {print $4}')
   if [[ ${available:-0} -lt 262144 ]]; then
-    notify 'Temporary storage nearly full. Stopping recording.'
     break
   fi
   sleep 0.25 9>&-
@@ -114,7 +109,8 @@ else
     sleep 0.1 9>&-
   done
 fi
-[[ -s $recording ]] || { notify 'No playable recording was produced.'; exit 1; }
+notify 'Recording ended.'
+[[ -s $recording ]] || exit 1
 
 printf 'preview\n' >"$root/phase"
 mpv --no-config --no-resume-playback --save-position-on-quit=no \
@@ -123,7 +119,5 @@ mpv --no-config --no-resume-playback --save-position-on-quit=no \
   --wayland-app-id=disposable-screenrecord-preview \
   --input-ipc-server="$session/preview.sock" -- "$recording" 9>&- &
 player=$!
-notify 'Close the preview (or press Q) to delete this recording.'
 wait "$player" || true
 player=
-notify 'Preview closed. Recording deleted.'
