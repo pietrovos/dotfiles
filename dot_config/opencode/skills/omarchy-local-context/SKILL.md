@@ -24,6 +24,12 @@ from Omarchy defaults when these files can be inspected.
   margin, rather than mere MP4 file creation, so speech after the cue is beyond
   native finalization's first-400ms audio mute/fade. The webcam still appears
   during native startup; the notification is the cue to begin speaking.
+  F10 also starts Voxtype dictation (without its OSD or extra notifications).
+  Stopping F10 waits for transcription and types it into the currently focused
+  app before opening the preview. The transcript is temporary in the same RAM
+  directory and is discarded with the video. Existing F9 hold-to-dictate
+  bindings are unchanged, and an already-active F9 dictation is not taken over.
+  Voxtype's `audio.max_duration_secs` is 3600 to cover longer recording sessions.
   the normal capture indicator/overlay/finalization remain native. It refuses
   to interfere with an existing normal recording. No desktop audio is requested.
   Scoped helper overrides select the connected MSI by model and anchor its
