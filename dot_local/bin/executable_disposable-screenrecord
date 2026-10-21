@@ -10,7 +10,6 @@ mkdir -p "$root"
 chmod 700 "$root"
 
 real_notify=$(command -v omarchy-notification-send)
-notify() { "$real_notify" "Disposable recording" "$1"; }
 active() { pgrep -f '^gpu-screen-recorder' >/dev/null; }
 owned_session() { [[ $1 == "$root"/clip.* && ${1#"$root"/} != */* ]]; }
 
@@ -45,6 +44,9 @@ shift 2
 player=
 recording=
 dictating=false
+transcriber=
+started_id=
+ended=false
 export OMARCHY_SCREENRECORD_DIR="$session"
 
 # This flow has exactly two toasts: our recording-started and recording-ended.
@@ -69,13 +71,24 @@ start_dictation() {
   done
 }
 
+stop_dictation() {
+  [[ $dictating == true && -z $transcriber ]] || return 0
+  # One stop that also waits: a second `stop --wait` issued after the first
+  # stop finds the daemon idle and reports "empty", losing the transcript.
+  # It runs in the background so transcription overlaps native finalization.
+  voxtype record stop --wait --json --wait-file "$session/transcript.txt" \
+    --timeout 300 >"$session/transcription.json" 2>/dev/null 9>&- &
+  transcriber=$!
+}
+
 finish_dictation() {
   [[ $dictating == true ]] || return 0
+  stop_dictation
+  # Completion barrier: the preview cannot steal focus while Voxtype is still
+  # transcribing, and the text is typed into the app that was focused.
+  wait "$transcriber" 2>/dev/null || true
+  transcriber=
   dictating=false
-  # File output gives us a completion barrier, so the preview cannot steal
-  # focus while Voxtype is still transcribing or typing into the current app.
-  voxtype record stop --wait --json --wait-file "$session/transcript.txt" \
-    --timeout 300 >"$session/transcription.json" 2>/dev/null || true
   local text
   text=$(jq -r 'select(.status == "ok") | .text // empty' "$session/transcription.json" 2>/dev/null)
   if [[ -n $text ]]; then wtype -d 1 -- "$text" 9>&-; fi
@@ -84,8 +97,14 @@ finish_dictation() {
 cleanup() {
   trap - EXIT INT TERM HUP
   if [[ -n $player ]]; then kill "$player" 2>/dev/null || true; wait "$player" 2>/dev/null || true; fi
+  if [[ -n $transcriber ]]; then kill "$transcriber" 2>/dev/null || true; fi
   if [[ $dictating == true ]]; then
     voxtype record cancel >/dev/null 2>&1 || true
+  fi
+  # Never fail silently: a missing "started" cue must not look like a slow one.
+  if [[ $ended != true && ! -e $session/stop ]]; then
+    "$real_notify" -u critical -t 4000 -r "${started_id:-0}" \
+      "Disposable recording" "Recording failed." 9>&- || true
   fi
   # Never stop a normal recording belonging to another Omarchy invocation.
   if [[ -n $recording && $(cat /tmp/omarchy-screenrecord-filename 2>/dev/null) == "$recording" ]] && active; then
@@ -121,25 +140,18 @@ recording=$(cat /tmp/omarchy-screenrecord-filename 2>/dev/null || true)
 if [[ $recording != "$session"/screenrecording-*.mp4 || ! -f $recording ]]; then
   exit 1 # Picker cancelled or native recorder failed to start.
 fi
-# File creation alone is not readiness: the MP4 header can precede capture.
-# Wait for actual muxed media, then get past Omarchy's first-400ms audio mute
-# and its 50ms fade before telling the user to speak.
-ready=false
-for ((i=0; i<150; i++)); do
-  active || exit 1
-  if [[ $(stat -c %s "$recording" 2>/dev/null || echo 0) -gt 4096 ]]; then
-    ready=true
-    break
-  fi
-  [[ ! -e $session/stop ]] || exit 0
-  sleep 0.1 9>&-
-done
-[[ $ready == true ]] || exit 1
+# gpu-screen-recorder creates the file with its first frame (measured: file
+# age matches clip duration within ~30ms), and Omarchy only returns once it
+# exists. Its later growth is 256KB write-buffer flushes, which track bitrate
+# rather than readiness, so waiting on size made the cue late and erratic.
+# Start dictation now so it catches the first words, then get past the
+# finalizer's 0.1s trim, first-400ms audio mute and 50ms fade before the cue.
+start_dictation
 sleep 0.6 9>&-
 active || exit 1
-start_dictation
+[[ ! -e $session/stop ]] || exit 0
 printf 'recording\n' >"$root/phase"
-notify 'Recording started.'
+started_id=$("$real_notify" -p -u normal -t 3000 "Disposable recording" "Recording started." 9>&-) || started_id=
 
 while active && [[ ! -e $session/stop ]]; do
   available=$(df -Pk "$session" | awk 'NR == 2 {print $4}')
@@ -150,9 +162,7 @@ while active && [[ ! -e $session/stop ]]; do
 done
 printf 'stopping\n' >"$root/phase"
 # Stop mic dictation now, rather than recording the native finalizer's delay.
-if [[ $dictating == true && $(dictation_state) == recording ]]; then
-  voxtype record stop >/dev/null 2>&1 || true
-fi
+stop_dictation
 if active; then
   omarchy screenrecord --stop-recording >/dev/null 9>&- || exit 1
 else
@@ -162,8 +172,9 @@ else
     sleep 0.1 9>&-
   done
 fi
-notify 'Recording ended.'
 [[ -s $recording ]] || exit 1
+ended=true
+"$real_notify" -u normal -t 3000 -r "${started_id:-0}" "Disposable recording" "Recording ended." 9>&- || true
 finish_dictation
 
 printf 'preview\n' >"$root/phase"
