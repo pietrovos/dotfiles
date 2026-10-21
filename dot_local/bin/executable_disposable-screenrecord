@@ -1,0 +1,115 @@
+#!/bin/bash
+# Use Omarchy's recorder, but preview its output and discard it on close.
+set -uo pipefail
+umask 077
+
+root="/dev/shm/omarchy-disposable-$UID"
+[[ ! -L $root ]] || exit 1
+mkdir -p "$root"
+[[ -d $root && -O $root ]] || exit 1
+chmod 700 "$root"
+
+notify() { omarchy-notification-send "Disposable recording" "$1"; }
+active() { pgrep -f '^gpu-screen-recorder' >/dev/null; }
+owned_session() { [[ $1 == "$root"/clip.* && ${1#"$root"/} != */* ]]; }
+
+if [[ ${1:-} != --worker ]]; then
+  exec 9>"$root/lock"
+  if ! flock -n 9; then
+    session=$(cat "$root/current" 2>/dev/null) || exit 0
+    owned_session "$session" || exit 1
+    if [[ $(cat "$root/phase" 2>/dev/null) == preview ]]; then
+      hyprctl dispatch 'hl.dsp.focus({ window = "class:^(disposable-screenrecord-preview)$" })' >/dev/null
+    else
+      touch "$session/stop"
+    fi
+    exit 0
+  fi
+  if active; then
+    notify 'Another screen recording is running. Stop that before using F10.'
+    exit 1
+  fi
+  # Only leftovers belonging to this wrapper are eligible for cleanup.
+  previous=$(cat "$root/current" 2>/dev/null || true)
+  if owned_session "$previous"; then rm -rf -- "$previous"; fi
+  session=$(mktemp -d "$root/clip.XXXXXXXX")
+  printf '%s\n' "$session" >"$root/current"
+  printf 'starting\n' >"$root/phase"
+  setsid "$0" --worker "$session" "${@}" 9>&9 >/dev/null 2>&1 &
+  exit 0
+fi
+
+session=$2
+owned_session "$session" || exit 1
+shift 2
+player=
+recording=
+export OMARCHY_SCREENRECORD_DIR="$session"
+
+# Keep Omarchy's errors, but replace its normal "saved" toast with our preview.
+real_notify=$(command -v omarchy-notification-send)
+mkdir "$session/bin"
+printf '#!/bin/bash\n[[ ${1:-} == "Screen recording saved" ]] && exit 0\nexec %q "$@"\n' \
+  "$real_notify" >"$session/bin/omarchy-notification-send"
+chmod +x "$session/bin/omarchy-notification-send"
+export PATH="$session/bin:$PATH"
+
+cleanup() {
+  trap - EXIT INT TERM HUP
+  if [[ -n $player ]]; then kill "$player" 2>/dev/null || true; wait "$player" 2>/dev/null || true; fi
+  # Never stop a normal recording belonging to another Omarchy invocation.
+  if [[ -n $recording && $(cat /tmp/omarchy-screenrecord-filename 2>/dev/null) == "$recording" ]] && active; then
+    omarchy screenrecord --stop-recording >/dev/null 2>&1 9>&- || true
+  fi
+  rm -rf -- "$session"
+  rm -f -- "$root/current" "$root/phase"
+}
+trap cleanup EXIT
+trap 'exit 0' INT TERM HUP
+
+if active; then
+  notify 'Another screen recording is running. Stop that before using F10.'
+  exit 1
+fi
+
+# Normal Omarchy picker, overlay, audio capture, indicator and finalization.
+# --fullscreen may be passed explicitly for unattended capture/testing.
+omarchy screenrecord --with-microphone-audio --with-webcam "$@" 9>&- || exit 1
+recording=$(cat /tmp/omarchy-screenrecord-filename 2>/dev/null || true)
+if [[ $recording != "$session"/screenrecording-*.mp4 || ! -f $recording ]]; then
+  exit 1 # Picker cancelled or native recorder failed to start.
+fi
+printf 'recording\n' >"$root/phase"
+notify 'Screen + microphone + webcam recording. Press F10 to stop and preview.'
+
+while active && [[ ! -e $session/stop ]]; do
+  available=$(df -Pk "$session" | awk 'NR == 2 {print $4}')
+  if [[ ${available:-0} -lt 262144 ]]; then
+    notify 'Temporary storage nearly full. Stopping recording.'
+    break
+  fi
+  sleep 0.25 9>&-
+done
+printf 'stopping\n' >"$root/phase"
+if active; then
+  omarchy screenrecord --stop-recording >/dev/null 9>&- || exit 1
+else
+  # If stopped via Omarchy's bar/other shortcut, let its finalizer finish first.
+  for ((i=0; i<600; i++)); do
+    [[ $(cat /tmp/omarchy-screenrecord-filename 2>/dev/null) != "$recording" ]] && break
+    sleep 0.1 9>&-
+  done
+fi
+[[ -s $recording ]] || { notify 'No playable recording was produced.'; exit 1; }
+
+printf 'preview\n' >"$root/phase"
+mpv --no-config --no-resume-playback --save-position-on-quit=no \
+  --keep-open=yes --force-window=yes --loop-file=inf \
+  --title='Disposable recording — close to discard' \
+  --wayland-app-id=disposable-screenrecord-preview \
+  --input-ipc-server="$session/preview.sock" -- "$recording" 9>&- &
+player=$!
+notify 'Close the preview (or press Q) to delete this recording.'
+wait "$player" || true
+player=
+notify 'Preview closed. Recording deleted.'

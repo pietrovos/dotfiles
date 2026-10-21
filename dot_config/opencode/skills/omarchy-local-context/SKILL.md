@@ -10,16 +10,18 @@ from Omarchy defaults when these files can be inspected.
 
 ## Current Customizations
 
-- `F10` toggles disposable OBS webcam + default-microphone recording via
-  `~/.local/bin/obs-disposable`. It launches an isolated OBS profile/scene
-  collection under private `/dev/shm/obs-disposable-<uid>/session-*` storage,
-  with no screen or desktop-audio capture and no changes to normal OBS settings.
-  After a camera warm-up, a notification marks recording readiness; pressing
-  F10 again stops recording, releases the devices, and opens an mpv preview.
-  Closing the preview (or Q) deletes the clip and the isolated OBS configuration.
-  F10 during preview focuses it. Storage is temporary, not a strict no-swap or
-  no-hibernation guarantee. `obs-disposable --status` reports lifecycle state;
-  failure diagnostics, without media, may remain in the private RAM directory.
+- `F10` toggles disposable **native Omarchy screen + default-mic + webcam**
+  recording through `~/.local/bin/disposable-screenrecord`, a wrapper around
+  `omarchy screenrecord --with-microphone-audio --with-webcam`. The first press
+  opens Omarchy's normal capture picker; the second stops/finalizes through
+  Omarchy and opens mpv. Closing the preview (or Q) deletes the clip and its
+  private `/dev/shm/omarchy-disposable-<uid>/clip.*` directory. F10 during preview
+  focuses it. Omarchy's normal saved-file toast is suppressed for this wrapper;
+  the normal capture indicator/overlay/finalization remain native. It refuses
+  to interfere with an existing normal recording. No desktop audio is requested.
+  `disposable-screenrecord --fullscreen` skips the picker. Storage is temporary,
+  not a strict no-swap/no-hibernation guarantee. This replaces the earlier
+  isolated-OBS `obs-disposable` implementation, removed at the user's request.
 
 - The LG TV (`HDMI-A-1`, 1920x1080@60) is independent at 150% scale,
   to the right of the ASUS, with persistent default workspace 11 via

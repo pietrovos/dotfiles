@@ -44,7 +44,7 @@ bind("SUPER + SHIFT + C", "Calendar", { webapp = "https://app.hey.com/calendar/w
 bind("SUPER + SHIFT + E", "Email", { webapp = "https://mail.google.com/mail/u/0/#inbox" })
 bind("SUPER + SHIFT + Y", "YouTube", { webapp = "https://youtube.com/" })
 bind("SUPER + SHIFT + V", "Toggle microphone monitoring", "/home/pietrovos/.config/hypr/toggle-mic-monitor")
-bind("F10", "Record webcam + mic; stop and preview (close to discard)", "/home/pietrovos/.local/bin/obs-disposable")
+bind("F10", "Record screen + mic + webcam; preview and discard", "/home/pietrovos/.local/bin/disposable-screenrecord")
 
 -- PRINT takes a region screenshot to the clipboard only, with a permanent
 -- notification offering save/edit/discard. Nothing is written to disk unless
