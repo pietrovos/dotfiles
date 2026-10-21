@@ -20,6 +20,10 @@ from Omarchy defaults when these files can be inspected.
   focuses it. Only “Recording started.” and “Recording ended.” notifications
   are shown; native toasts, preview/deletion messages and error toasts are
   suppressed for this wrapper, without affecting normal recording notifications.
+  The started notification waits for actual muxed media plus a 600ms safety
+  margin, rather than mere MP4 file creation, so speech after the cue is beyond
+  native finalization's first-400ms audio mute/fade. The webcam still appears
+  during native startup; the notification is the cue to begin speaking.
   the normal capture indicator/overlay/finalization remain native. It refuses
   to interfere with an existing normal recording. No desktop audio is requested.
   Scoped helper overrides select the connected MSI by model and anchor its

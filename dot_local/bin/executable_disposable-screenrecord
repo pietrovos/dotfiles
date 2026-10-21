@@ -89,6 +89,22 @@ recording=$(cat /tmp/omarchy-screenrecord-filename 2>/dev/null || true)
 if [[ $recording != "$session"/screenrecording-*.mp4 || ! -f $recording ]]; then
   exit 1 # Picker cancelled or native recorder failed to start.
 fi
+# File creation alone is not readiness: the MP4 header can precede capture.
+# Wait for actual muxed media, then get past Omarchy's first-400ms audio mute
+# and its 50ms fade before telling the user to speak.
+ready=false
+for ((i=0; i<150; i++)); do
+  active || exit 1
+  if [[ $(stat -c %s "$recording" 2>/dev/null || echo 0) -gt 4096 ]]; then
+    ready=true
+    break
+  fi
+  [[ ! -e $session/stop ]] || exit 0
+  sleep 0.1 9>&-
+done
+[[ $ready == true ]] || exit 1
+sleep 0.6 9>&-
+active || exit 1
 printf 'recording\n' >"$root/phase"
 notify 'Recording started.'
 
