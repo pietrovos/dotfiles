@@ -72,15 +72,29 @@ if active; then
   exit 1
 fi
 
-# Normal Omarchy picker, overlay, audio capture, indicator and finalization.
-# --fullscreen may be passed explicitly for unattended capture/testing.
-omarchy screenrecord --with-microphone-audio --with-webcam "$@" 9>&- || exit 1
+# Scope monitor selection to this invocation without changing desktop focus or
+# modifying Omarchy. Its native recorder/overlay/finalizer still do the work.
+monitor=$(hyprctl monitors -j | jq -cer 'first(.[] | select(.model | test("MSI"; "i"))) // empty')
+if [[ -z $monitor ]]; then
+  notify 'MSI monitor is not connected. Nothing was recorded.'
+  exit 1
+fi
+monitor_name=$(jq -r '.name' <<<"$monitor")
+anchor=$(jq -r '[((.width / .scale) | floor), ((.height / .scale) | floor), .x, .y] | "\(.[0])x\(.[1])+\(.[2])+\(.[3])"' <<<"$monitor")
+printf '#!/bin/bash\nprintf "%%s\\n" %q\n' "$monitor_name" \
+  >"$session/bin/omarchy-hyprland-monitor-focused"
+real_resize=$(command -v omarchy-capture-webcam-resize)
+printf '#!/bin/bash\nprintf "%%s\\n" %q >"${XDG_RUNTIME_DIR:-/tmp}/omarchy-screenrecord-region"\nexec %q "$@"\n' \
+  "$anchor" "$real_resize" >"$session/bin/omarchy-capture-webcam-resize"
+chmod +x "$session/bin/omarchy-hyprland-monitor-focused" "$session/bin/omarchy-capture-webcam-resize"
+
+omarchy screenrecord --fullscreen --resolution=0x0 --with-microphone-audio --with-webcam 9>&- || exit 1
 recording=$(cat /tmp/omarchy-screenrecord-filename 2>/dev/null || true)
 if [[ $recording != "$session"/screenrecording-*.mp4 || ! -f $recording ]]; then
   exit 1 # Picker cancelled or native recorder failed to start.
 fi
 printf 'recording\n' >"$root/phase"
-notify 'Screen + microphone + webcam recording. Press F10 to stop and preview.'
+notify 'MSI screen + microphone + webcam recording. Press F10 to stop and preview.'
 
 while active && [[ ! -e $session/stop ]]; do
   available=$(df -Pk "$session" | awk 'NR == 2 {print $4}')
