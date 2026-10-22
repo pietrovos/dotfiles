@@ -45,6 +45,7 @@ bind("SUPER + SHIFT + E", "Email", { webapp = "https://mail.google.com/mail/u/0/
 bind("SUPER + SHIFT + Y", "YouTube", { webapp = "https://youtube.com/" })
 bind("SUPER + SHIFT + V", "Toggle microphone monitoring", "/home/pietrovos/.config/hypr/toggle-mic-monitor")
 bind("F10", "Record MSI + mic + webcam and dictate; preview and discard", "/home/pietrovos/.local/bin/disposable-screenrecord")
+bind("F9", "Toggle dictation", "voxtype record toggle")
 
 -- PRINT takes a region screenshot to the clipboard only, with a permanent
 -- notification offering save/edit/discard. Nothing is written to disk unless
