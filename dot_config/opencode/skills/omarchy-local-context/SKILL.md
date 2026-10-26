@@ -130,6 +130,14 @@ from Omarchy defaults when these files can be inspected.
   action when the requested position is absent. `ALT+mouse_down` and
   `ALT+mouse_up` cycle to the next and previous window in the active subspace
   (group), alongside `SUPER+ALT+TAB` and `SUPER+ALT+SHIFT+TAB`.
+  Every group-switch path (`ALT+1–0`, `ALT`/`SUPER+ALT`+scroll,
+  `SUPER+ALT+(SHIFT+)TAB`, `SUPER+CTRL+LEFT/RIGHT`, and bar tab clicks in
+  `pietrovos.group-tabs`) runs `~/.config/hypr/select-group-window
+  <1-10|0|next|prev>`, which preserves fullscreen. Stock switching hands
+  fullscreen to the new member, so Chromium exits page/video fullscreen.
+  The script parks a fullscreen member with `fullscreen_state` internal 0 /
+  client kept (tiled, but the app still thinks it is fullscreen), then
+  restores a shown member with internal 0 / client 2 to 2/2 (2026-10-25).
   `ALT+SHIFT+1` through
   `ALT+SHIFT+0` move the active member to positions 1 through 10 via
   `~/.config/hypr/reorder-group-window`. `SUPER+SHIFT+R` opens the custom OpenCode build in the

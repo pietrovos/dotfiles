@@ -102,6 +102,10 @@ bind("ALT + mouse_down", "Next window in subspace", "/home/pietrovos/.config/hyp
 bind("ALT + mouse_up", "Previous window in subspace", "/home/pietrovos/.config/hypr/select-group-window prev")
 bind("SUPER + ALT + TAB", "Next window in group", "/home/pietrovos/.config/hypr/select-group-window next")
 bind("SUPER + ALT + SHIFT + TAB", "Previous window in group", "/home/pietrovos/.config/hypr/select-group-window prev")
+bind("SUPER + CTRL + LEFT", "Move grouped window focus left", "/home/pietrovos/.config/hypr/select-group-window prev")
+bind("SUPER + CTRL + RIGHT", "Move grouped window focus right", "/home/pietrovos/.config/hypr/select-group-window next")
+bind("SUPER + ALT + mouse_down", "Next window in group", "/home/pietrovos/.config/hypr/select-group-window next")
+bind("SUPER + ALT + mouse_up", "Previous window in group", "/home/pietrovos/.config/hypr/select-group-window prev")
 
 for index = 1, 10 do
   if index <= 5 then
