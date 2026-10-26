@@ -4,13 +4,13 @@
     "layout": {
       "center": [
         {
+          "id": "omarchy.keyboard-layout"
+        },
+        {
           "format": "dddd h:mm AP",
           "formatAlt": "d MMMM 'W'ww yyyy",
           "id": "omarchy.clock",
           "verticalFormat": "h\nAP\nmm"
-        },
-        {
-          "id": "omarchy.keyboard-layout"
         },
         {
           "id": "omarchy.weather"

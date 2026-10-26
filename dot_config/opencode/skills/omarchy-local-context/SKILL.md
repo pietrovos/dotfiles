@@ -157,12 +157,10 @@ from Omarchy defaults when these files can be inspected.
   `~/.config/hypr/reorder-group-window`. `SUPER+SHIFT+R` opens the custom OpenCode build in the
   current terminal directory via `~/.config/hypr/opencode-duplicate`.
   `SUPER+SHIFT+L` opens Claude Code in the current terminal directory via
-  `~/.config/hypr/claude-code`. That launcher runs kitty directly (not
-  `xdg-terminal-exec`, which cannot pass options) with
-  `--class=org.omarchy.claude -o foreground=#eeeeee`: Claude Code draws reply
-  body text in the terminal's default foreground, not its theme's `text`, so
-  Greenify's `#00ff99` made replies green. Only these windows are white;
-  `claude` typed in a normal kitty stays green (2026-10-25).
+  `~/.config/hypr/claude-code`. Claude Code draws reply body text in the
+  terminal's default foreground (Greenify `#00ff99`), not its theme's `text`.
+  A white-foreground kitty launcher was tried and reverted at the user's
+  request (2026-10-25): they prefer the green replies.
 - `SUPER+ESC` switches to workspace 6, or back to the previous workspace when
   already on 6 (overriding Omarchy's default
   System menu) via `~/.config/hypr/bindings.lua`.
