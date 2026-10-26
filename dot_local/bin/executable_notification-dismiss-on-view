@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# Usage: notification-dismiss-on-view <notification-id> <window-address>
+# Closes the notification once the window is the shown tab of its group on the focused
+# workspace. Used by the Claude Code (~/.claude/hooks/notify.sh) and OpenCode
+# (~/.config/opencode/cli-plugins/completion-notification/tui.ts) completion notifications.
+
+id=$1
+address=$2
+[[ $id =~ ^[0-9]+$ && -n $address ]] || exit 1
+
+on_screen() {
+  local window
+  window=$(hyprctl clients -j 2>/dev/null | jq -c --arg a "$address" 'map(select(.address == $a)) | first // empty')
+  # The window closed, so there is nothing left to reach.
+  [[ -z $window ]] && exit 0
+  [[ $(jq -r '.visible' <<<"$window") == true &&
+     $(hyprctl activeworkspace -j 2>/dev/null | jq -r '.id') == $(jq -r '.workspace.id' <<<"$window") ]]
+}
+
+close_notification() {
+  gdbus call --session --dest org.freedesktop.Notifications \
+    --object-path /org/freedesktop/Notifications \
+    --method org.freedesktop.Notifications.CloseNotification "$id" >/dev/null 2>&1
+  exit 0
+}
+
+socket="$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock"
+exec {events}< <(exec socat -u "UNIX-CONNECT:$socket" - 2>/dev/null)
+socat_pid=$!
+trap 'kill "$socat_pid" 2>/dev/null' EXIT
+
+# Subscribe before the first check so a switch in between is not missed.
+on_screen && close_notification
+
+while IFS= read -r line <&"$events"; do
+  case ${line%%>>*} in
+    workspace | workspacev2 | focusedmon | focusedmonv2 | activewindowv2 | movewindowv2 | closewindow | changegroupactive)
+      on_screen && close_notification
+      ;;
+  esac
+done

@@ -1,4 +1,4 @@
-import { execFile } from "node:child_process"
+import { type ChildProcess, execFile, spawn } from "node:child_process"
 import { Plugin } from "@opencode/plugin/tui"
 
 type HyprClient = {
@@ -42,6 +42,31 @@ async function isOnScreen(window: HyprClient | undefined) {
   return active.id === window.workspace.id
 }
 
+// Shows a completion that closes itself once its window is on screen, and resolves with
+// the action taken (empty when it was closed without a click).
+function dismissedOnView(command: string[], window: HyprClient) {
+  return new Promise<string>((resolve) => {
+    const notification = spawn(command[0], ["--print-id", ...command.slice(1)], {
+      stdio: ["ignore", "pipe", "ignore"],
+    })
+    let stdout = ""
+    let watcher: ChildProcess | undefined
+    notification.stdout.on("data", (chunk) => {
+      stdout += chunk
+      const id = stdout.split("\n")[0]
+      if (!watcher && stdout.includes("\n") && /^\d+$/.test(id)) {
+        watcher = spawn(`${process.env.HOME}/.local/bin/notification-dismiss-on-view`, [id, window.address], { stdio: "ignore" })
+        watcher.on("error", () => {})
+      }
+    })
+    notification.on("error", () => resolve(""))
+    notification.on("close", () => {
+      watcher?.kill()
+      resolve(stdout.split("\n").slice(1).join("\n"))
+    })
+  })
+}
+
 async function notify(window: HyprClient | undefined, title: string, body?: string, isQuestion = false) {
   const command = [
     "notify-send",
@@ -58,7 +83,8 @@ async function notify(window: HyprClient | undefined, title: string, body?: stri
   }
 
   // Omarchy invokes the default action when the notification card is clicked.
-  const action = await output([...command.slice(0, -1), "--action=default=Focus", command.at(-1)!])
+  const withAction = [...command.slice(0, -1), "--action=default=Focus", command.at(-1)!]
+  const action = isQuestion ? await output(withAction) : await dismissedOnView(withAction, window)
   if (action.trim() === "default") {
     await output(["hyprctl", "dispatch", `hl.dsp.focus({ window = \"address:${window.address}\" })`])
 

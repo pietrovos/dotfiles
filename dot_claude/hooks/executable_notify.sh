@@ -2,6 +2,33 @@
 # Desktop notification for Claude Code, mirroring ~/.config/opencode/plugins/completion-notification.ts.
 # Usage: notify.sh finished|question   (hook JSON arrives on stdin and is ignored)
 
+# Detached half: shows the notification and waits for a click (see the end of the file).
+# kind, address and group_index arrive through the environment.
+if [[ ${1:-} == --show ]]; then
+  shift
+  if [[ -z $address ]]; then
+    notify-send "$@"
+    exit
+  fi
+  # Omarchy invokes the default action when the notification card is clicked.
+  if [[ $kind == question ]]; then
+    action=$(notify-send --action=default=Focus "$@")
+  else
+    # Completions close themselves once their window is on screen.
+    exec {notification}< <(notify-send --print-id --action=default=Focus "$@")
+    read -r id <&"$notification"
+    "$HOME/.local/bin/notification-dismiss-on-view" "$id" "$address" &
+    watcher=$!
+    action=$(cat <&"$notification")
+    kill "$watcher" 2>/dev/null
+  fi
+  if [[ $action == default ]]; then
+    hyprctl dispatch "hl.dsp.focus({ window = \"address:$address\" })" >/dev/null
+    (( group_index > 0 )) && hyprctl dispatch "hl.dsp.group.active({ index = $group_index })" >/dev/null
+  fi
+  exit
+fi
+
 kind=${1:-finished}
 cat >/dev/null
 
@@ -44,18 +71,8 @@ else
   args=(--app-name="Claude Code" --urgency=critical --expire-time=0 "Claude Code finished" "Workspace $workspace$tab")
 fi
 
-# Detach so the hook returns immediately while notify-send waits for a click.
-(
-  if [[ -z $address ]]; then
-    notify-send "${args[@]}"
-    exit
-  fi
-  # Omarchy invokes the default action when the notification card is clicked.
-  action=$(notify-send --action=default=Focus "${args[@]}")
-  if [[ $action == default ]]; then
-    hyprctl dispatch "hl.dsp.focus({ window = \"address:$address\" })" >/dev/null
-    (( group_index > 0 )) && hyprctl dispatch "hl.dsp.group.active({ index = $group_index })" >/dev/null
-  fi
-) </dev/null >/dev/null 2>&1 &
-disown
+# Claude Code kills the hook's process group when it returns, so the waiting part runs
+# in its own session (re-invoked as --show) to outlive the hook.
+export kind address group_index
+setsid -f "$0" --show "${args[@]}" </dev/null >/dev/null 2>&1
 exit 0

@@ -209,6 +209,12 @@ from Omarchy defaults when these files can be inspected.
   until clicked, focus that window when clicked, and use critical urgency for
   red attention styling. OpenCode's built-in TUI desktop notifications are
   disabled so the custom notification is the only alert.
+  Completion (not question) notifications close themselves once their window
+  becomes the shown tab on the focused workspace: both notifiers send with
+  `notify-send --print-id` and run `~/.local/bin/notification-dismiss-on-view
+  <id> <address>`, which listens on Hyprland's socket2 and calls
+  `CloseNotification`; it exits if the window closes or the card is clicked
+  (2026-10-25).
 - The cloned `pietrovos.notifications` shell service renders only OpenCode
   question notifications with an explicit red background and border,
   independent of the active theme's urgent color.
