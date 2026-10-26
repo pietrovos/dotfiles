@@ -112,7 +112,7 @@ export const register: Register = on => {
 
     return (
       // flex-start shrinks the box to the text instead of the full row.
-      <Box borderStyle="single" borderColor="#ff5c5c" backgroundColor="#2a1414" paddingX={1} marginTop={1} alignSelf="flex-start">
+      <Box borderStyle="single" borderColor="#ff5c5c" paddingX={1} marginTop={1} alignSelf="flex-start">
         <Text color="#ff5c5c"><Text color="#d47a7a">❯ </Text><Text color="#ffffff">pietrovos:</Text> {parts}</Text>
       </Box>
     )
