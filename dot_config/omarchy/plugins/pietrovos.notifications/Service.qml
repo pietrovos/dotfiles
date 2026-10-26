@@ -162,9 +162,13 @@ Item {
     liveRefs[snapshot.originalId] = notification
     // Guard the delete: a newer notification may have reused this originalId
     // (freedesktop replaces_id) and taken over the map slot.
-    notification.closed.connect(function() {
+    notification.closed.connect(function(reason) {
       if (service.liveRefs[snapshot.originalId] === notification)
         delete service.liveRefs[snapshot.originalId]
+      // The sender withdrew it (CloseNotification), so its toast leaves too.
+      // Dismissals and expiries already removed their own row.
+      if (reason === NotificationCloseReason.CloseRequested)
+        Qt.callLater(function() { service.removeWithdrawnPopup(snapshot) })
     })
 
     // DND bypass rules: chat apps abuse urgency=critical to force
@@ -312,6 +316,17 @@ Item {
 
   function dismissPopup(index) {
     removePopup(index, "dismiss")
+  }
+
+  // Matches by file name, not just originalId, so a newer notification that
+  // reused the id keeps its toast.
+  function removeWithdrawnPopup(snapshot) {
+    var fileName = NotificationLogic.popupFileName(snapshot)
+    for (var i = popupModel.count - 1; i >= 0; i--) {
+      var row = popupModel.get(i)
+      if (!row || row.originalId !== snapshot.originalId || isRestoredRow(row)) continue
+      if (NotificationLogic.popupFileName(row) === fileName) removePopup(i, "dismiss")
+    }
   }
 
   function expirePopup(index) {

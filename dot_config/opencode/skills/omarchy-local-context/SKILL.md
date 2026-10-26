@@ -219,6 +219,12 @@ from Omarchy defaults when these files can be inspected.
   `notify.sh` re-invokes itself as `notify.sh --show` under `setsid -f`; a plain
   backgrounded/disowned subshell was killed, leaving cards without the
   dismiss watcher or click-to-focus.
+  Stock Omarchy's notification service ignored sender closes (it only dropped
+  its live reference), so `pietrovos.notifications/Service.qml` now removes a
+  toast when `closed` fires with `NotificationCloseReason.CloseRequested`
+  (`removeWithdrawnPopup`, matched by popup file name so a reused id keeps
+  its toast). Stale cards: `qs -p /usr/share/omarchy/shell ipc call
+  notifications dismiss "<summary substring>"`.
 - The cloned `pietrovos.notifications` shell service renders only OpenCode
   question notifications with an explicit red background and border,
   independent of the active theme's urgent color.
