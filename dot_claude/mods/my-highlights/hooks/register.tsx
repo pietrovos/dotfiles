@@ -85,9 +85,7 @@ export const register: Register = on => {
 
   on('prompt.edit', async ($, e, next) => {
     const r = await next(e)
-    // Typed text is red like sent prompts; highlights come later so they win.
-    const base: PromptDecoration = { start: 0, end: r.text.length, color: '#ff5c5c' }
-    const mine: PromptDecoration[] = [base, ...spans(r.text).map(s => ({ start: s.start, end: s.end, ...s.style }))]
+    const mine: PromptDecoration[] = spans(r.text).map(s => ({ start: s.start, end: s.end, ...s.style }))
     return { ...r, decorations: [...(r.decorations ?? []), ...mine] }
   })
 
