@@ -61,9 +61,7 @@ export const register: Register = on => {
 
   on('prompt.edit', async ($, e, next) => {
     const r = await next(e)
-    // Typed text is red like sent prompts; highlights come later so they win.
-    const base: PromptDecoration = { start: 0, end: r.text.length, color: '#ff5c5c' }
-    const mine: PromptDecoration[] = [base, ...spans(r.text).map(s => ({ start: s.start, end: s.end, ...s.style }))]
+    const mine: PromptDecoration[] = spans(r.text).map(s => ({ start: s.start, end: s.end, ...s.style }))
     return { ...r, decorations: [...(r.decorations ?? []), ...mine] }
   })
 
@@ -88,7 +86,7 @@ export const register: Register = on => {
 
     return (
       // flex-start shrinks the box to the text instead of the full row.
-      <Box key="message" hover={{ backgroundColor: "#3a1a1a" }} borderStyle="single" borderColor="#ff5c5c" backgroundColor="#2a1414" paddingX={1} marginTop={1} alignSelf="flex-start">
+      <Box borderStyle="single" borderColor="#ff5c5c" backgroundColor="#2a1414" paddingX={1} marginTop={1} alignSelf="flex-start">
         <Text color="#ff5c5c"><Text color="#d47a7a">❯ </Text><Text color="#ffffff">pietrovos:</Text> {parts}</Text>
       </Box>
     )
