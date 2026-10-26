@@ -105,10 +105,15 @@ from Omarchy defaults when these files can be inspected.
   cross-workspace focus helper matching an older Chromium window.
 - Group controls render in the top bar through
   `~/.config/omarchy/plugins/pietrovos.group-tabs/`.
-- The subspace widget marks the shown tab by keeping its number and giving it
-  a full-opacity `MultiEffect` glow in the bar foreground color (`shadowBlur`
-  0.6), instead of replacing it with a filled-square glyph; other numbers
-  stay at 0.55 opacity.
+- The subspace widget (`pietrovos.group-tabs`) and workspaces widget
+  (`pietrovos.workspaces`) mark the shown tab/focused workspace by keeping its
+  number and making it glow, instead of replacing it with a filled-square
+  glyph. The glow is a `layer.effect` of three stacked `MultiEffect` shadows
+  in the bar foreground color (one shadow tops out at full opacity):
+  `shadowBlur` 1.0, `blurMax` 32, `shadowScale` 1.2, with manual
+  `paddingRect: Qt.rect(48, 48, 48, 48)`. Auto padding clipped the halo into
+  a visible box; asymmetric padding (e.g. 96 right/bottom) pushed the scaled
+  glow off-centre toward the bottom-right.
 - The subspace widget has a single rounded, 1px border around its numbered
   tabs and optional name, using the bar foreground color at 50% opacity.
 - The widget is placed after `pietrovos.workspaces` in

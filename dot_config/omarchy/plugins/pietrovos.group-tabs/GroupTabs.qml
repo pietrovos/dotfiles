@@ -157,8 +157,9 @@ BarWidget {
                 shadowColor: root.bar ? root.bar.barForeground : Color.foreground
                 shadowBlur: 1.0
                 blurMax: 32
+                shadowScale: 1.2
                 autoPaddingEnabled: false
-                paddingRect: Qt.rect(48, 48, 96, 96)
+                paddingRect: Qt.rect(48, 48, 48, 48)
                 shadowOpacity: 1
                 shadowHorizontalOffset: 0
                 shadowVerticalOffset: 0
