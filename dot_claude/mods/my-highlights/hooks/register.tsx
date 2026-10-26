@@ -73,7 +73,7 @@ const TEXT: Style = { color: '#ff5c5c' }
 const NAME: Style = { color: '#ffffff' }
 const CARET: Style = { color: '#d47a7a' }
 // Blank cells between the border and the text on each side.
-const PAD_X = 2
+const PAD_X = 1
 // Border cells and padding on each side, plus a spare column.
 const BOX_CHROME = 2 + 2 * PAD_X + 1
 
