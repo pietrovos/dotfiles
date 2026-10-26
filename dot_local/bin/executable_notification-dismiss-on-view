@@ -8,16 +8,23 @@ id=$1
 address=$2
 [[ $id =~ ^[0-9]+$ && -n $address ]] || exit 1
 
+# TEMP debug log
+exec 2>>"$XDG_RUNTIME_DIR/notification-dismiss.log"
+echo "$(date +%T.%N) start id=$id address=$address" >&2
+trap 'echo "$(date +%T.%N) exit id=$id" >&2' EXIT
+
 on_screen() {
   local window
   window=$(hyprctl clients -j 2>/dev/null | jq -c --arg a "$address" 'map(select(.address == $a)) | first // empty')
   # The window closed, so there is nothing left to reach.
-  [[ -z $window ]] && exit 0
+  [[ -z $window ]] && { echo "$(date +%T) window gone" >&2; exit 0; }
+  echo "$(date +%T) check visible=$(jq -r .visible <<<"$window") ws=$(jq -r .workspace.id <<<"$window") active=$(hyprctl activeworkspace -j | jq -r .id)" >&2
   [[ $(jq -r '.visible' <<<"$window") == true &&
      $(hyprctl activeworkspace -j 2>/dev/null | jq -r '.id') == $(jq -r '.workspace.id' <<<"$window") ]]
 }
 
 close_notification() {
+  echo "$(date +%T) closing $id" >&2
   gdbus call --session --dest org.freedesktop.Notifications \
     --object-path /org/freedesktop/Notifications \
     --method org.freedesktop.Notifications.CloseNotification "$id" >/dev/null 2>&1
@@ -27,12 +34,13 @@ close_notification() {
 socket="$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock"
 exec {events}< <(exec socat -u "UNIX-CONNECT:$socket" - 2>/dev/null)
 socat_pid=$!
-trap 'kill "$socat_pid" 2>/dev/null' EXIT
+trap 'kill "$socat_pid" 2>/dev/null; echo "$(date +%T) exit id=$id" >&2' EXIT
 
 # Subscribe before the first check so a switch in between is not missed.
 on_screen && close_notification
 
 while IFS= read -r line <&"$events"; do
+  echo "$(date +%T) event ${line:0:80}" >&2
   case ${line%%>>*} in
     workspace | workspacev2 | focusedmon | focusedmonv2 | activewindowv2 | movewindowv2 | closewindow | changegroupactive)
       on_screen && close_notification

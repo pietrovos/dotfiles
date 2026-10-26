@@ -215,6 +215,10 @@ from Omarchy defaults when these files can be inspected.
   <id> <address>`, which listens on Hyprland's socket2 and calls
   `CloseNotification`; it exits if the window closes or the card is clicked
   (2026-10-25).
+  Claude Code kills a hook's process group when the hook returns, so
+  `notify.sh` re-invokes itself as `notify.sh --show` under `setsid -f`; a plain
+  backgrounded/disowned subshell was killed, leaving cards without the
+  dismiss watcher or click-to-focus.
 - The cloned `pietrovos.notifications` shell service renders only OpenCode
   question notifications with an explicit red background and border,
   independent of the active theme's urgent color.
