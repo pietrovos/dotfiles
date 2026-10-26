@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Layouts
 import Quickshell.Hyprland
 import Quickshell.Io
@@ -137,8 +138,18 @@ BarWidget {
         readonly property bool focused: root.focusedId === modelData
 
         bar: root.bar
-        text: focused ? "\uDB85\uDCFB" : (modelData === 10 ? "0" : String(modelData))
+        text: modelData === 10 ? "0" : String(modelData)
         opacity: occupied || focused ? 1 : 0.5
+        // The focused workspace glows instead of being replaced by a filled square.
+        layer.enabled: focused
+        layer.effect: MultiEffect {
+          shadowEnabled: true
+          shadowColor: root.bar ? root.bar.barForeground : Color.foreground
+          shadowBlur: 0.6
+          shadowOpacity: 1
+          shadowHorizontalOffset: 0
+          shadowVerticalOffset: 0
+        }
         horizontalMargin: 6
         verticalPadding: 6
         fixedWidth: root.vertical ? root.barSize : Style.space(20)

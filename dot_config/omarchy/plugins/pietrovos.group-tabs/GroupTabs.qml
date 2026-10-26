@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Hyprland
@@ -139,8 +140,18 @@ BarWidget {
           readonly property bool focused: index === root.activeIndex
 
           bar: root.bar
-          text: focused ? "\uDB85\uDCFB" : (index === 9 ? "0" : String(index + 1))
+          text: index === 9 ? "0" : String(index + 1)
           opacity: focused ? 1 : 0.55
+          // The shown tab glows instead of being replaced by a filled square.
+          layer.enabled: focused
+          layer.effect: MultiEffect {
+            shadowEnabled: true
+            shadowColor: root.bar ? root.bar.barForeground : Color.foreground
+            shadowBlur: 0.6
+            shadowOpacity: 1
+            shadowHorizontalOffset: 0
+            shadowVerticalOffset: 0
+          }
           horizontalMargin: 6
           verticalPadding: 6
           fixedWidth: Style.space(20)
