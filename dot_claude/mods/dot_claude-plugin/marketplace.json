@@ -1,0 +1,5 @@
+{
+  "name": "pietrovos-mods",
+  "owner": { "name": "pietrovos" },
+  "plugins": [{ "name": "my-highlights", "source": "./my-highlights" }]
+}
