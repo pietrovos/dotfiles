@@ -97,8 +97,11 @@ for index = 1, 10 do
 end
 
 -- Grouped-window tabs: Alt+1 through Alt+0 select positions 1 through 10.
-bind("ALT + mouse_down", "Next window in subspace", hl.dsp.group.next())
-bind("ALT + mouse_up", "Previous window in subspace", hl.dsp.group.prev())
+-- All group switching goes through select-group-window so fullscreen survives it.
+bind("ALT + mouse_down", "Next window in subspace", "/home/pietrovos/.config/hypr/select-group-window next")
+bind("ALT + mouse_up", "Previous window in subspace", "/home/pietrovos/.config/hypr/select-group-window prev")
+bind("SUPER + ALT + TAB", "Next window in group", "/home/pietrovos/.config/hypr/select-group-window next")
+bind("SUPER + ALT + SHIFT + TAB", "Previous window in group", "/home/pietrovos/.config/hypr/select-group-window prev")
 
 for index = 1, 10 do
   if index <= 5 then

@@ -1,11 +1,36 @@
 #!/bin/sh
+# Usage: select-group-window <1-10|0|next|prev>
+#
+# Switching group members normally hands fullscreen to the new member, which
+# makes apps such as Chromium exit page fullscreen (videos). Instead, a
+# fullscreen member is parked (tiled, but still told it is fullscreen) before
+# the switch, and a parked member is made fullscreen again when shown.
 
 target=$1
 [ "$target" = 0 ] && target=10
 
+active=$(hyprctl activewindow -j)
+
 case "$target" in
+  next|prev)
+    echo "$active" | jq -e '(.grouped // []) | length > 1' >/dev/null || exit 0
+    dispatcher="hl.dsp.group.$target()"
+    ;;
   ''|*[!0-9]*) exit 1 ;;
+  *)
+    echo "$active" | jq -e --argjson target "$target" '(.grouped // []) | length >= $target' >/dev/null || exit 0
+    dispatcher="hl.dsp.group.active({ index = $target })"
+    ;;
 esac
 
-hyprctl activewindow -j | jq -e --argjson target "$target" '(.grouped // []) | length >= $target' >/dev/null || exit 0
-hyprctl dispatch "hl.dsp.group.active({ index = $target })" >/dev/null
+if [ "$(echo "$active" | jq '.fullscreen')" = 2 ]; then
+  client=$(echo "$active" | jq '.fullscreenClient')
+  hyprctl dispatch "hl.dsp.window.fullscreen_state({ internal = 0, client = $client, action = \"set\" })" >/dev/null
+fi
+
+hyprctl dispatch "$dispatcher" >/dev/null
+
+shown=$(hyprctl activewindow -j)
+if echo "$shown" | jq -e '.fullscreen == 0 and .fullscreenClient == 2' >/dev/null; then
+  hyprctl dispatch 'hl.dsp.window.fullscreen_state({ internal = 2, client = 2, action = "set" })' >/dev/null
+fi

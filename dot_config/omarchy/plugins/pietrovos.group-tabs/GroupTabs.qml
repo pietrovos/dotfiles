@@ -47,7 +47,7 @@ BarWidget {
   function focusMember(index) {
     if (!root.bar) return
     activeIndex = index - 1
-    root.bar.run("hyprctl dispatch " + Util.shellQuote("hl.dsp.group.active({ index = " + index + " })"))
+    root.bar.run("/home/pietrovos/.config/hypr/select-group-window " + index)
   }
 
   visible: members.length > 0 && !vertical
