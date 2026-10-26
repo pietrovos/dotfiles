@@ -123,6 +123,13 @@ from Omarchy defaults when these files can be inspected.
 - The `omarchy.indicators` widget (mic, recording, dictation, nightlight,
   do-not-disturb, idle-inhibit icons) is removed from the bar center at the
   user's request (2026-10-25).
+- Bar center is just the clock (`h:mm AP`, no weekday) and keyboard layout;
+  `omarchy.weather` is removed and `omarchy.system-update` sits first in the
+  right section (2026-10-25).
+- The clock is the clone `pietrovos.clock` (also `bar.centerAnchor`). Its
+  horizontal label is drawn by its own `timeLabel` Text: bold, 1.15x body
+  size; the WidgetButton's built-in label is hidden and `fixedWidth` follows
+  `timeLabel`. A glow on the clock was tried and rejected as ugly (2026-10-25).
 - `~/.config/omarchy/shell.toml` pins only `[font]`/`[bar]` and the menu and
   launcher alpha/glass values; it deliberately omits `[menu]`/`[launcher]`
   colors so the Omarchy menu (`SUPER+SPACE`) and launcher (`SUPER+ALT+SPACE`)

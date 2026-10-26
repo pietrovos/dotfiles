@@ -1,6 +1,6 @@
 {
   "bar": {
-    "centerAnchor": "omarchy.clock",
+    "centerAnchor": "pietrovos.clock",
     "layout": {
       "center": [
         {
@@ -9,7 +9,7 @@
         {
           "format": "h:mm AP",
           "formatAlt": "d MMMM 'W'ww yyyy",
-          "id": "omarchy.clock",
+          "id": "pietrovos.clock",
           "verticalFormat": "h\nAP\nmm"
         }
       ],

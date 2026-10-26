@@ -67,67 +67,6 @@ function codeBare(markdown: string): string {
   return out + wrap(markdown.slice(at))
 }
 
-const BORDER = '#ff5c5c'
-const FILL = '#2a1414'
-const TEXT: Style = { color: '#ff5c5c' }
-const NAME: Style = { color: '#ffffff' }
-const CARET: Style = { color: '#d47a7a' }
-// Blank cells between the border and the text on each side.
-const PAD_X = 1
-// Border cells and padding on each side, plus a spare column.
-const BOX_CHROME = 2 + 2 * PAD_X + 1
-
-type Cell = { ch: string; style: Style }
-
-// The prefix and message as styled cells, wrapped at spaces into rows of at
-// most `max` cells (a longer word is cut).
-function boxRows(text: string, max: number): Cell[][] {
-  const cells: Cell[] = [
-    { ch: '❯', style: CARET },
-    { ch: ' ', style: TEXT },
-    ...[...'pietrovos:'].map(ch => ({ ch, style: NAME })),
-    { ch: ' ', style: TEXT },
-  ]
-  const marks = spans(text)
-  let i = 0
-  for (const ch of text) {
-    const mark = marks.find(m => i >= m.start && i < m.end)
-    cells.push({ ch, style: mark ? mark.style : TEXT })
-    i += ch.length
-  }
-
-  const limit = Math.max(10, max)
-  const rows: Cell[][] = []
-  let row: Cell[] = []
-  for (const cell of cells) {
-    if (cell.ch === '\n') {
-      rows.push(row)
-      row = []
-      continue
-    }
-    row.push(cell)
-    if (row.length > limit) {
-      const space = row.map(c => c.ch).lastIndexOf(' ')
-      const cut = space > 0 ? space : limit
-      rows.push(row.slice(0, cut))
-      row = row.slice(space > 0 ? cut + 1 : cut)
-    }
-  }
-  rows.push(row)
-  return rows
-}
-
-// Consecutive cells of one style as one run of text.
-function groupRuns(cells: Cell[]): { text: string; style: Style }[] {
-  const runs: { text: string; style: Style }[] = []
-  for (const cell of cells) {
-    const last = runs[runs.length - 1]
-    if (last && last.style === cell.style) last.text += cell.ch
-    else runs.push({ text: cell.ch, style: cell.style })
-  }
-  return runs
-}
-
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     await refreshRam($)
@@ -157,35 +96,24 @@ export const register: Register = on => {
     if (kind !== 'composer' && kind !== 'bridge') return next(e)
 
     const { Box, Text } = $.ui.resolve(e)
-    const rows = boxRows(e.props.text, (e.viewport?.columns ?? 80) - BOX_CHROME)
-    const width = Math.max(...rows.map(row => row.length))
-    const run = (cells: Cell[]) => groupRuns(cells).map(r => (
-      <Text color={r.style.color} bold={r.style.bold} underline={r.style.underline}>{r.text}</Text>
-    ))
+    const text = e.props.text
+    const parts: (string | ReturnType<typeof Text>)[] = []
+    let at = 0
+    for (const s of spans(text)) {
+      if (s.start > at) parts.push(text.slice(at, s.start))
+      parts.push(
+        <Text color={s.style.color} bold={s.style.bold} underline={s.style.underline}>
+          {text.slice(s.start, s.end)}
+        </Text>,
+      )
+      at = s.end
+    }
+    if (at < text.length) parts.push(text.slice(at))
 
-    const blank = (
-      <Text wrap="truncate-end">
-        <Text color={BORDER}>▕</Text>
-        <Text backgroundColor={FILL}>{' '.repeat(width + 2 * PAD_X)}</Text>
-        <Text color={BORDER}>▏</Text>
-      </Text>
-    )
-
-    // Drawn by hand: a Box border leaves its cells unfilled, so the background
-    // stopped short of the line. Eighth-block edges sit flush with the fill.
     return (
-      <Box flexDirection="column" marginTop={1} alignSelf="flex-start">
-        <Text color={BORDER} wrap="truncate-end">{' ' + '▁'.repeat(width + 2 * PAD_X) + ' '}</Text>
-        {blank}
-        {rows.map(row => (
-          <Text wrap="truncate-end">
-            <Text color={BORDER}>▕</Text>
-            <Text backgroundColor={FILL}>{' '.repeat(PAD_X)}{run(row)}{' '.repeat(width - row.length + PAD_X)}</Text>
-            <Text color={BORDER}>▏</Text>
-          </Text>
-        ))}
-        {blank}
-        <Text color={BORDER} wrap="truncate-end">{' ' + '▔'.repeat(width + 2 * PAD_X) + ' '}</Text>
+      // flex-start shrinks the box to the text instead of the full row.
+      <Box borderStyle="single" borderColor="#ff5c5c" backgroundColor="#2a1414" paddingX={1} marginTop={1} alignSelf="flex-start">
+        <Text color="#ff5c5c"><Text color="#d47a7a">❯ </Text><Text color="#ffffff">pietrovos:</Text> {parts}</Text>
       </Box>
     )
   })
