@@ -120,6 +120,9 @@ from Omarchy defaults when these files can be inspected.
   `~/.config/omarchy/shell.json`.
 - The top-left `omarchy.menu` bar button is removed from `shell.json`'s left
   section at the user's request; `SUPER+SPACE` still opens the menu (2026-10-25).
+- The `omarchy.indicators` widget (mic, recording, dictation, nightlight,
+  do-not-disturb, idle-inhibit icons) is removed from the bar center at the
+  user's request (2026-10-25).
 - `~/.config/omarchy/shell.toml` pins only `[font]`/`[bar]` and the menu and
   launcher alpha/glass values; it deliberately omits `[menu]`/`[launcher]`
   colors so the Omarchy menu (`SUPER+SPACE`) and launcher (`SUPER+ALT+SPACE`)
@@ -154,7 +157,12 @@ from Omarchy defaults when these files can be inspected.
   `~/.config/hypr/reorder-group-window`. `SUPER+SHIFT+R` opens the custom OpenCode build in the
   current terminal directory via `~/.config/hypr/opencode-duplicate`.
   `SUPER+SHIFT+L` opens Claude Code in the current terminal directory via
-  `~/.config/hypr/claude-code`.
+  `~/.config/hypr/claude-code`. That launcher runs kitty directly (not
+  `xdg-terminal-exec`, which cannot pass options) with
+  `--class=org.omarchy.claude -o foreground=#eeeeee`: Claude Code draws reply
+  body text in the terminal's default foreground, not its theme's `text`, so
+  Greenify's `#00ff99` made replies green. Only these windows are white;
+  `claude` typed in a normal kitty stays green (2026-10-25).
 - `SUPER+ESC` switches to workspace 6, or back to the previous workspace when
   already on 6 (overriding Omarchy's default
   System menu) via `~/.config/hypr/bindings.lua`.
