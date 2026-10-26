@@ -36,7 +36,18 @@
       }
     ]
   },
+  "extraKnownMarketplaces": {
+    "pietrovos-mods": {
+      "source": {
+        "source": "directory",
+        "path": "/home/pietrovos/.claude/mods"
+      }
+    }
+  },
   "theme": "custom:lucent-orng",
   "preferredNotifChannel": "notifications_disabled",
-  "agentPushNotifEnabled": true
+  "agentPushNotifEnabled": true,
+  "enabledPlugins": {
+    "my-highlights@pietrovos-mods": true
+  }
 }
