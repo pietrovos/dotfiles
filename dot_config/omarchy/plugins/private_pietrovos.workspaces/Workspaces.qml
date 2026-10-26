@@ -21,7 +21,11 @@ BarWidget {
   property int focusedId: 0
   property bool refreshPending: false
 
-  readonly property var workspaceIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  readonly property var workspaceIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+  // Only workspaces with windows, plus the focused one so you can see where you are.
+  readonly property var visibleIds: workspaceIds.filter(function(id) {
+    return occupiedIds[id] === true || focusedId === id
+  })
 
   readonly property var stateEvents: [
     "workspace", "workspacev2",
@@ -65,11 +69,11 @@ BarWidget {
     var occupied = {}
     for (var i = 0; i < list.length; i++) {
       var id = list[i] && list[i].id
-      if (id > 0 && id <= 10 && list[i].windows > 0) occupied[id] = true
+      if (id > 0 && id <= 11 && list[i].windows > 0) occupied[id] = true
     }
 
     root.occupiedIds = occupied
-    root.focusedId = (active.id > 0 && active.id <= 10) ? active.id : 0
+    root.focusedId = (active.id > 0 && active.id <= 11) ? active.id : 0
   }
 
   function focusWorkspace(id) {
@@ -124,12 +128,12 @@ BarWidget {
     id: grid
     anchors.fill: parent
     anchors.rightMargin: root.trailingGap
-    columns: root.vertical ? 1 : root.workspaceIds.length
+    columns: root.vertical ? 1 : Math.max(1, root.visibleIds.length)
     columnSpacing: root.vertical ? 0 : Style.space(1)
     rowSpacing: root.vertical ? Style.space(2) : 0
 
     Repeater {
-      model: root.workspaceIds
+      model: root.visibleIds
 
       WidgetButton {
         required property int modelData
