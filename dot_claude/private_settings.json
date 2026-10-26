@@ -49,9 +49,5 @@
   "agentPushNotifEnabled": true,
   "enabledPlugins": {
     "my-highlights@pietrovos-mods": true
-  },
-  "statusLine": {
-    "type": "command",
-    "command": "~/.claude/statusline.sh"
   }
 }

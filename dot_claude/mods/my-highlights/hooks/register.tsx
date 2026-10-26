@@ -1,4 +1,18 @@
-import type { Color, PromptDecoration, Register } from 'claude-code'
+import { atom, read, update } from 'claude-code'
+import type { Color, EngineInterface, PromptDecoration, Register } from 'claude-code'
+
+// RAM in use (total minus available), shown at the end of the hint line.
+const ram = atom({ plugin: 'my-highlights', key: 'ram' } as const, '')
+
+async function refreshRam($: EngineInterface) {
+  const info = await $.fs.read('/proc/meminfo')
+  const kb = (name: string) => Number(new RegExp(`^${name}:\\s+(\\d+)`, 'm').exec(info)?.[1] ?? 0)
+  const total = kb('MemTotal')
+  const used = total - kb('MemAvailable')
+  if (!total) return
+  const text = `RAM ${(used / 1048576).toFixed(1)}/${Math.round(total / 1048576)} GB`
+  await update($, ram, () => text)
+}
 
 type Style = { color: Color; bold?: boolean; underline?: boolean }
 
@@ -54,6 +68,16 @@ function codeBare(markdown: string): string {
 }
 
 export const register: Register = on => {
+  on('session.start', async ($, e, next) => {
+    await refreshRam($)
+    $.clock.every(5000, () => void refreshRam($))
+    return next(e)
+  })
+
+  on('ui.render', { component: 'PromptHint' }, async ($, e, next) => {
+    const text = await read($, ram)
+    return text ? next({ ...e, props: { ...e.props, tail: ` · ${text}` } }) : next(e)
+  })
   on('ui.render', { component: 'AssistantMessage' }, ($, e, next) => {
     const text = codeBare(e.props.text)
     return text === e.props.text ? next(e) : next({ ...e, props: { ...e.props, text } })
@@ -61,7 +85,9 @@ export const register: Register = on => {
 
   on('prompt.edit', async ($, e, next) => {
     const r = await next(e)
-    const mine: PromptDecoration[] = spans(r.text).map(s => ({ start: s.start, end: s.end, ...s.style }))
+    // Typed text is red like sent prompts; highlights come later so they win.
+    const base: PromptDecoration = { start: 0, end: r.text.length, color: '#ff5c5c' }
+    const mine: PromptDecoration[] = [base, ...spans(r.text).map(s => ({ start: s.start, end: s.end, ...s.style }))]
     return { ...r, decorations: [...(r.decorations ?? []), ...mine] }
   })
 

@@ -1,1 +1,6 @@
-{ "name": "my-highlights", "version": "0.1.0", "description": "Makes your own messages stand out and colors code, paths, URLs and @mentions as you type" }
+{
+  "name": "my-highlights",
+  "version": "0.1.0",
+  "description": "Styles your sent prompts, colors code, paths, URLs and @mentions, and shows RAM use under the prompt",
+  "types": "./types/index.d.ts"
+}
