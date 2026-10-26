@@ -142,13 +142,26 @@ BarWidget {
         opacity: occupied || focused ? 1 : 0.5
         // The focused workspace glows instead of being replaced by a filled square.
         layer.enabled: focused
-        layer.effect: MultiEffect {
-          shadowEnabled: true
-          shadowColor: root.bar ? root.bar.barForeground : Color.foreground
-          shadowBlur: 0.6
-          shadowOpacity: 1
-          shadowHorizontalOffset: 0
-          shadowVerticalOffset: 0
+        layer.effect: Item {
+          id: glow
+          property var source
+          // Stacked shadows: one MultiEffect shadow tops out at full opacity.
+          Repeater {
+            model: 3
+            MultiEffect {
+              anchors.fill: parent
+              source: glow.source
+              shadowEnabled: true
+              shadowColor: root.bar ? root.bar.barForeground : Color.foreground
+              shadowBlur: 1.0
+              blurMax: 32
+              autoPaddingEnabled: false
+              paddingRect: Qt.rect(48, 48, 96, 96)
+              shadowOpacity: 1
+              shadowHorizontalOffset: 0
+              shadowVerticalOffset: 0
+            }
+          }
         }
         horizontalMargin: 6
         verticalPadding: 6
