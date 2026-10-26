@@ -20,11 +20,13 @@ BarWidget {
   property var occupiedIds: ({})
   property int focusedId: 0
   property bool refreshPending: false
+  property bool tvActive: false
 
   readonly property var workspaceIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-  // Only workspaces with windows, plus the focused one so you can see where you are.
+  // 1-10 always; the TV's workspace 11 only while the TV is on as its own screen
+  // (or if 11 is somehow occupied or focused without it).
   readonly property var visibleIds: workspaceIds.filter(function(id) {
-    return occupiedIds[id] === true || focusedId === id
+    return id <= 10 || tvActive || occupiedIds[id] === true || focusedId === id
   })
 
   readonly property var stateEvents: [
@@ -57,9 +59,11 @@ BarWidget {
 
     var active
     var list
+    var monitors = []
     try {
       active = JSON.parse(parts[0].trim())
       list = JSON.parse(parts[1].trim())
+      if (parts.length > 2) monitors = JSON.parse(parts[2].trim())
     } catch (error) {
       return
     }
@@ -73,6 +77,9 @@ BarWidget {
     }
 
     root.occupiedIds = occupied
+    root.tvActive = Array.isArray(monitors) && monitors.some(function(monitor) {
+      return monitor && monitor.name === "HDMI-A-1" && !monitor.disabled && monitor.mirrorOf === "none"
+    })
     root.focusedId = (active.id > 0 && active.id <= 11) ? active.id : 0
   }
 
@@ -105,7 +112,7 @@ BarWidget {
 
   Process {
     id: stateProc
-    command: ["sh", "-c", "hyprctl -j activeworkspace; printf '\\n@@@\\n'; hyprctl -j workspaces"]
+    command: ["sh", "-c", "hyprctl -j activeworkspace; printf '\\n@@@\\n'; hyprctl -j workspaces; printf '\\n@@@\\n'; hyprctl -j monitors"]
 
     onRunningChanged: {
       if (!running && root.refreshPending) root.refresh()

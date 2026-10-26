@@ -183,10 +183,10 @@ from Omarchy defaults when these files can be inspected.
   refreshed on occupancy/focus Hyprland events (including `changeworkspaceid`)
   and a 5s safety poll, so the bar greys out the emptied source number the
   moment a swap lands.
-- `pietrovos.workspaces` shows only occupied workspaces (windows > 0) plus the
-  focused one, hiding empty numbers instead of dimming them. It covers
-  workspaces 1–11, so the TV's workspace 11 appears (labelled "11") when it
-  has windows or is focused (2026-10-25).
+- `pietrovos.workspaces` always shows 1–10 (empty ones dimmed) and adds the
+  TV's workspace 11 (labelled "11") while `HDMI-A-1` is an enabled,
+  non-mirrored monitor in `hyprctl -j monitors` (or if 11 is occupied/focused).
+  A hide-empty-workspaces variant was tried and reverted (2026-10-26).
 - `SUPER+CTRL+SHIFT+1` through `SUPER+CTRL+SHIFT+0` swap the current
   workspace with workspaces 1 through 10 in `bindings.lua`. Native
   `hl.dispatch(hl.dsp.workspace.change_id(...))` calls exchange whole
