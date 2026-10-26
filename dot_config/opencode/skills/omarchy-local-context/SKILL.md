@@ -118,6 +118,8 @@ from Omarchy defaults when these files can be inspected.
   tabs and optional name, using the bar foreground color at 50% opacity.
 - The widget is placed after `pietrovos.workspaces` in
   `~/.config/omarchy/shell.json`.
+- The top-left `omarchy.menu` bar button is removed from `shell.json`'s left
+  section at the user's request; `SUPER+SPACE` still opens the menu (2026-10-25).
 - `~/.config/omarchy/shell.toml` pins only `[font]`/`[bar]` and the menu and
   launcher alpha/glass values; it deliberately omits `[menu]`/`[launcher]`
   colors so the Omarchy menu (`SUPER+SPACE`) and launcher (`SUPER+ALT+SPACE`)

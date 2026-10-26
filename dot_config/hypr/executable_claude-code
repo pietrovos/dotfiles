@@ -2,4 +2,7 @@
 
 cwd=$(omarchy-cmd-terminal-cwd)
 
-exec setsid uwsm-app -- xdg-terminal-exec --app-id=org.omarchy.claude --working-directory="$cwd" -e /home/pietrovos/.local/bin/claude --remote-control
+# kitty directly (not xdg-terminal-exec) so Claude windows can use white body
+# text: Claude Code draws reply text in the terminal's default foreground,
+# which the Greenify theme makes green.
+exec setsid uwsm-app -- kitty --class=org.omarchy.claude --directory="$cwd" -o foreground=#eeeeee -e /home/pietrovos/.local/bin/claude --remote-control
