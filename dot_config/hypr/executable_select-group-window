@@ -5,9 +5,13 @@
 # makes apps such as Chromium exit page fullscreen (videos). Instead, a
 # fullscreen member is parked (tiled, but still told it is fullscreen) before
 # the switch, and a parked member is made fullscreen again when shown.
+# Parked windows are recorded so tiled fullscreen (the same state, set on
+# purpose) is left alone.
 
 target=$1
 [ "$target" = 0 ] && target=10
+
+parked="${XDG_RUNTIME_DIR:-/tmp}/hypr-parked-group-windows"
 
 active=$(hyprctl activewindow -j)
 
@@ -26,11 +30,16 @@ esac
 if [ "$(echo "$active" | jq '.fullscreen')" = 2 ]; then
   client=$(echo "$active" | jq '.fullscreenClient')
   hyprctl dispatch "hl.dsp.window.fullscreen_state({ internal = 0, client = $client, action = \"set\" })" >/dev/null
+  echo "$active" | jq -r '.address' >>"$parked"
 fi
 
 hyprctl dispatch "$dispatcher" >/dev/null
 
 shown=$(hyprctl activewindow -j)
-if echo "$shown" | jq -e '.fullscreen == 0 and .fullscreenClient == 2' >/dev/null; then
-  hyprctl dispatch 'hl.dsp.window.fullscreen_state({ internal = 2, client = 2, action = "set" })' >/dev/null
+address=$(echo "$shown" | jq -r '.address')
+if [ -f "$parked" ] && grep -qx "$address" "$parked"; then
+  grep -vx "$address" "$parked" >"$parked.tmp"
+  mv "$parked.tmp" "$parked"
+  echo "$shown" | jq -e '.fullscreen == 0' >/dev/null &&
+    hyprctl dispatch 'hl.dsp.window.fullscreen_state({ internal = 2, client = 2, action = "set" })' >/dev/null
 fi
