@@ -72,8 +72,10 @@ const FILL = '#2a1414'
 const TEXT: Style = { color: '#ff5c5c' }
 const NAME: Style = { color: '#ffffff' }
 const CARET: Style = { color: '#d47a7a' }
+// Blank cells between the border and the text on each side.
+const PAD_X = 2
 // Border cells and padding on each side, plus a spare column.
-const BOX_CHROME = 5
+const BOX_CHROME = 2 + 2 * PAD_X + 1
 
 type Cell = { ch: string; style: Style }
 
@@ -136,9 +138,8 @@ export const register: Register = on => {
   on('ui.render', { component: 'PromptHint' }, async ($, e, next) => {
     const text = await read($, ram)
     if (!text) return next(e)
-    // The engine's line can already end in a separator.
-    const sep = e.props.hint.trimEnd().endsWith('·') ? ' ' : ' · '
-    return next({ ...e, props: { ...e.props, tail: sep + text } })
+    // The engine puts its own separator before the tail.
+    return next({ ...e, props: { ...e.props, tail: ` ${text}` } })
   })
   on('ui.render', { component: 'AssistantMessage' }, ($, e, next) => {
     const text = codeBare(e.props.text)
@@ -162,19 +163,29 @@ export const register: Register = on => {
       <Text color={r.style.color} bold={r.style.bold} underline={r.style.underline}>{r.text}</Text>
     ))
 
+    const blank = (
+      <Text wrap="truncate-end">
+        <Text color={BORDER}>▕</Text>
+        <Text backgroundColor={FILL}>{' '.repeat(width + 2 * PAD_X)}</Text>
+        <Text color={BORDER}>▏</Text>
+      </Text>
+    )
+
     // Drawn by hand: a Box border leaves its cells unfilled, so the background
     // stopped short of the line. Eighth-block edges sit flush with the fill.
     return (
       <Box flexDirection="column" marginTop={1} alignSelf="flex-start">
-        <Text color={BORDER} wrap="truncate-end">{' ' + '▁'.repeat(width + 2) + ' '}</Text>
+        <Text color={BORDER} wrap="truncate-end">{' ' + '▁'.repeat(width + 2 * PAD_X) + ' '}</Text>
+        {blank}
         {rows.map(row => (
           <Text wrap="truncate-end">
             <Text color={BORDER}>▕</Text>
-            <Text backgroundColor={FILL}>{' '}{run(row)}{' '.repeat(width - row.length + 1)}</Text>
+            <Text backgroundColor={FILL}>{' '.repeat(PAD_X)}{run(row)}{' '.repeat(width - row.length + PAD_X)}</Text>
             <Text color={BORDER}>▏</Text>
           </Text>
         ))}
-        <Text color={BORDER} wrap="truncate-end">{' ' + '▔'.repeat(width + 2) + ' '}</Text>
+        {blank}
+        <Text color={BORDER} wrap="truncate-end">{' ' + '▔'.repeat(width + 2 * PAD_X) + ' '}</Text>
       </Box>
     )
   })
