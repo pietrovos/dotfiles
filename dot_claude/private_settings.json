@@ -44,6 +44,7 @@
       }
     }
   },
+  "autoUpdatesChannel": "stable",
   "theme": "custom:lucent-orng",
   "preferredNotifChannel": "notifications_disabled",
   "agentPushNotifEnabled": true,
