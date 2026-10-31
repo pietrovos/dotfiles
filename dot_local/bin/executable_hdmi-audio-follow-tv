@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# Keep the NVIDIA HDMI card on the LG TV's profile. The card plays to one display
+# at a time and the kernel assigns its PCMs dynamically, so find the TV by the
+# name in its ELD rather than pinning a profile. A non-HDMI default stays put.
+
+card=alsa_card.pci-0000_01_00.1
+tv="LG TV"
+
+tv_profile() {
+  pactl -f json list cards 2>/dev/null | jq -r --arg card "$card" --arg tv "$tv" '
+    .[] | select(.name == $card) | .ports[]
+    | select(.properties["device.product.name"] == $tv and .availability != "not available")
+    | .profiles[] | select(startswith("output:hdmi-stereo"))' | head -n 1
+}
+
+active_profile() {
+  pactl -f json list cards 2>/dev/null |
+    jq -r --arg card "$card" '.[] | select(.name == $card) | .active_profile'
+}
+
+follow_tv() {
+  local profile sink configured
+  profile=$(tv_profile)
+  [[ -n $profile && $profile != "$(active_profile)" ]] || return 0
+
+  configured=$(pw-metadata 0 default.configured.audio.sink 2>/dev/null)
+  pactl set-card-profile "$card" "$profile" || return 0
+
+  [[ $configured == *alsa_output.pci-0000_01_00.1.* ]] || return 0
+  sink=alsa_output.pci-0000_01_00.1.${profile#output:}
+  for _ in {1..30}; do
+    pactl list sinks short | grep -qF "$sink" && break
+    sleep 0.1
+  done
+  pactl set-default-sink "$sink"
+}
+
+follow_tv
+
+pactl subscribe | while read -r event; do
+  [[ $event == *" on card "* ]] || continue
+  while read -r -t 0.3 _; do :; done
+  follow_tv
+done
+
+# Only reached when PipeWire goes away; systemd restarts this.
+exit 1

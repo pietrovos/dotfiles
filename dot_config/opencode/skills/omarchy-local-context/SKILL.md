@@ -66,6 +66,16 @@ from Omarchy defaults when these files can be inspected.
   Restored 1080p/60 pending confirmation; cable/link instability is suspected,
   not confirmed.
   Monitor settings stay machine-local.
+- Audio goes to the LG TV through `hdmi-audio-follow-tv.service`, which runs
+  `~/.local/bin/hdmi-audio-follow-tv`. The NVIDIA HDMI card plays to one display
+  at a time, selected by card profile: setting only the default sink does not
+  move it, and WirePlumber's saved `default-profile` restored MSI on reboot
+  (2026-10-31). PCMs are assigned dynamically (the TV is `eld#0.0` but PCM 8,
+  profile `hdmi-stereo-extra2`), so the service finds the port whose
+  `device.product.name` is `LG TV` on startup and card events, then switches
+  the profile. It moves the default sink only if the configured default was
+  already on this HDMI card, so choosing headphones sticks; MSI and ASUS
+  HDMI audio are not selectable while the service runs and the TV is detected.
 
 - Kitty's `CTRL+SHIFT+A` copies the active terminal's screen and retained
   scrollback to the clipboard as plain text through `launch --type=clipboard

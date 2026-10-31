@@ -1,0 +1,13 @@
+[Unit]
+Description=Keep HDMI audio on the LG TV
+PartOf=graphical-session.target
+After=graphical-session.target pipewire-pulse.socket wireplumber.service
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/hdmi-audio-follow-tv
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=graphical-session.target
