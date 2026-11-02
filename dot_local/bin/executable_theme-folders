@@ -2,8 +2,9 @@
 set -uo pipefail
 
 # A folder step in front of the Omarchy theme picker, shown in
-# pietrovos.theme-picker, a clone of the stock picker. A folder is a directory in ~/.config/omarchy/theme-folders holding one
-# empty file per theme, named after the theme, so yazi can organize them.
+# pietrovos.theme-picker, a clone of the stock picker. A folder is a directory
+# in ~/.config/omarchy/theme-folders holding one empty file per theme, named
+# after the theme, so yazi can organize them.
 
 folders="${HOME}/.config/omarchy/theme-folders"
 cache="${XDG_CACHE_HOME:-${HOME}/.cache}/omarchy/theme-folders"

@@ -400,17 +400,26 @@ from Omarchy defaults when these files can be inspected.
   comment saying fields are kept, so the override restates icon, label and
   aliases; losing the `theme` alias made the keybind open the root menu
   (2026-11-02). Test such changes with the keybind's own route,
-  `omarchy menu toggle theme`. It shows folders in the stock image picker, then that folder's
-  themes in the same picker; Esc in the themes returns to the folders.
+  `omarchy menu toggle theme`. It shows folders, then that folder's
+  themes, in `pietrovos.theme-picker`, a clone of `omarchy.image-picker`
+  summoned with `omarchy-shell shell summon` (the shell hardcodes the stock id
+  for its `image-selector` IPC, so wallpapers keep the stock picker). The clone
+  reports `<action>\t<path>\t<filter>`. Backspace on an empty filter goes back
+  (key repeat is ignored, so holding it to clear a filter stops there). Esc or a
+  click outside exits from anywhere and saves view, item and filter to
+  `~/.cache/omarchy/theme-folders/resume`, which the next open restores;
+  applying a theme clears it. A new overlay plugin needs `omarchy restart shell`
+  before it can be summoned.
   A folder is a directory in `~/.config/omarchy/theme-folders/` holding one
   empty file per theme (machine-local, like themes). Moving those files in
   yazi organizes themes, and a theme may be in several folders. The `Organize`
-  tile opens that directory, `All Themes` opens the stock flat switcher, and
-  unfiled themes appear in a virtual `Unsorted` tile. Covers (2x2 collages)
-  and per-folder preview links live in `~/.cache/omarchy/theme-folders/`,
-  rebuilt only when a stat signature changes, which keeps opening instant.
+  tile opens that directory, `All Themes` lists everything, and unfiled themes
+  appear in a virtual `Unsorted` tile. Covers (2x2 collages) and per-folder
+  preview links live in `~/.cache/omarchy/theme-folders/`, rebuilt only when a
+  stat signature changes, which keeps opening instant. Thumbnails come from
+  `omarchy-menu-images --cache-only` and its `.rows` file.
   The separate `themeSwitchProc` in the shell's `Background.qml` still opens
-  the flat stock switcher. Close the picker from a script with
+  the flat stock switcher. Close the stock picker from a script with
   `omarchy-shell shell hide omarchy.image-picker`; `image-selector close`
   does not exist.
 

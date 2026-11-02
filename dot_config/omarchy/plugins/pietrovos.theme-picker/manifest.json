@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "id": "pietrovos.theme-picker",
+  "name": "Theme picker",
+  "version": "1.0.0",
+  "author": "pietrovos",
+  "description": "Image picker for theme-folders, reporting how it was left and where",
+  "kinds": [
+    "overlay"
+  ],
+  "keepLoaded": true,
+  "entryPoints": {
+    "overlay": "ImagePicker.qml"
+  }
+}
