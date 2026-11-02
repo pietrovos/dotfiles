@@ -142,29 +142,14 @@ BarWidget {
     columnSpacing: root.vertical ? 0 : Style.space(1)
     rowSpacing: root.vertical ? Style.space(2) : 0
 
-    Item {
+    WidgetButton {
       visible: root.tvKeys
-      Layout.alignment: Qt.AlignCenter
-      Layout.rightMargin: root.vertical ? 0 : Style.space(2)
-      implicitWidth: tvLabel.implicitWidth + Style.space(8)
-      implicitHeight: root.barSize - Style.space(2)
-
-      Rectangle {
-        anchors.fill: parent
-        color: root.bar ? root.bar.barForeground : Color.foreground
-        radius: Math.min(Style.cornerRadius, height / 2)
-        opacity: 0.18
-      }
-
-      Text {
-        id: tvLabel
-        anchors.centerIn: parent
-        text: "TV"
-        color: root.bar ? root.bar.barForeground : Color.foreground
-        opacity: 0.85
-        font.family: Style.font.family
-        font.pixelSize: Style.font.body
-      }
+      bar: root.bar
+      text: "TV"
+      horizontalMargin: 6
+      verticalPadding: 6
+      fixedWidth: root.vertical ? root.barSize : Style.space(20)
+      fixedHeight: root.barSize
     }
 
     Repeater {

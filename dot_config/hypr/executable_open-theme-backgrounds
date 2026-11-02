@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# The folder a theme really keeps its backgrounds in. The stock
+# `omarchy theme bg install` opens an empty side folder instead, and the applied
+# theme under ~/.local/state is a copy that the next theme change replaces.
+theme=$(cat "${HOME}/.local/state/omarchy/current/theme.name")
+folder="$(readlink -f "$(omarchy theme dir "${theme}")")/backgrounds"
+
+# Packaged themes are read-only, so their additions live in the user folder.
+if [[ ${folder} == /usr/share/* ]]; then
+  folder="${HOME}/.config/omarchy/backgrounds/${theme}"
+fi
+
+mkdir -p "${folder}"
+exec nautilus "${folder}"

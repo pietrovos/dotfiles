@@ -67,9 +67,9 @@ from Omarchy defaults when these files can be inspected.
   change focus. `$XDG_STATE_HOME/omarchy/tv-workspace-keys` (`0`/`1`) keeps
   the choice across reloads and drives the bar: `pietrovos.workspaces` watches
   it with a FileView and shows only the reachable ten, labelled by number key
-  (11 shows `1`, 20 shows `0`). In TV mode a `TV` box precedes them: a subtle
-  fill (0.18) and no border. Rejected: any border, a 0.3 fill as too bright,
-  and a plain label. Desktop mode shows no TV tag and no TV workspaces, at
+  (11 shows `1`, 20 shows `0`). In TV mode a non-clickable `TV` tile precedes
+  them, drawn like a number. Boxes (shaded, bordered, or both) were tried and
+  rejected. Desktop mode shows no TV tag and no TV workspaces, at
   the user's request (a tag beside/among the numbers was rejected as ugly).
   `SUPER+CTRL+SHIFT+1–0`
   swaps stay inside the current workspace's own range regardless of the flip,
@@ -351,6 +351,12 @@ from Omarchy defaults when these files can be inspected.
 - `SUPER+CTRL+ALT+S` toggles the user `chezmoi-sync.timer` through
   `~/.config/hypr/toggle-chezmoi-sync`, with a desktop notification. The timer's
   enabled state is machine-local.
+- `SUPER+ALT+B` runs `~/.config/hypr/open-theme-backgrounds`, opening the
+  current theme's real backgrounds folder in Nautilus (via `omarchy theme dir`,
+  or `~/.config/omarchy/backgrounds/<theme>` for read-only packaged themes).
+  The stock `omarchy theme bg install` opens only that empty side folder.
+  New images appear in the rotation the next time that theme is applied,
+  because `current/theme` is a copy.
 - `random-custom-theme.timer` (user, `WantedBy=graphical-session.target`) runs
   `~/.local/bin/random-custom-theme` 10s after login and every 30 minutes. It
   picks from `~/.config/omarchy/custom-themes/` only, never the current theme,

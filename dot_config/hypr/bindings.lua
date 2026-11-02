@@ -57,6 +57,7 @@ bind("SUPER + SHIFT + P", "Paint", { webapp = "https://jspaint.app" })
 bind("SUPER + SHIFT + X", "X", { webapp = "https://x.com/" })
 bind("SUPER + SHIFT + ALT + X", "X Post", { webapp = "https://x.com/compose/post" })
 bind("SUPER + SHIFT + I", "Install Theme menu", "omarchy-launch-tui omarchy-theme-install")
+bind("SUPER + ALT + B", "Open current theme backgrounds", "/home/pietrovos/.config/hypr/open-theme-backgrounds")
 bind("SUPER + CTRL + ALT + C", "Toggle Codex account", "/home/pietrovos/.local/bin/codex-account toggle")
 bind("SUPER + CTRL + ALT + S", "Toggle automatic chezmoi sync", "/home/pietrovos/.config/hypr/toggle-chezmoi-sync")
 
