@@ -2,6 +2,8 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import QtQuick
+import QtQuick.Effects
+import QtQuick.Shapes
 import qs.Commons
 import qs.Ui
 
@@ -23,7 +25,6 @@ Item {
   property string pendingColorsRaw: ""
   property string pendingShellRaw: ""
   property real revealProgress: 1
-  readonly property int revealDuration: 700
 
   function imageUrl(path) {
     return Util.fileUrl(path)
@@ -46,7 +47,7 @@ Item {
     backgroundVersion += 1
     revealStartedVersion = -1
 
-    revealTimer.stop()
+    revealAnimation.stop()
     finishingTransition = false
 
     if (instant || !displayedBackground) {
@@ -92,11 +93,11 @@ Item {
 
   function startReveal(panel) {
     if (!incomingBackground) return
-    panel.beginReveal()
+    panel.maskReady = true
     if (revealStartedVersion === backgroundVersion) return
     revealStartedVersion = backgroundVersion
     applyPendingTheme()
-    revealTimer.restart()
+    revealAnimation.restart()
   }
 
   function openSelector() {
@@ -158,14 +159,15 @@ Item {
     onTriggered: root.applyPendingTheme()
   }
 
-  // Each screen animates its own reveal on its render thread, in step with that
-  // screen's refresh rate. This only hands over once every screen has finished;
-  // the margin covers a screen whose wallpaper finished decoding slightly later.
-  Timer {
-    id: revealTimer
-    interval: root.revealDuration + 150
-    repeat: false
-    onTriggered: {
+  NumberAnimation {
+    id: revealAnimation
+    target: root
+    property: "revealProgress"
+    from: 0
+    to: 1
+    duration: 420
+    easing.type: Easing.InOutCubic
+    onFinished: {
       if (root.incomingBackground) {
         root.displayedBackground = root.currentBackground || root.incomingBackground
         root.finishingTransition = true
@@ -201,15 +203,6 @@ Item {
 
       property bool maskReady: false
 
-      readonly property size wallpaperSize: Qt.size(Math.ceil(width * modelData.devicePixelRatio), Math.ceil(height * modelData.devicePixelRatio))
-
-      function beginReveal() {
-        if (maskReady) return
-        maskReady = true
-        revealEffect.progress = 0
-        revealAnimator.restart()
-      }
-
       function maybeStartReveal() {
         if (!root.incomingBackground || root.revealProgress !== 0 || maskReady) return
         if (incomingFrame.status !== Image.Ready) return
@@ -229,7 +222,6 @@ Item {
         id: base
         anchors.fill: parent
         source: root.imageUrl(root.displayedBackground)
-        sourceSize: panel.wallpaperSize
         fillMode: Image.PreserveAspectCrop
         asynchronous: true
         cache: true
@@ -246,54 +238,72 @@ Item {
         id: oldFrame
         anchors.fill: parent
         source: root.imageUrl(root.oldBackground)
-        sourceSize: panel.wallpaperSize
         fillMode: Image.PreserveAspectCrop
         asynchronous: true
         cache: false
         smooth: true
+        mipmap: true
         visible: root.oldBackground !== "" && root.revealProgress < 1
         onStatusChanged: panel.maybeStartReveal()
       }
 
-      Image {
-        id: incomingFrame
-        anchors.fill: parent
-        visible: false
-        layer.enabled: root.incomingBackground !== ""
-        source: root.imageUrl(root.incomingBackground)
-        sourceSize: panel.wallpaperSize
-        fillMode: Image.PreserveAspectCrop
-        asynchronous: true
-        cache: false
-        smooth: true
-        onStatusChanged: panel.maybeStartReveal()
-      }
-
-      ShaderEffect {
-        id: revealEffect
+      Item {
+        id: incomingLayer
         anchors.fill: parent
         visible: root.incomingBackground !== "" && incomingFrame.status === Image.Ready && (root.revealProgress >= 1 || panel.maskReady)
-        fragmentShader: Qt.resolvedUrl("reveal.frag.qsb")
+        layer.enabled: root.incomingBackground !== "" && root.revealProgress < 1
+        layer.smooth: true
+        layer.effect: MultiEffect {
+          maskEnabled: true
+          maskSource: revealMask
+          maskThresholdMin: 0.5
+          maskSpreadAtMin: 0.02
+        }
 
-        property variant source: incomingFrame
-        property real progress: 0
-        property vector2d pixelSize: Qt.vector2d(panel.wallpaperSize.width, panel.wallpaperSize.height)
+        Image {
+          id: incomingFrame
+          anchors.fill: parent
+          source: root.imageUrl(root.incomingBackground)
+          fillMode: Image.PreserveAspectCrop
+          asynchronous: true
+          cache: false
+          smooth: true
+          mipmap: true
+          onStatusChanged: panel.maybeStartReveal()
+        }
       }
 
-      UniformAnimator {
-        id: revealAnimator
-        target: revealEffect
-        uniform: "progress"
-        from: 0
-        to: 1
-        duration: root.revealDuration
-        easing.type: Easing.InOutCubic
+      Item {
+        id: revealMask
+        anchors.fill: parent
+        visible: false
+        layer.enabled: true
+
+        readonly property real slant: -0.18
+        readonly property real centerTop: width / 2 - slant * height / 2
+        readonly property real centerBottom: width / 2 + slant * height / 2
+        readonly property real reach: width / 2 + Math.abs(slant) * height / 2 + 4
+        readonly property real spread: reach * root.revealProgress
+
+        Shape {
+          anchors.fill: parent
+          antialiasing: true
+          preferredRendererType: Shape.CurveRenderer
+          ShapePath {
+            fillColor: "white"
+            strokeColor: "transparent"
+            startX: revealMask.centerTop - revealMask.spread; startY: 0
+            PathLine { x: revealMask.centerTop + revealMask.spread; y: 0 }
+            PathLine { x: revealMask.centerBottom + revealMask.spread; y: revealMask.height }
+            PathLine { x: revealMask.centerBottom - revealMask.spread; y: revealMask.height }
+            PathLine { x: revealMask.centerTop - revealMask.spread; y: 0 }
+          }
+        }
       }
 
       Connections {
         target: root
         function onIncomingBackgroundChanged() {
-          revealAnimator.stop()
           panel.maskReady = false
           panel.maybeStartReveal()
         }
