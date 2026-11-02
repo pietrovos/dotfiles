@@ -368,17 +368,8 @@ from Omarchy defaults when these files can be inspected.
   The stock `omarchy theme bg install` opens only that empty side folder.
   New images appear in the rotation the next time that theme is applied,
   because `current/theme` is a copy.
-- `random-custom-theme.timer` (user, `WantedBy=graphical-session.target`) runs
-  `~/.local/bin/random-custom-theme` 10s after login and every 30 minutes. It
-  picks from `~/.config/omarchy/custom-themes/` only, never the current theme,
-  so new replicas join automatically. The service uses `KillMode=process`
-  because `omarchy theme set` leaves background cleanup and thumbnail jobs
-  behind, which a cgroup kill would strand as files in
-  `~/.cache/omarchy/background-transitions`. It exports
-  `THEME_KEEP_NAUTILUS=1`, which `apply-gtk-css.hook` honours by not quitting
-  Nautilus, so an open window isn't closed every half hour (it picks up the new
-  colors next launch). Each run also does a `hyprctl reload`.
-  Stop it with `systemctl --user disable --now random-custom-theme.timer`.
+- A random custom-theme timer (at login and every 30 minutes) was added and
+  removed at the user's request on 2026-11-02; do not recreate it unasked.
 - Greenify replicas: `~/.local/bin/theme-replica` makes themes that are
   Greenify recoloured. The seven custom `*iffy` themes live in
   `~/.config/omarchy/custom-themes/`, with relative symlinks at
