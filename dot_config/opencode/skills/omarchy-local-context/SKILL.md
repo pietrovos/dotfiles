@@ -352,7 +352,7 @@ from Omarchy defaults when these files can be inspected.
   `~/.config/hypr/toggle-chezmoi-sync`, with a desktop notification. The timer's
   enabled state is machine-local.
 - `SUPER+ALT+B` runs `~/.config/hypr/open-theme-backgrounds`, opening the
-  current theme's real backgrounds folder in Nautilus (via `omarchy theme dir`,
+  current theme's real backgrounds folder in yazi (via `omarchy theme dir`,
   or `~/.config/omarchy/backgrounds/<theme>` for read-only packaged themes).
   The stock `omarchy theme bg install` opens only that empty side folder.
   New images appear in the rotation the next time that theme is applied,
