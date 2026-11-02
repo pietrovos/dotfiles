@@ -61,6 +61,18 @@ from Omarchy defaults when these files can be inspected.
   at 1080p/60, via `~/.config/hypr/toggle-tv-mirror`. The machine-local flag
   `$XDG_STATE_HOME/omarchy/tv-mirror` (default `~/.local/state/omarchy/tv-mirror`)
   remembers mirror mode across reloads/logins; absent means independent.
+  Workspaces 11–20 are dedicated to the TV by rules in `monitors.lua` (only
+  while independent; mirror mode drops the rules). `SUPER+ALT+T` flips the
+  number row between 1–10 and 11–20 for `SUPER+1–0`, `SUPER+SHIFT+1–0` and
+  `SUPER+SHIFT+ALT+1–0`, via closures in `bindings.lua`. The flip does not
+  change focus. `$XDG_STATE_HOME/omarchy/tv-workspace-keys` (`0`/`1`) keeps
+  the choice across reloads and drives the bar: `pietrovos.workspaces` watches
+  it with a FileView and shows the reachable ten, plus 11 while the TV is
+  independent and anything else occupied or focused. `SUPER+CTRL+SHIFT+1–0`
+  swaps stay inside the current workspace's own range regardless of the flip,
+  so TV workspaces stay on the TV; its temporary ID starts at 21.
+  wtype cannot test `code:` binds (its keycodes are its own: the first key
+  sends code 9, which is ESC); a raw `/dev/uinput` device can (2026-11-02).
   Enabling HDMI ULTRA HD Deep Color on TV HDMI 1 exposed 4K/60 modes,
   but 4K/60 caused repeated brief blackouts over the current long HDMI run.
   Restored 1080p/60 pending confirmation; cable/link instability is suspected,
