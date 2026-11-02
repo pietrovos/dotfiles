@@ -17,6 +17,7 @@ for version in 3 4; do
 done
 
 # GTK reads its user CSS at startup, so recolor a running Nautilus immediately.
-if pgrep -x nautilus >/dev/null; then
+# Scheduled theme changes leave it open rather than closing it under the user.
+if [[ -z ${THEME_KEEP_NAUTILUS:-} ]] && pgrep -x nautilus >/dev/null; then
   nautilus -q >/dev/null 2>&1 || true
 fi
