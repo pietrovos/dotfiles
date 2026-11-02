@@ -55,20 +55,21 @@ from Omarchy defaults when these files can be inspected.
 - The LG TV (`HDMI-A-1`, 1920x1080@60) is independent at 150% scale,
   to the right of the ASUS, with persistent default workspace 11 via
   `~/.config/hypr/monitors.lua`. MSI (`DP-2`) keeps workspaces 1–5 and 7–10;
-  ASUS (`DP-3`) keeps workspace 6. `SUPER+CTRL+T` focuses TV workspace 11;
-  `SUPER+CTRL+SHIFT+T` moves the active window there and follows it.
+  ASUS (`DP-3`) keeps workspace 6. `SUPER+CTRL+SHIFT+T` moves the active window there and follows it.
   `SUPER+CTRL+ALT+T` toggles between this independent setup and mirroring MSI
   at 1080p/60, via `~/.config/hypr/toggle-tv-mirror`. The machine-local flag
   `$XDG_STATE_HOME/omarchy/tv-mirror` (default `~/.local/state/omarchy/tv-mirror`)
   remembers mirror mode across reloads/logins; absent means independent.
   Workspaces 11–20 are dedicated to the TV by rules in `monitors.lua` (only
-  while independent; mirror mode drops the rules). `SUPER+ALT+T` flips the
+  while independent; mirror mode drops the rules). `SUPER+CTRL+T` flips the
   number row between 1–10 and 11–20 for `SUPER+1–0`, `SUPER+SHIFT+1–0` and
   `SUPER+SHIFT+ALT+1–0`, via closures in `bindings.lua`. The flip does not
   change focus. `$XDG_STATE_HOME/omarchy/tv-workspace-keys` (`0`/`1`) keeps
   the choice across reloads and drives the bar: `pietrovos.workspaces` watches
   it with a FileView and shows the reachable ten, plus 11 while the TV is
-  independent and anything else occupied or focused. `SUPER+CTRL+SHIFT+1–0`
+  independent and anything else occupied or focused. TV workspaces are labelled
+  by their number key (11 shows `1`, 20 shows `0`) after a non-clickable `TV`
+  tag, which is full opacity while the keys are on the TV. `SUPER+CTRL+SHIFT+1–0`
   swaps stay inside the current workspace's own range regardless of the flip,
   so TV workspaces stay on the TV; its temporary ID starts at 21.
   wtype cannot test `code:` binds (its keycodes are its own: the first key
@@ -206,7 +207,7 @@ from Omarchy defaults when these files can be inspected.
   and a 5s safety poll, so the bar greys out the emptied source number the
   moment a swap lands.
 - `pietrovos.workspaces` always shows 1–10 (empty ones dimmed) and adds the
-  TV's workspace 11 (labelled "11") while `HDMI-A-1` is an enabled,
+  TV's workspace 11 (under the `TV` tag) while `HDMI-A-1` is an enabled,
   non-mirrored monitor in `hyprctl -j monitors` (or if 11 is occupied/focused).
   A hide-empty-workspaces variant was tried and reverted (2026-10-26).
 - `SUPER+CTRL+SHIFT+1` through `SUPER+CTRL+SHIFT+0` swap the current

@@ -32,6 +32,13 @@ BarWidget {
   readonly property var visibleIds: workspaceIds.filter(function(id) {
     return (tvKeys ? id > 10 : id <= 10) || (id === 11 && tvActive) || occupiedIds[id] === true || focusedId === id
   })
+  // TV workspaces reuse the number key labels, so a "TV" tag precedes them.
+  readonly property int tvTag: -1
+  readonly property var barItems: {
+    var firstTv = visibleIds.findIndex(function(id) { return id > 10 })
+    if (firstTv === -1) return visibleIds
+    return visibleIds.slice(0, firstTv).concat([tvTag], visibleIds.slice(firstTv))
+  }
 
   readonly property var stateEvents: [
     "workspace", "workspacev2",
@@ -128,7 +135,7 @@ BarWidget {
     }
   }
 
-  // Written by the SUPER + ALT + T binding in bindings.lua.
+  // Written by the SUPER + CTRL + T binding in bindings.lua.
   FileView {
     path: root.tvKeysPath
     watchChanges: true
@@ -148,22 +155,23 @@ BarWidget {
     id: grid
     anchors.fill: parent
     anchors.rightMargin: root.trailingGap
-    columns: root.vertical ? 1 : Math.max(1, root.visibleIds.length)
+    columns: root.vertical ? 1 : Math.max(1, root.barItems.length)
     columnSpacing: root.vertical ? 0 : Style.space(1)
     rowSpacing: root.vertical ? Style.space(2) : 0
 
     Repeater {
-      model: root.visibleIds
+      model: root.barItems
 
       WidgetButton {
         required property int modelData
 
         readonly property bool occupied: root.occupiedIds[modelData] === true
         readonly property bool focused: root.focusedId === modelData
+        readonly property bool isTvTag: modelData === root.tvTag
 
         bar: root.bar
-        text: modelData === 10 ? "0" : String(modelData)
-        opacity: occupied || focused ? 1 : 0.5
+        text: isTvTag ? "TV" : String(modelData % 10)
+        opacity: occupied || focused || (isTvTag && root.tvKeys) ? 1 : 0.5
         // The focused workspace glows instead of being replaced by a filled square.
         layer.enabled: focused
         layer.effect: Item {
@@ -192,7 +200,7 @@ BarWidget {
         verticalPadding: 6
         fixedWidth: root.vertical ? root.barSize : Style.space(20)
         fixedHeight: root.barSize
-        onPressed: function() { root.focusWorkspace(modelData) }
+        onPressed: function() { if (!isTvTag) root.focusWorkspace(modelData) }
       }
     }
   }

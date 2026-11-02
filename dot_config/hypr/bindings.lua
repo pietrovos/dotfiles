@@ -60,7 +60,7 @@ bind("SUPER + SHIFT + I", "Install Theme menu", "omarchy-launch-tui omarchy-them
 bind("SUPER + CTRL + ALT + C", "Toggle Codex account", "/home/pietrovos/.local/bin/codex-account toggle")
 bind("SUPER + CTRL + ALT + S", "Toggle automatic chezmoi sync", "/home/pietrovos/.config/hypr/toggle-chezmoi-sync")
 
--- SUPER + ALT + T flips the number row between workspaces 1-10 and the TV's 11-20.
+-- SUPER + CTRL + T flips the number row between workspaces 1-10 and the TV's 11-20.
 -- The choice survives reloads, and the bar reads it from this file.
 local state_home = os.getenv("XDG_STATE_HOME") or (os.getenv("HOME") .. "/.local/state")
 local tv_keys_path = state_home .. "/omarchy/tv-workspace-keys"
@@ -82,7 +82,7 @@ else
   save_tv_keys()
 end
 
-bind("SUPER + ALT + T", "Toggle number keys between desktop and TV workspaces", function()
+bind("SUPER + CTRL + T", "Toggle number keys between desktop and TV workspaces", function()
   tv_keys = not tv_keys
   save_tv_keys()
 end)
@@ -172,7 +172,6 @@ bind("mouse:275", "Dismiss last notification", "omarchy-shell notifications dism
 bind("mouse:276", "Invoke last notification", "omarchy-shell notifications invokeLast")
 
 -- Add extra bindings below.
-bind("SUPER + CTRL + T", "Focus LG TV workspace", hl.dsp.focus({ workspace = "11" }))
 bind("SUPER + CTRL + SHIFT + T", "Move window to LG TV", hl.dsp.window.move({ workspace = "11", follow = true }))
 bind("SUPER + CTRL + ALT + T", "Toggle LG TV mirroring", "/home/pietrovos/.config/hypr/toggle-tv-mirror")
 
