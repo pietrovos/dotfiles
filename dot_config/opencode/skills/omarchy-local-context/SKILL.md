@@ -396,7 +396,11 @@ from Omarchy defaults when these files can be inspected.
   through a `style.theme` action override in
   `~/.config/omarchy/extensions/omarchy-menu.jsonc` (a key rebind or a PATH
   shadow would miss the menu, and the shell puts `/usr/share/omarchy/bin`
-  first). It shows folders in the stock image picker, then that folder's
+  first). Menu overrides blank every field they omit, despite that file's
+  comment saying fields are kept, so the override restates icon, label and
+  aliases; losing the `theme` alias made the keybind open the root menu
+  (2026-11-02). Test such changes with the keybind's own route,
+  `omarchy menu toggle theme`. It shows folders in the stock image picker, then that folder's
   themes in the same picker; Esc in the themes returns to the folders.
   A folder is a directory in `~/.config/omarchy/theme-folders/` holding one
   empty file per theme (machine-local, like themes). Moving those files in
@@ -405,8 +409,8 @@ from Omarchy defaults when these files can be inspected.
   unfiled themes appear in a virtual `Unsorted` tile. Covers (2x2 collages)
   and per-folder preview links live in `~/.cache/omarchy/theme-folders/`,
   rebuilt only when a stat signature changes, which keeps opening instant.
-  Clicking the desktop background (`Background.qml`) still opens the flat
-  stock switcher. Close the picker from a script with
+  The separate `themeSwitchProc` in the shell's `Background.qml` still opens
+  the flat stock switcher. Close the picker from a script with
   `omarchy-shell shell hide omarchy.image-picker`; `image-selector close`
   does not exist.
 

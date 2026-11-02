@@ -29,5 +29,7 @@
   // "about": {"icon":"","label":"About","action":"omarchy-launch-or-focus-tui \"zsh -c 'fastfetch; read -k 1'\""},
 
   // SUPER + CTRL + SHIFT + SPACE and Style > Theme open theme folders first.
-  "style.theme": {"action":"/home/pietrovos/.local/bin/theme-folders"},
+  // Overrides blank every field they omit, so this restates the stock ones;
+  // the keybind reaches this row through the "theme" alias.
+  "style.theme": {"icon":"󰸌","label":"Theme","aliases":["theme","themes"],"action":"/home/pietrovos/.local/bin/theme-folders"},
 }
