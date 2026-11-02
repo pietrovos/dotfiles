@@ -13,4 +13,4 @@ if [[ ${folder} == /usr/share/* ]]; then
 fi
 
 mkdir -p "${folder}"
-exec nautilus "${folder}"
+exec setsid uwsm-app -- nautilus --new-window "${folder}"
