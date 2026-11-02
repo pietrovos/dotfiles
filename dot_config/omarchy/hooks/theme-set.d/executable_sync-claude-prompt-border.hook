@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Claude Code stays on the hand-picked lucent-orng theme, so copy only the prompt
+# border colors across from the Omarchy-generated Claude theme. Claude Code
+# hot-reloads its themes folder, so running sessions retint.
+
+source="$HOME/.local/state/omarchy/current/theme/claude.json"
+target="$HOME/.claude/themes/lucent-orng.json"
+
+[[ -f $source && -f $target ]] || exit 0
+
+border=$(jq -r '.overrides.promptBorder // empty' "$source")
+shimmer=$(jq -r '.overrides.promptBorderShimmer // empty' "$source")
+[[ -n $border && -n $shimmer ]] || exit 0
+
+tmp=$(mktemp "$target.XXXXXX")
+jq --arg border "$border" --arg shimmer "$shimmer" \
+  '.overrides.promptBorder = $border | .overrides.promptBorderShimmer = $shimmer' \
+  "$target" >"$tmp"
+chmod --reference="$target" "$tmp"
+mv "$tmp" "$target"

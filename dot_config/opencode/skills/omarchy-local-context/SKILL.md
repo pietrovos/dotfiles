@@ -351,6 +351,12 @@ from Omarchy defaults when these files can be inspected.
 - `SUPER+CTRL+ALT+S` toggles the user `chezmoi-sync.timer` through
   `~/.config/hypr/toggle-chezmoi-sync`, with a desktop notification. The timer's
   enabled state is machine-local.
+- Claude Code stays on the hand-picked `custom:lucent-orng` theme, so Omarchy's
+  generated `~/.claude/themes/omarchy.json` is unused. The hook
+  `~/.config/omarchy/hooks/theme-set.d/sync-claude-prompt-border.hook` copies
+  only `promptBorder`/`promptBorderShimmer` from the current theme's
+  `claude.json` into `lucent-orng.json`, so the prompt box follows the theme.
+  Switching wholly to `custom:omarchy` was considered and declined.
 - `SUPER+ALT+B` runs `~/.config/hypr/open-theme-backgrounds`, opening the
   current theme's real backgrounds folder in yazi (via `omarchy theme dir`,
   or `~/.config/omarchy/backgrounds/<theme>` for read-only packaged themes).
