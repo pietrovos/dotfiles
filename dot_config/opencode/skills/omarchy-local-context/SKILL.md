@@ -392,6 +392,24 @@ from Omarchy defaults when these files can be inspected.
   same way. `theme-replica new <name> <colour>`, `theme-replica sync` after
   changing Greenify, `theme-replica list`.
 
+- `SUPER+CTRL+SHIFT+SPACE` and Style > Theme open `~/.local/bin/theme-folders`
+  through a `style.theme` action override in
+  `~/.config/omarchy/extensions/omarchy-menu.jsonc` (a key rebind or a PATH
+  shadow would miss the menu, and the shell puts `/usr/share/omarchy/bin`
+  first). It shows folders in the stock image picker, then that folder's
+  themes in the same picker; Esc in the themes returns to the folders.
+  A folder is a directory in `~/.config/omarchy/theme-folders/` holding one
+  empty file per theme (machine-local, like themes). Moving those files in
+  yazi organizes themes, and a theme may be in several folders. The `Organize`
+  tile opens that directory, `All Themes` opens the stock flat switcher, and
+  unfiled themes appear in a virtual `Unsorted` tile. Covers (2x2 collages)
+  and per-folder preview links live in `~/.cache/omarchy/theme-folders/`,
+  rebuilt only when a stat signature changes, which keeps opening instant.
+  Clicking the desktop background (`Background.qml`) still opens the flat
+  stock switcher. Close the picker from a script with
+  `omarchy-shell shell hide omarchy.image-picker`; `image-selector close`
+  does not exist.
+
 ## Required Workflow
 
 1. Read the relevant files under `~/.config/hypr/` and

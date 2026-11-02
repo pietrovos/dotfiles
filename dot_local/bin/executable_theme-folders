@@ -1,0 +1,204 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+# A folder step in front of the Omarchy theme picker, using the same picker for
+# both. A folder is a directory in ~/.config/omarchy/theme-folders holding one
+# empty file per theme, named after the theme, so yazi can organize them.
+
+folders="${HOME}/.config/omarchy/theme-folders"
+cache="${XDG_CACHE_HOME:-${HOME}/.cache}/omarchy/theme-folders"
+covers="${cache}/covers"
+contents="${cache}/contents"
+user_themes="${HOME}/.config/omarchy/themes"
+stock_themes="${OMARCHY_PATH:-/usr/share/omarchy}/themes"
+icon_font="CaskaydiaMono-NF-Regular"
+
+# A second press must not close this picker and leave two loops fighting it.
+mkdir -p "${folders}" "${covers}" "${contents}"
+exec 9>"${cache}/lock"
+flock -n 9 || exit 0
+
+find_preview() {
+  local theme_path="$1" preview
+
+  preview=$(find -L "${theme_path}" -maxdepth 1 -type f -iregex '.*/preview\.\(png\|jpe?g\|webp\|gif\|bmp\)' -print -quit 2>/dev/null)
+  if [[ -z ${preview} && -d ${theme_path}/backgrounds ]]; then
+    preview=$(find -L "${theme_path}/backgrounds" -maxdepth 1 -type f -iregex '.*\.\(png\|jpe?g\|webp\|gif\|bmp\)' -print 2>/dev/null | sort | head -n 1)
+  fi
+  printf '%s' "${preview}"
+}
+
+all_themes() {
+  find -L "${user_themes}" "${stock_themes}" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' 2>/dev/null | sort -u
+}
+
+declare -A previews=()
+
+load_previews() {
+  local theme preview
+
+  previews=()
+  while IFS= read -r theme; do
+    preview=""
+    [[ -d ${user_themes}/${theme} ]] && preview=$(find_preview "${user_themes}/${theme}")
+    [[ -z ${preview} && -d ${stock_themes}/${theme} ]] && preview=$(find_preview "${stock_themes}/${theme}")
+    [[ -n ${preview} ]] && previews[${theme}]=${preview}
+  done < <(all_themes)
+}
+
+# Replaces a cover only when its images change, because the picker rescans a
+# folder whenever the folder's mtime moves.
+write_collage() {
+  local name="$1" tmp="${cache}/${1}.tmp.jpg" signature
+  shift
+
+  signature=$(printf '%s\n' "$@")
+  if [[ -f ${covers}/${name}.jpg && $(cat "${cache}/${name}.signature" 2>/dev/null) == "${signature}" ]]; then
+    return
+  fi
+
+  if (( $# == 0 )); then
+    magick -size 1536x864 "xc:#15171c" -font "${icon_font}" -pointsize 300 -gravity center \
+      -fill "#6b7280" -annotate 0 $'\U000f024b' -quality 85 "${tmp}"
+  else
+    magick montage "$@" -thumbnail 768x432^ -gravity center -extent 768x432 \
+      -tile 2x2 -geometry +0+0 -background "#15171c" -quality 85 "${tmp}"
+  fi
+  mv -f "${tmp}" "${covers}/${name}.jpg"
+  printf '%s' "${signature}" >"${cache}/${name}.signature"
+}
+
+write_organize_cover() {
+  [[ -f ${covers}/Organize.jpg ]] && return
+  magick -size 1536x864 "xc:#15171c" -font "${icon_font}" -pointsize 300 -gravity center \
+    -fill "#d1d5db" -annotate 0 $'\U000f0256' -quality 85 "${cache}/Organize.tmp.jpg"
+  mv -f "${cache}/Organize.tmp.jpg" "${covers}/Organize.jpg"
+}
+
+sync_contents() {
+  local folder="$1" dir="${contents}/$1" theme preview link
+  shift
+
+  mkdir -p "${dir}"
+  for link in "${dir}"/*; do
+    [[ -L ${link} ]] || continue
+    theme=${link##*/}
+    theme=${theme%.*}
+    [[ " $* " == *" ${theme} "* ]] || rm -f "${link}"
+  done
+
+  for theme in "$@"; do
+    preview=${previews[${theme}]}
+    link="${dir}/${theme}.${preview##*.}"
+    [[ $(readlink "${link}" 2>/dev/null) == "${preview}" ]] || ln -sfn "${preview}" "${link}"
+  done
+}
+
+current_theme=$(cat "${HOME}/.local/state/omarchy/current/theme.name" 2>/dev/null)
+
+build_folders() {
+  local folder name theme marker
+  local -a themes images
+  local -A sorted=() kept=(All-Themes.jpg 1 Organize.jpg 1)
+
+  load_previews
+
+  for folder in "${folders}"/*/; do
+    [[ -d ${folder} ]] || continue
+    name=${folder%/}
+    name=${name##*/}
+    themes=()
+    images=()
+
+    for marker in "${folder}"*; do
+      [[ -f ${marker} ]] || continue
+      theme=${marker##*/}
+      sorted[${theme}]=1
+      [[ -n ${previews[${theme}]:-} ]] || continue
+      themes+=("${theme}")
+      images+=("${previews[${theme}]}")
+    done
+
+    sync_contents "${name}" "${themes[@]}"
+    write_collage "${name}" "${images[@]:0:4}"
+    kept[${name}.jpg]=1
+  done
+
+  # A newly installed theme stays reachable until it has been filed.
+  themes=()
+  images=()
+  while IFS= read -r theme; do
+    [[ -n ${previews[${theme}]:-} ]] || continue
+    (( ${#images[@]} < 4 )) && images+=("${previews[${theme}]}")
+    [[ -z ${sorted[${theme}]:-} ]] && themes+=("${theme}")
+  done < <(all_themes)
+  write_collage "All-Themes" "${images[@]}"
+
+  if (( ${#themes[@]} > 0 )); then
+    images=()
+    for theme in "${themes[@]:0:4}"; do
+      images+=("${previews[${theme}]}")
+    done
+    sync_contents "Unsorted" "${themes[@]}"
+    write_collage "Unsorted" "${images[@]}"
+    kept[Unsorted.jpg]=1
+  fi
+
+  write_organize_cover
+
+  for marker in "${covers}"/*; do
+    [[ -e ${marker} && -n ${kept[${marker##*/}]:-} ]] || rm -f "${marker}"
+  done
+}
+
+# Rebuilding spawns a find per theme, too slow to run on every open.
+refresh_folders() {
+  local signature
+
+  signature=$(stat -Lc '%n %Y' "${folders}" "${folders}"/*/ "${user_themes}" "${stock_themes}" \
+    "${user_themes}"/* "${user_themes}"/*/backgrounds 2>/dev/null)
+  [[ -f ${cache}/folders.signature && $(<"${cache}/folders.signature") == "${signature}" ]] && return
+
+  build_folders
+  printf '%s' "${signature}" >"${cache}/folders.signature"
+}
+
+selected="${covers}/Unsorted.jpg"
+marker=$(find "${folders}" -mindepth 2 -maxdepth 2 -name "${current_theme}" -print -quit 2>/dev/null)
+if [[ -n ${marker} ]]; then
+  marker=${marker%/*}
+  selected="${covers}/${marker##*/}.jpg"
+fi
+
+while true; do
+  refresh_folders
+  choice=$(omarchy-menu-images --print-name --show-labels --filterable --selected "${selected}" "${covers}")
+  theme=""
+
+  case "${choice}" in
+    "")
+      exit 0
+      ;;
+    Organize)
+      exec 9>&-
+      exec omarchy-launch-tui yazi "${folders}"
+      ;;
+    All-Themes)
+      theme=$(omarchy-theme-switcher)
+      ;;
+    *)
+      for extension in png jpg jpeg webp gif bmp; do
+        current_link="${contents}/${choice}/${current_theme}.${extension}"
+        [[ -e ${current_link} ]] && break
+      done
+      theme=$(omarchy-menu-images --print-name --show-labels --filterable --lazy-thumbnails \
+        --selected "${current_link}" "${contents}/${choice}")
+      ;;
+  esac
+
+  selected="${covers}/${choice}.jpg"
+  if [[ -n ${theme} ]]; then
+    exec 9>&-
+    exec omarchy-theme-set "${theme}"
+  fi
+done
