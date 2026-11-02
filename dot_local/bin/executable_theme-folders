@@ -179,7 +179,7 @@ refresh_folders() {
 # from omarchy-menu-images, which leaves its rows in the cache.
 pick() {
   local dir="$1" selected_path="$2" start_filter="$3" can_go_back="$4"
-  local rows key selection_file done_file payload
+  local rows key selection_file done_file payload shell_pid
 
   omarchy-menu-images --cache-only "${dir}" >/dev/null 2>&1
   key=$(printf '%s' "${dir}" | md5sum | cut -d ' ' -f 1)
@@ -198,11 +198,14 @@ pick() {
   action=""
   picked=""
   filter=""
+  shell_pid=$(pgrep -nx quickshell)
   if [[ $(omarchy-shell shell summon pietrovos.theme-picker "${payload}") == "ok" ]]; then
-    while [[ ! -e ${done_file} ]]; do
+    # A shell restart takes the picker with it and nothing would ever answer,
+    # leaving this script holding the lock that blocks every later press.
+    while [[ ! -e ${done_file} ]] && kill -0 "${shell_pid}" 2>/dev/null; do
       sleep 0.01
     done
-    IFS=$'\t' read -r action picked filter <"${selection_file}"
+    [[ -s ${selection_file} ]] && IFS=$'\t' read -r action picked filter <"${selection_file}"
   fi
   rm -f "${selection_file}" "${done_file}"
 }
@@ -222,7 +225,7 @@ if [[ -n ${marker} ]]; then
 fi
 filter=""
 
-# Esc leaves a position to come back to; applying a theme clears it.
+# Esc and applying a theme both leave a position to come back to.
 if [[ -f ${resume} ]]; then
   IFS=$'\t' read -r saved_view saved_selected saved_filter <"${resume}"
   if [[ ${saved_view} == "folders" || -e ${covers}/${saved_view}.jpg ]]; then
@@ -253,7 +256,7 @@ while true; do
       choice=${picked##*/}
       choice=${choice%.*}
       if [[ ${view} != "folders" ]]; then
-        rm -f "${resume}"
+        printf '%s\t%s\t%s\n' "${view}" "${picked}" "${filter}" >"${resume}"
         exec 9>&-
         exec omarchy-theme-set "${choice}"
       elif [[ ${choice} == "Organize" ]]; then

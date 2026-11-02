@@ -411,9 +411,9 @@ from Omarchy defaults when these files can be inspected.
   for its `image-selector` IPC, so wallpapers keep the stock picker). The clone
   reports `<action>\t<path>\t<filter>`. Backspace on an empty filter goes back
   (key repeat is ignored, so holding it to clear a filter stops there). Esc or a
-  click outside exits from anywhere and saves view, item and filter to
-  `~/.cache/omarchy/theme-folders/resume`, which the next open restores;
-  applying a theme clears it. A new overlay plugin needs `omarchy restart shell`
+  click outside exits from anywhere. Exiting and applying a theme both save
+  view, item and filter to `~/.cache/omarchy/theme-folders/resume`, which the
+  next open restores; the `Organize` tile clears it. A new overlay plugin needs `omarchy restart shell`
   before it can be summoned.
   A folder is a directory in `~/.config/omarchy/theme-folders/` holding one
   empty file per theme (machine-local, like themes). Moving those files in
