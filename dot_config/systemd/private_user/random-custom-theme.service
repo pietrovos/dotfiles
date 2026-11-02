@@ -1,0 +1,9 @@
+[Unit]
+Description=Apply a random custom Omarchy theme
+After=graphical-session.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/random-custom-theme
+# omarchy theme set leaves cleanup and thumbnail jobs running after it exits.
+KillMode=process

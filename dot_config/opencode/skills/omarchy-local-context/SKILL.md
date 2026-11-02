@@ -350,6 +350,17 @@ from Omarchy defaults when these files can be inspected.
 - `SUPER+CTRL+ALT+S` toggles the user `chezmoi-sync.timer` through
   `~/.config/hypr/toggle-chezmoi-sync`, with a desktop notification. The timer's
   enabled state is machine-local.
+- `random-custom-theme.timer` (user, `WantedBy=graphical-session.target`) runs
+  `~/.local/bin/random-custom-theme` 10s after login and every 30 minutes. It
+  picks from `~/.config/omarchy/custom-themes/` only, never the current theme,
+  so new replicas join automatically. The service uses `KillMode=process`
+  because `omarchy theme set` leaves background cleanup and thumbnail jobs
+  behind, which a cgroup kill would strand as files in
+  `~/.cache/omarchy/background-transitions`. It exports
+  `THEME_KEEP_NAUTILUS=1`, which `apply-gtk-css.hook` honours by not quitting
+  Nautilus, so an open window isn't closed every half hour (it picks up the new
+  colors next launch). Each run also does a `hyprctl reload`.
+  Stop it with `systemctl --user disable --now random-custom-theme.timer`.
 - Greenify replicas: `~/.local/bin/theme-replica` makes themes that are
   Greenify recoloured. The seven custom `*iffy` themes live in
   `~/.config/omarchy/custom-themes/`, with relative symlinks at
