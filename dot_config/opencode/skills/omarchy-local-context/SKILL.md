@@ -66,10 +66,11 @@ from Omarchy defaults when these files can be inspected.
   `SUPER+SHIFT+ALT+1–0`, via closures in `bindings.lua`. The flip does not
   change focus. `$XDG_STATE_HOME/omarchy/tv-workspace-keys` (`0`/`1`) keeps
   the choice across reloads and drives the bar: `pietrovos.workspaces` watches
-  it with a FileView and shows the reachable ten, plus 11 while the TV is
-  independent and anything else occupied or focused. TV workspaces are labelled
-  by their number key (11 shows `1`, 20 shows `0`) after a non-clickable `TV`
-  tag, which is full opacity while the keys are on the TV. `SUPER+CTRL+SHIFT+1–0`
+  it with a FileView and shows only the reachable ten, labelled by number key
+  (11 shows `1`, 20 shows `0`). In TV mode a `TV` box styled like the subspace
+  name box follows them. Desktop mode shows no TV tag and no TV workspaces, at
+  the user's request (a tag beside/among the numbers was rejected as ugly).
+  `SUPER+CTRL+SHIFT+1–0`
   swaps stay inside the current workspace's own range regardless of the flip,
   so TV workspaces stay on the TV; its temporary ID starts at 21.
   wtype cannot test `code:` binds (its keycodes are its own: the first key
@@ -206,9 +207,8 @@ from Omarchy defaults when these files can be inspected.
   refreshed on occupancy/focus Hyprland events (including `changeworkspaceid`)
   and a 5s safety poll, so the bar greys out the emptied source number the
   moment a swap lands.
-- `pietrovos.workspaces` always shows 1–10 (empty ones dimmed) and adds the
-  TV's workspace 11 (under the `TV` tag) while `HDMI-A-1` is an enabled,
-  non-mirrored monitor in `hyprctl -j monitors` (or if 11 is occupied/focused).
+- `pietrovos.workspaces` always shows ten numbers (empty ones dimmed): 1–10,
+  or 11–20 while the number keys are on the TV.
   A hide-empty-workspaces variant was tried and reverted (2026-10-26).
 - `SUPER+CTRL+SHIFT+1` through `SUPER+CTRL+SHIFT+0` swap the current
   workspace with workspaces 1 through 10 in `bindings.lua`. Native

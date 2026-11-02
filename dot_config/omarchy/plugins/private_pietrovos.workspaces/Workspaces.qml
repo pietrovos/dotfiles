@@ -21,24 +21,14 @@ BarWidget {
   property var occupiedIds: ({})
   property int focusedId: 0
   property bool refreshPending: false
-  property bool tvActive: false
   property bool tvKeys: false
 
   readonly property string tvKeysPath: (Quickshell.env("XDG_STATE_HOME") || (Quickshell.env("HOME") + "/.local/state")) + "/omarchy/tv-workspace-keys"
 
-  readonly property var workspaceIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
-  // The ten workspaces the number keys currently reach, plus the TV's workspace 11
-  // while the TV is on as its own screen, and anything else occupied or focused.
-  readonly property var visibleIds: workspaceIds.filter(function(id) {
-    return (tvKeys ? id > 10 : id <= 10) || (id === 11 && tvActive) || occupiedIds[id] === true || focusedId === id
-  })
-  // TV workspaces reuse the number key labels, so a "TV" tag precedes them.
-  readonly property int tvTag: -1
-  readonly property var barItems: {
-    var firstTv = visibleIds.findIndex(function(id) { return id > 10 })
-    if (firstTv === -1) return visibleIds
-    return visibleIds.slice(0, firstTv).concat([tvTag], visibleIds.slice(firstTv))
-  }
+  // The ten workspaces the number keys currently reach.
+  readonly property var visibleIds: tvKeys
+    ? [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+    : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
   readonly property var stateEvents: [
     "workspace", "workspacev2",
@@ -49,9 +39,7 @@ BarWidget {
     "destroyworkspace", "destroyworkspacev2",
     "moveworkspace", "moveworkspacev2",
     "changeworkspaceid",
-    "activespecial",
-    "monitoradded", "monitoraddedv2",
-    "monitorremoved", "monitorremovedv2"
+    "activespecial"
   ]
 
   function refresh() {
@@ -70,11 +58,9 @@ BarWidget {
 
     var active
     var list
-    var monitors = []
     try {
       active = JSON.parse(parts[0].trim())
       list = JSON.parse(parts[1].trim())
-      if (parts.length > 2) monitors = JSON.parse(parts[2].trim())
     } catch (error) {
       return
     }
@@ -88,9 +74,6 @@ BarWidget {
     }
 
     root.occupiedIds = occupied
-    root.tvActive = Array.isArray(monitors) && monitors.some(function(monitor) {
-      return monitor && monitor.name === "HDMI-A-1" && !monitor.disabled && monitor.mirrorOf === "none"
-    })
     root.focusedId = (active.id > 0 && active.id <= 20) ? active.id : 0
   }
 
@@ -123,7 +106,7 @@ BarWidget {
 
   Process {
     id: stateProc
-    command: ["sh", "-c", "hyprctl -j activeworkspace; printf '\\n@@@\\n'; hyprctl -j workspaces; printf '\\n@@@\\n'; hyprctl -j monitors"]
+    command: ["sh", "-c", "hyprctl -j activeworkspace; printf '\\n@@@\\n'; hyprctl -j workspaces"]
 
     onRunningChanged: {
       if (!running && root.refreshPending) root.refresh()
@@ -155,23 +138,22 @@ BarWidget {
     id: grid
     anchors.fill: parent
     anchors.rightMargin: root.trailingGap
-    columns: root.vertical ? 1 : Math.max(1, root.barItems.length)
+    columns: root.vertical ? 1 : root.visibleIds.length + (root.tvKeys ? 1 : 0)
     columnSpacing: root.vertical ? 0 : Style.space(1)
     rowSpacing: root.vertical ? Style.space(2) : 0
 
     Repeater {
-      model: root.barItems
+      model: root.visibleIds
 
       WidgetButton {
         required property int modelData
 
         readonly property bool occupied: root.occupiedIds[modelData] === true
         readonly property bool focused: root.focusedId === modelData
-        readonly property bool isTvTag: modelData === root.tvTag
 
         bar: root.bar
-        text: isTvTag ? "TV" : String(modelData % 10)
-        opacity: occupied || focused || (isTvTag && root.tvKeys) ? 1 : 0.5
+        text: String(modelData % 10)
+        opacity: occupied || focused ? 1 : 0.5
         // The focused workspace glows instead of being replaced by a filled square.
         layer.enabled: focused
         layer.effect: Item {
@@ -200,7 +182,33 @@ BarWidget {
         verticalPadding: 6
         fixedWidth: root.vertical ? root.barSize : Style.space(20)
         fixedHeight: root.barSize
-        onPressed: function() { if (!isTvTag) root.focusWorkspace(modelData) }
+        onPressed: function() { root.focusWorkspace(modelData) }
+      }
+    }
+
+    // Styled like the subspace name box in pietrovos.group-tabs.
+    Item {
+      visible: root.tvKeys
+      Layout.alignment: Qt.AlignCenter
+      Layout.leftMargin: root.vertical ? 0 : Style.space(2)
+      implicitWidth: tvLabel.implicitWidth + Style.space(8)
+      implicitHeight: root.barSize - Style.space(2)
+
+      Rectangle {
+        anchors.fill: parent
+        color: root.bar ? root.bar.barForeground : Color.foreground
+        radius: Math.min(Style.cornerRadius, height / 2)
+        opacity: 0.12
+      }
+
+      Text {
+        id: tvLabel
+        anchors.centerIn: parent
+        text: "TV"
+        color: root.bar ? root.bar.barForeground : Color.foreground
+        opacity: 0.85
+        font.family: Style.font.family
+        font.pixelSize: Style.font.body
       }
     }
   }
