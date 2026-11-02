@@ -60,11 +60,57 @@ bind("SUPER + SHIFT + I", "Install Theme menu", "omarchy-launch-tui omarchy-them
 bind("SUPER + CTRL + ALT + C", "Toggle Codex account", "/home/pietrovos/.local/bin/codex-account toggle")
 bind("SUPER + CTRL + ALT + S", "Toggle automatic chezmoi sync", "/home/pietrovos/.config/hypr/toggle-chezmoi-sync")
 
+-- SUPER + ALT + T flips the number row between workspaces 1-10 and the TV's 11-20.
+-- The choice survives reloads, and the bar reads it from this file.
+local state_home = os.getenv("XDG_STATE_HOME") or (os.getenv("HOME") .. "/.local/state")
+local tv_keys_path = state_home .. "/omarchy/tv-workspace-keys"
+local tv_keys = false
+
+local function save_tv_keys()
+  local file = io.open(tv_keys_path, "w")
+  if file then
+    file:write(tv_keys and "1\n" or "0\n")
+    file:close()
+  end
+end
+
+local tv_keys_file = io.open(tv_keys_path, "r")
+if tv_keys_file then
+  tv_keys = tv_keys_file:read("l") == "1"
+  tv_keys_file:close()
+else
+  save_tv_keys()
+end
+
+bind("SUPER + ALT + T", "Toggle number keys between desktop and TV workspaces", function()
+  tv_keys = not tv_keys
+  save_tv_keys()
+end)
+
+local function number_key_workspace(index)
+  return tostring(tv_keys and index + 10 or index)
+end
+
+for index = 1, 10 do
+  local key = "code:" .. tostring(index + 9)
+  bind("SUPER + " .. key, "Switch to workspace " .. index, function()
+    hl.dispatch(hl.dsp.focus({ workspace = number_key_workspace(index) }))
+  end)
+  bind("SUPER + SHIFT + " .. key, "Move window to workspace " .. index, function()
+    hl.dispatch(hl.dsp.window.move({ workspace = number_key_workspace(index) }))
+  end)
+  bind("SUPER + SHIFT + ALT + " .. key, "Move window silently to workspace " .. index, function()
+    hl.dispatch(hl.dsp.window.move({ workspace = number_key_workspace(index), follow = false }))
+  end)
+end
+
 -- Swap whole workspace IDs, preserving their layout trees, groups and sizes.
 -- Focus follows the original workspace to its new number. An unused destination
 -- simply receives the current workspace; selecting the current number is a no-op.
-local function swap_workspace(target)
+-- A swap stays within the current workspace's range so TV workspaces stay on the TV.
+local function swap_workspace(index)
   local current = hl.get_active_workspace()
+  local target = current and index + (current.id > 10 and 10 or 0)
   if not current or current.id <= 0 or current.id == target or hl.get_active_special_workspace() then
     return
   end
@@ -76,7 +122,7 @@ local function swap_workspace(target)
   end
 
   if occupied[target] then
-    local temporary = 11
+    local temporary = 21
     while occupied[temporary] do
       temporary = temporary + 1
     end
@@ -89,10 +135,9 @@ local function swap_workspace(target)
 end
 
 for index = 1, 10 do
-  local target = index
   local key = index == 10 and "0" or tostring(index)
   bind("SUPER + CTRL + SHIFT + " .. key, "Swap workspace with " .. index, function()
-    swap_workspace(target)
+    swap_workspace(index)
   end)
 end
 

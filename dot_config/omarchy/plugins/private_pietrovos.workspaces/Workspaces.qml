@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Effects
 import QtQuick.Layouts
+import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
 import qs.Commons
@@ -21,12 +22,15 @@ BarWidget {
   property int focusedId: 0
   property bool refreshPending: false
   property bool tvActive: false
+  property bool tvKeys: false
 
-  readonly property var workspaceIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-  // 1-10 always; the TV's workspace 11 only while the TV is on as its own screen
-  // (or if 11 is somehow occupied or focused without it).
+  readonly property string tvKeysPath: (Quickshell.env("XDG_STATE_HOME") || (Quickshell.env("HOME") + "/.local/state")) + "/omarchy/tv-workspace-keys"
+
+  readonly property var workspaceIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+  // The ten workspaces the number keys currently reach, plus the TV's workspace 11
+  // while the TV is on as its own screen, and anything else occupied or focused.
   readonly property var visibleIds: workspaceIds.filter(function(id) {
-    return id <= 10 || tvActive || occupiedIds[id] === true || focusedId === id
+    return (tvKeys ? id > 10 : id <= 10) || (id === 11 && tvActive) || occupiedIds[id] === true || focusedId === id
   })
 
   readonly property var stateEvents: [
@@ -73,14 +77,14 @@ BarWidget {
     var occupied = {}
     for (var i = 0; i < list.length; i++) {
       var id = list[i] && list[i].id
-      if (id > 0 && id <= 11 && list[i].windows > 0) occupied[id] = true
+      if (id > 0 && id <= 20 && list[i].windows > 0) occupied[id] = true
     }
 
     root.occupiedIds = occupied
     root.tvActive = Array.isArray(monitors) && monitors.some(function(monitor) {
       return monitor && monitor.name === "HDMI-A-1" && !monitor.disabled && monitor.mirrorOf === "none"
     })
-    root.focusedId = (active.id > 0 && active.id <= 11) ? active.id : 0
+    root.focusedId = (active.id > 0 && active.id <= 20) ? active.id : 0
   }
 
   function focusWorkspace(id) {
@@ -122,6 +126,15 @@ BarWidget {
       waitForEnd: true
       onStreamFinished: root.applyState(text)
     }
+  }
+
+  // Written by the SUPER + ALT + T binding in bindings.lua.
+  FileView {
+    path: root.tvKeysPath
+    watchChanges: true
+    printErrors: false
+    onFileChanged: reload()
+    onLoaded: root.tvKeys = text().trim() === "1"
   }
 
   Component.onCompleted: root.refresh()
