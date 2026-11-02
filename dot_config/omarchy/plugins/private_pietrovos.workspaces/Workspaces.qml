@@ -142,6 +142,41 @@ BarWidget {
     columnSpacing: root.vertical ? 0 : Style.space(1)
     rowSpacing: root.vertical ? Style.space(2) : 0
 
+    // Styled like the subspace name box in pietrovos.group-tabs.
+    Item {
+      visible: root.tvKeys
+      Layout.alignment: Qt.AlignCenter
+      Layout.rightMargin: root.vertical ? 0 : Style.space(2)
+      implicitWidth: tvLabel.implicitWidth + Style.space(8)
+      implicitHeight: root.barSize - Style.space(2)
+
+      Rectangle {
+        anchors.fill: parent
+        color: root.bar ? root.bar.barForeground : Color.foreground
+        radius: Math.min(Style.cornerRadius, height / 2)
+        opacity: 0.12
+      }
+
+      Rectangle {
+        anchors.fill: parent
+        color: "transparent"
+        radius: Math.min(Style.cornerRadius, height / 2)
+        border.width: 1
+        border.color: root.bar ? root.bar.barForeground : Color.foreground
+        opacity: 0.5
+      }
+
+      Text {
+        id: tvLabel
+        anchors.centerIn: parent
+        text: "TV"
+        color: root.bar ? root.bar.barForeground : Color.foreground
+        opacity: 0.85
+        font.family: Style.font.family
+        font.pixelSize: Style.font.body
+      }
+    }
+
     Repeater {
       model: root.visibleIds
 
@@ -183,32 +218,6 @@ BarWidget {
         fixedWidth: root.vertical ? root.barSize : Style.space(20)
         fixedHeight: root.barSize
         onPressed: function() { root.focusWorkspace(modelData) }
-      }
-    }
-
-    // Styled like the subspace name box in pietrovos.group-tabs.
-    Item {
-      visible: root.tvKeys
-      Layout.alignment: Qt.AlignCenter
-      Layout.leftMargin: root.vertical ? 0 : Style.space(2)
-      implicitWidth: tvLabel.implicitWidth + Style.space(8)
-      implicitHeight: root.barSize - Style.space(2)
-
-      Rectangle {
-        anchors.fill: parent
-        color: root.bar ? root.bar.barForeground : Color.foreground
-        radius: Math.min(Style.cornerRadius, height / 2)
-        opacity: 0.12
-      }
-
-      Text {
-        id: tvLabel
-        anchors.centerIn: parent
-        text: "TV"
-        color: root.bar ? root.bar.barForeground : Color.foreground
-        opacity: 0.85
-        font.family: Style.font.family
-        font.pixelSize: Style.font.body
       }
     }
   }

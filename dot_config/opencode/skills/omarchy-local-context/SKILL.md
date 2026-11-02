@@ -67,8 +67,8 @@ from Omarchy defaults when these files can be inspected.
   change focus. `$XDG_STATE_HOME/omarchy/tv-workspace-keys` (`0`/`1`) keeps
   the choice across reloads and drives the bar: `pietrovos.workspaces` watches
   it with a FileView and shows only the reachable ten, labelled by number key
-  (11 shows `1`, 20 shows `0`). In TV mode a `TV` box styled like the subspace
-  name box follows them. Desktop mode shows no TV tag and no TV workspaces, at
+  (11 shows `1`, 20 shows `0`). In TV mode a bordered `TV` box styled like the
+  subspace widget precedes them. Desktop mode shows no TV tag and no TV workspaces, at
   the user's request (a tag beside/among the numbers was rejected as ugly).
   `SUPER+CTRL+SHIFT+1–0`
   swaps stay inside the current workspace's own range regardless of the flip,
