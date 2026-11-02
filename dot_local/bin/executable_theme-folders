@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-# A folder step in front of the Omarchy theme picker, using the same picker for
-# both. A folder is a directory in ~/.config/omarchy/theme-folders holding one
+# A folder step in front of the Omarchy theme picker, shown in
+# pietrovos.theme-picker, a clone of the stock picker. A folder is a directory in ~/.config/omarchy/theme-folders holding one
 # empty file per theme, named after the theme, so yazi can organize them.
 
 folders="${HOME}/.config/omarchy/theme-folders"
 cache="${XDG_CACHE_HOME:-${HOME}/.cache}/omarchy/theme-folders"
 covers="${cache}/covers"
 contents="${cache}/contents"
+resume="${cache}/resume"
 user_themes="${HOME}/.config/omarchy/themes"
 stock_themes="${OMARCHY_PATH:-/usr/share/omarchy}/themes"
 icon_font="CaskaydiaMono-NF-Regular"
@@ -127,11 +128,14 @@ build_folders() {
   # A newly installed theme stays reachable until it has been filed.
   themes=()
   images=()
+  local -a everything=()
   while IFS= read -r theme; do
     [[ -n ${previews[${theme}]:-} ]] || continue
+    everything+=("${theme}")
     (( ${#images[@]} < 4 )) && images+=("${previews[${theme}]}")
     [[ -z ${sorted[${theme}]:-} ]] && themes+=("${theme}")
   done < <(all_themes)
+  sync_contents "All-Themes" "${everything[@]}"
   write_collage "All-Themes" "${images[@]}"
 
   if (( ${#themes[@]} > 0 )); then
@@ -163,42 +167,102 @@ refresh_folders() {
   printf '%s' "${signature}" >"${cache}/folders.signature"
 }
 
+# Sets action, picked and filter from how the picker was left. Thumbnails come
+# from omarchy-menu-images, which leaves its rows in the cache.
+pick() {
+  local dir="$1" selected_path="$2" start_filter="$3" can_go_back="$4"
+  local rows key selection_file done_file payload
+
+  omarchy-menu-images --cache-only "${dir}" >/dev/null 2>&1
+  key=$(printf '%s' "${dir}" | md5sum | cut -d ' ' -f 1)
+  rows=$(cat "${XDG_CACHE_HOME:-${HOME}/.cache}/omarchy/image-selector/${key}.rows" 2>/dev/null)
+  [[ -n ${rows} ]] || rows=$(find -L "${dir}" -mindepth 1 -maxdepth 1 -type f -printf '%p\t%p\n' | sort)
+
+  selection_file=$(mktemp)
+  done_file=$(mktemp)
+  rm -f "${done_file}"
+
+  payload=$(jq -nc --arg rows "${rows}" --arg selected "${selected_path}" --arg selection "${selection_file}" \
+    --arg done "${done_file}" --arg filter "${start_filter}" --argjson back "${can_go_back}" \
+    '{imageRows: $rows, selectedImage: $selected, selectionFile: $selection, doneFile: $done,
+      showLabels: true, filterable: true, filterText: $filter, canGoBack: $back}')
+
+  action=""
+  picked=""
+  filter=""
+  if [[ $(omarchy-shell shell summon pietrovos.theme-picker "${payload}") == "ok" ]]; then
+    while [[ ! -e ${done_file} ]]; do
+      sleep 0.01
+    done
+    IFS=$'\t' read -r action picked filter <"${selection_file}"
+  fi
+  rm -f "${selection_file}" "${done_file}"
+}
+
+theme_link() {
+  find "${contents}/$1" -maxdepth 1 -name "${current_theme}.*" -print -quit 2>/dev/null
+}
+
+refresh_folders
+
+view="folders"
 selected="${covers}/Unsorted.jpg"
 marker=$(find "${folders}" -mindepth 2 -maxdepth 2 -name "${current_theme}" -print -quit 2>/dev/null)
 if [[ -n ${marker} ]]; then
   marker=${marker%/*}
   selected="${covers}/${marker##*/}.jpg"
 fi
+filter=""
+
+# Esc leaves a position to come back to; applying a theme clears it.
+if [[ -f ${resume} ]]; then
+  IFS=$'\t' read -r saved_view saved_selected saved_filter <"${resume}"
+  if [[ ${saved_view} == "folders" || -e ${covers}/${saved_view}.jpg ]]; then
+    view=${saved_view}
+    selected=${saved_selected}
+    filter=${saved_filter}
+  fi
+fi
 
 while true; do
-  refresh_folders
-  choice=$(omarchy-menu-images --print-name --show-labels --filterable --selected "${selected}" "${covers}")
-  theme=""
+  if [[ ${view} == "folders" ]]; then
+    pick "${covers}" "${selected}" "${filter}" false
+  else
+    pick "${contents}/${view}" "${selected}" "${filter}" true
+  fi
 
-  case "${choice}" in
-    "")
+  case "${action}" in
+    exit)
+      printf '%s\t%s\t%s\n' "${view}" "${picked}" "${filter}" >"${resume}"
       exit 0
       ;;
-    Organize)
-      exec 9>&-
-      exec omarchy-launch-tui yazi "${folders}"
+    back)
+      selected="${covers}/${view}.jpg"
+      view="folders"
+      filter=""
       ;;
-    All-Themes)
-      theme=$(omarchy-theme-switcher)
+    apply)
+      choice=${picked##*/}
+      choice=${choice%.*}
+      if [[ ${view} != "folders" ]]; then
+        rm -f "${resume}"
+        exec 9>&-
+        exec omarchy-theme-set "${choice}"
+      elif [[ ${choice} == "Organize" ]]; then
+        rm -f "${resume}"
+        exec 9>&-
+        exec omarchy-launch-tui yazi "${folders}"
+      elif [[ -n $(find -L "${contents}/${choice}" -mindepth 1 -maxdepth 1 -print -quit 2>/dev/null) ]]; then
+        view=${choice}
+        selected=$(theme_link "${choice}")
+        filter=""
+      else
+        # An empty folder has nothing to pick, so stay on its tile.
+        selected=${picked}
+      fi
       ;;
     *)
-      for extension in png jpg jpeg webp gif bmp; do
-        current_link="${contents}/${choice}/${current_theme}.${extension}"
-        [[ -e ${current_link} ]] && break
-      done
-      theme=$(omarchy-menu-images --print-name --show-labels --filterable --lazy-thumbnails \
-        --selected "${current_link}" "${contents}/${choice}")
+      exit 0
       ;;
   esac
-
-  selected="${covers}/${choice}.jpg"
-  if [[ -n ${theme} ]]; then
-    exec 9>&-
-    exec omarchy-theme-set "${theme}"
-  fi
 done
