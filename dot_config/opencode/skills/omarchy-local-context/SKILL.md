@@ -357,6 +357,16 @@ from Omarchy defaults when these files can be inspected.
   only `promptBorder`/`promptBorderShimmer` from the current theme's
   `claude.json` into `lucent-orng.json`, so the prompt box follows the theme.
   Switching wholly to `custom:omarchy` was considered and declined.
+- Wallpaper transitions use the clone `pietrovos.background` (in `shell.json`,
+  replacing `omarchy.background`) for monitor-rate smoothness. Stock redrew a
+  `Shape` CurveRenderer mask through `MultiEffect` every frame, driven by a
+  GUI-thread NumberAnimation, and measured 75–125 fps on the 240 Hz MSI. The
+  clone keeps the slanted reveal in `reveal.frag`, stepped by a per-screen
+  `UniformAnimator` on each render thread (700ms): measured about 230 fps on
+  DP-2 (179–235), 142 on DP-3, 60 on the TV. Images decode at screen size
+  through `sourceSize`, without mipmaps. Editing `reveal.frag` needs a rebuild:
+  `/usr/lib/qt6/bin/qsb --qt6 -o reveal.frag.qsb reveal.frag`. Duration is
+  `revealDuration`. A clone does not receive upstream Omarchy background fixes.
 - `SUPER+ALT+B` runs `~/.config/hypr/open-theme-backgrounds`, opening the
   current theme's real backgrounds folder in yazi (via `omarchy theme dir`,
   or `~/.config/omarchy/backgrounds/<theme>` for read-only packaged themes).
