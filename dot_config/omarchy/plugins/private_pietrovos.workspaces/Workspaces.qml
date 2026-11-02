@@ -142,7 +142,6 @@ BarWidget {
     columnSpacing: root.vertical ? 0 : Style.space(1)
     rowSpacing: root.vertical ? Style.space(2) : 0
 
-    // Styled like the subspace name box in pietrovos.group-tabs.
     Item {
       visible: root.tvKeys
       Layout.alignment: Qt.AlignCenter
@@ -154,16 +153,7 @@ BarWidget {
         anchors.fill: parent
         color: root.bar ? root.bar.barForeground : Color.foreground
         radius: Math.min(Style.cornerRadius, height / 2)
-        opacity: 0.12
-      }
-
-      Rectangle {
-        anchors.fill: parent
-        color: "transparent"
-        radius: Math.min(Style.cornerRadius, height / 2)
-        border.width: 1
-        border.color: root.bar ? root.bar.barForeground : Color.foreground
-        opacity: 0.5
+        opacity: 0.18
       }
 
       Text {
