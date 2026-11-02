@@ -36,6 +36,9 @@
       }
     ]
   },
+  "enabledPlugins": {
+    "my-highlights@pietrovos-mods": true
+  },
   "extraKnownMarketplaces": {
     "pietrovos-mods": {
       "source": {
@@ -45,10 +48,7 @@
     }
   },
   "autoUpdatesChannel": "stable",
-  "theme": "custom:lucent-orng",
+  "theme": "custom:omarchy",
   "preferredNotifChannel": "notifications_disabled",
-  "agentPushNotifEnabled": true,
-  "enabledPlugins": {
-    "my-highlights@pietrovos-mods": true
-  }
+  "agentPushNotifEnabled": true
 }
