@@ -418,6 +418,8 @@ from Omarchy defaults when these files can be inspected.
   preview links live in `~/.cache/omarchy/theme-folders/`, rebuilt only when a
   stat signature changes, which keeps opening instant. Thumbnails come from
   `omarchy-menu-images --cache-only` and its `.rows` file.
+  Greenify and the `*iffy` replicas preview as their first background by
+  filename instead of `preview.png`, in this picker only.
   The separate `themeSwitchProc` in the shell's `Background.qml` still opens
   the flat stock switcher. Close the stock picker from a script with
   `omarchy-shell shell hide omarchy.image-picker`; `image-selector close`

@@ -12,6 +12,7 @@ covers="${cache}/covers"
 contents="${cache}/contents"
 resume="${cache}/resume"
 user_themes="${HOME}/.config/omarchy/themes"
+custom_themes="${HOME}/.config/omarchy/custom-themes"
 stock_themes="${OMARCHY_PATH:-/usr/share/omarchy}/themes"
 icon_font="CaskaydiaMono-NF-Regular"
 
@@ -20,13 +21,16 @@ mkdir -p "${folders}" "${covers}" "${contents}"
 exec 9>"${cache}/lock"
 flock -n 9 || exit 0
 
+find_background() {
+  [[ -d $1/backgrounds ]] || return
+  find -L "$1/backgrounds" -maxdepth 1 -type f -iregex '.*\.\(png\|jpe?g\|webp\|gif\|bmp\)' -print 2>/dev/null | sort | head -n 1
+}
+
 find_preview() {
   local theme_path="$1" preview
 
   preview=$(find -L "${theme_path}" -maxdepth 1 -type f -iregex '.*/preview\.\(png\|jpe?g\|webp\|gif\|bmp\)' -print -quit 2>/dev/null)
-  if [[ -z ${preview} && -d ${theme_path}/backgrounds ]]; then
-    preview=$(find -L "${theme_path}/backgrounds" -maxdepth 1 -type f -iregex '.*\.\(png\|jpe?g\|webp\|gif\|bmp\)' -print 2>/dev/null | sort | head -n 1)
-  fi
+  [[ -n ${preview} ]] || preview=$(find_background "${theme_path}")
   printf '%s' "${preview}"
 }
 
@@ -42,7 +46,9 @@ load_previews() {
   previews=()
   while IFS= read -r theme; do
     preview=""
-    [[ -d ${user_themes}/${theme} ]] && preview=$(find_preview "${user_themes}/${theme}")
+    # Greenify and its replicas share one screenshot, so show their own wallpapers.
+    [[ ${theme} == "greenify" || -d ${custom_themes}/${theme} ]] && preview=$(find_background "${user_themes}/${theme}")
+    [[ -z ${preview} && -d ${user_themes}/${theme} ]] && preview=$(find_preview "${user_themes}/${theme}")
     [[ -z ${preview} && -d ${stock_themes}/${theme} ]] && preview=$(find_preview "${stock_themes}/${theme}")
     [[ -n ${preview} ]] && previews[${theme}]=${preview}
   done < <(all_themes)
@@ -86,7 +92,8 @@ sync_contents() {
     [[ -L ${link} ]] || continue
     theme=${link##*/}
     theme=${theme%.*}
-    [[ " $* " == *" ${theme} "* ]] || rm -f "${link}"
+    # A new preview can change the extension, which would leave a duplicate.
+    [[ " $* " == *" ${theme} "* && $(readlink "${link}") == "${previews[${theme}]:-}" ]] || rm -f "${link}"
   done
 
   for theme in "$@"; do

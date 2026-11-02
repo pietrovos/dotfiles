@@ -64,15 +64,20 @@
     },
     {
       "id": "pietrovos.theme-picker"
+    },
+    {
+      "id": "pietrovos.background"
     }
   ],
   "version": 1,
   "disabledPlugins": [
     "omarchy.notifications",
-    "omarchy.lock"
+    "omarchy.lock",
+    "omarchy.background"
   ],
   "cloneSourceRestores": [
     "pietrovos.notifications",
-    "pietrovos.lock"
+    "pietrovos.lock",
+    "pietrovos.background"
   ]
 }
