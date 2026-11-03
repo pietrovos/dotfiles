@@ -34,6 +34,7 @@ BarWidget {
     return item ? item.x + item.width / 2 : -1
   }
   readonly property bool markerShown: markerX >= 0 && !vertical
+  onMarkerXChanged: console.log("MARKERDBG markerX", markerX, "focused", focusedId)
 
   // The ten workspaces the number keys currently reach.
   readonly property var visibleIds: tvKeys
@@ -270,6 +271,7 @@ BarWidget {
   // A short line under the number that slides to the next workspace.
   Rectangle {
     visible: root.markerShown && root.marker === "underline"
+    onXChanged: console.log("MARKERDBG ux", x.toFixed(1))
     width: 12
     height: 2
     radius: 1
