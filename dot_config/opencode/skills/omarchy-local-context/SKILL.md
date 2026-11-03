@@ -218,8 +218,10 @@ from Omarchy defaults when these files can be inspected.
   refreshed on occupancy/focus Hyprland events (including `changeworkspaceid`)
   and a 5s safety poll, so the bar greys out the emptied source number the
   moment a swap lands.
-- `pietrovos.workspaces` replaces the focused number with an 8px solid dot in
-  the bar text colour, and every change snaps. Stock `WidgetButton` fades its
+- `pietrovos.workspaces` replaces the focused number with a 12px hollow ring
+  (1.5px border, bar text colour) with a 4px spark orbiting it (1.6s per turn,
+  `RotationAnimator`, MultiEffect shadow glow); an 8px solid dot came before
+  it. Every change snaps. Stock `WidgetButton` fades its
   own `opacity` (140ms) and label `color` (160ms) and neither can be disabled
   from outside, so each number is a plain `Item` wrapper that carries the
   occupied/empty dimming, with the button inside and `labelVisible: false`

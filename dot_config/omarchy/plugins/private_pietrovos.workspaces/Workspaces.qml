@@ -174,7 +174,6 @@ BarWidget {
           anchors.fill: parent
           bar: root.bar
           text: String(slot.modelData % 10)
-          // The focused workspace shows a dot in place of its number.
           labelVisible: !slot.focused
           horizontalMargin: 6
           verticalPadding: 6
@@ -183,13 +182,60 @@ BarWidget {
           onPressed: function() { root.focusWorkspace(slot.modelData) }
         }
 
-        Rectangle {
+        // The focused workspace shows a dimmed ring in place of its number, with
+        // a bright point and fading tail travelling around it. The light stays
+        // inside the ring's outline: a blurred glow spilled past it.
+        Item {
+          id: marker
+          readonly property color tint: root.bar ? root.bar.barForeground : Color.foreground
           visible: slot.focused && !root.vertical
           anchors.centerIn: parent
-          width: 8
-          height: 8
-          radius: 4
-          color: root.bar ? root.bar.barForeground : Color.foreground
+          width: 12
+          height: 12
+          onTintChanged: halo.requestPaint()
+
+          // Drawn at 3x and scaled down so it stays crisp at this size.
+          Canvas {
+            id: halo
+            anchors.centerIn: parent
+            width: parent.width * 3
+            height: parent.height * 3
+            scale: 1 / 3
+            smooth: true
+            antialiasing: true
+            onWidthChanged: requestPaint()
+
+            RotationAnimator on rotation {
+              running: marker.visible
+              loops: Animation.Infinite
+              from: 0
+              to: 360
+              duration: 1600
+            }
+
+            onPaint: {
+              var ctx = getContext("2d")
+              var line = 4.5
+              var r = width / 2 - line / 2
+              var tint = marker.tint
+              ctx.reset()
+              ctx.lineWidth = line
+
+              ctx.strokeStyle = Qt.rgba(tint.r, tint.g, tint.b, 0.4)
+              ctx.beginPath()
+              ctx.arc(width / 2, height / 2, r, 0, 2 * Math.PI)
+              ctx.stroke()
+
+              var comet = ctx.createConicalGradient(width / 2, height / 2, 0)
+              comet.addColorStop(0, Qt.rgba(tint.r, tint.g, tint.b, 1))
+              comet.addColorStop(0.35, Qt.rgba(tint.r, tint.g, tint.b, 0))
+              comet.addColorStop(1, Qt.rgba(tint.r, tint.g, tint.b, 0))
+              ctx.strokeStyle = comet
+              ctx.beginPath()
+              ctx.arc(width / 2, height / 2, r, 0, 2 * Math.PI)
+              ctx.stroke()
+            }
+          }
         }
       }
     }
