@@ -23,7 +23,17 @@ BarWidget {
   property bool refreshPending: false
   property bool tvKeys: false
 
-  readonly property string tvKeysPath: (Quickshell.env("XDG_STATE_HOME") || (Quickshell.env("HOME") + "/.local/state")) + "/omarchy/tv-workspace-keys"
+  readonly property string stateDir: (Quickshell.env("XDG_STATE_HOME") || (Quickshell.env("HOME") + "/.local/state")) + "/omarchy"
+  readonly property string tvKeysPath: stateDir + "/tv-workspace-keys"
+
+  // How the focused workspace is marked: "dot", "orbit" or "underline".
+  property string marker: "dot"
+  readonly property real markerX: {
+    var index = visibleIds.indexOf(focusedId)
+    var item = buttons.count > 0 && index >= 0 ? buttons.itemAt(index) : null
+    return item ? item.x + item.width / 2 : -1
+  }
+  readonly property bool markerShown: markerX >= 0 && !vertical
 
   // The ten workspaces the number keys currently reach.
   readonly property var visibleIds: tvKeys
@@ -127,6 +137,17 @@ BarWidget {
     onLoaded: root.tvKeys = text().trim() === "1"
   }
 
+  FileView {
+    path: root.stateDir + "/workspace-marker"
+    watchChanges: true
+    printErrors: false
+    onFileChanged: reload()
+    onLoaded: {
+      var value = text().trim()
+      root.marker = ["dot", "orbit", "underline"].indexOf(value) !== -1 ? value : "dot"
+    }
+  }
+
   Component.onCompleted: root.refresh()
 
   readonly property real trailingGap: root.vertical ? 0 : Style.spaceReal(1.5)
@@ -153,6 +174,7 @@ BarWidget {
     }
 
     Repeater {
+      id: buttons
       model: root.visibleIds
 
       WidgetButton {
@@ -164,18 +186,11 @@ BarWidget {
         bar: root.bar
         text: String(modelData % 10)
         opacity: occupied || focused ? 1 : 0.5
-        // The focused workspace glows instead of being replaced by a filled square,
-        // and the glow breathes so it stands apart from the occupied ones.
+        // The focused workspace glows instead of being replaced by a filled square.
         layer.enabled: focused
         layer.effect: Item {
           id: glow
           property var source
-          property real pulse: 1
-          SequentialAnimation on pulse {
-            loops: Animation.Infinite
-            NumberAnimation { to: 0.25; duration: 1100; easing.type: Easing.InOutSine }
-            NumberAnimation { to: 1; duration: 1100; easing.type: Easing.InOutSine }
-          }
           // Stacked shadows: one MultiEffect shadow tops out at full opacity.
           Repeater {
             model: 3
@@ -189,7 +204,7 @@ BarWidget {
               shadowScale: 1.2
               autoPaddingEnabled: false
               paddingRect: Qt.rect(48, 48, 48, 48)
-              shadowOpacity: glow.pulse
+              shadowOpacity: 1
               shadowHorizontalOffset: 0
               shadowVerticalOffset: 0
             }
@@ -202,5 +217,65 @@ BarWidget {
         onPressed: function() { root.focusWorkspace(modelData) }
       }
     }
+  }
+
+  readonly property color markerColor: root.bar ? root.bar.barForeground : Color.foreground
+
+  // A dot under the number that bobs, and glides to the next workspace.
+  Rectangle {
+    id: dot
+    property real bob: 0
+    visible: root.markerShown && root.marker === "dot"
+    width: 4
+    height: 4
+    radius: 2
+    color: root.markerColor
+    x: root.markerX - width / 2
+    y: root.height - 7 + bob
+    Behavior on x { NumberAnimation { duration: 260; easing.type: Easing.OutCubic } }
+    SequentialAnimation on bob {
+      running: dot.visible
+      loops: Animation.Infinite
+      NumberAnimation { to: -2.5; duration: 700; easing.type: Easing.InOutSine }
+      NumberAnimation { to: 0; duration: 700; easing.type: Easing.InOutSine }
+    }
+  }
+
+  // A dot circling the number.
+  Item {
+    id: orbit
+    property real angle: 0
+    visible: root.markerShown && root.marker === "orbit"
+    x: root.markerX
+    y: root.height / 2
+    Behavior on x { NumberAnimation { duration: 260; easing.type: Easing.OutCubic } }
+    NumberAnimation on angle {
+      running: orbit.visible
+      loops: Animation.Infinite
+      from: 0
+      to: 2 * Math.PI
+      duration: 2400
+    }
+
+    Rectangle {
+      width: 3
+      height: 3
+      radius: 1.5
+      color: root.markerColor
+      x: 11 * Math.cos(orbit.angle) - width / 2
+      y: 10 * Math.sin(orbit.angle) - height / 2
+    }
+  }
+
+  // A short line under the number that slides to the next workspace.
+  Rectangle {
+    visible: root.markerShown && root.marker === "underline"
+    width: 12
+    height: 2
+    radius: 1
+    color: root.markerColor
+    x: root.markerX - width / 2
+    y: root.height - 5
+    Behavior on x { NumberAnimation { duration: 260; easing.type: Easing.OutCubic } }
   }
 }
