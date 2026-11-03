@@ -24,6 +24,10 @@ require("hypr.autostart")
 require("default.hypr.toggles")
 
 -- Add any other personal Hyprland configuration below.
+-- Qt picks its basic render loop here, which draws every bar window in turn on
+-- one thread and held bar animations to ~40fps across the 240/144/60Hz screens.
+-- The threaded loop gives each window its own vsync (~210fps on the MSI).
+hl.env("QSG_RENDER_LOOP", "threaded")
 -- o.window("qemu", { workspace = "5" })
 o.window({ title = "discord%.com is sharing your screen%.", class = "^$" }, { workspace = "special silent" })
 o.window("org.gnome.Nautilus", { opacity = "0.85 0.75" })

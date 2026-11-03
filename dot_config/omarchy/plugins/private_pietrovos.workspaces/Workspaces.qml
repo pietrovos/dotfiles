@@ -223,8 +223,16 @@ BarWidget {
     x: centerX - width / 2
     y: (root.height - height) / 2
 
+    // Theme colours: the iris is the accent, the rim, pupil and tomoe the bar
+    // background, so it follows theme changes.
+    readonly property color irisColor: Color.accent
+    readonly property color inkColor: Color.bar.background
+    onIrisColorChanged: eye.requestPaint()
+    onInkColorChanged: eye.requestPaint()
+
     // Drawn at 3x and scaled down so it stays crisp at this size.
     Canvas {
+      id: eye
       anchors.centerIn: parent
       width: parent.width * 3
       height: parent.height * 3
@@ -248,13 +256,14 @@ BarWidget {
         ctx.translate(r, r)
 
         var iris = ctx.createRadialGradient(0, 0, r * 0.1, 0, 0, r)
-        iris.addColorStop(0, "#e0262c")
-        iris.addColorStop(1, "#8c0d12")
+        // Darker in the middle so the number on top stays readable.
+        iris.addColorStop(0, Qt.darker(ring.irisColor, 1.7))
+        iris.addColorStop(1, ring.irisColor)
         ctx.fillStyle = iris
         ctx.beginPath()
         ctx.arc(0, 0, r - 2, 0, 2 * Math.PI)
         ctx.fill()
-        ctx.strokeStyle = "#000000"
+        ctx.strokeStyle = ring.inkColor
         ctx.lineWidth = 4
         ctx.stroke()
 
@@ -264,7 +273,7 @@ BarWidget {
         ctx.arc(0, 0, r * 0.58, 0, 2 * Math.PI)
         ctx.stroke()
 
-        ctx.fillStyle = "#000000"
+        ctx.fillStyle = ring.inkColor
         ctx.beginPath()
         ctx.arc(0, 0, r * 0.2, 0, 2 * Math.PI)
         ctx.fill()
