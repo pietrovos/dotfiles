@@ -22,6 +22,8 @@ BarWidget {
   property int focusedId: 0
   property bool refreshPending: false
   property bool tvKeys: false
+  // Only the focused workspace shows, and the rest while SUPER is held.
+  property bool superHeld: false
   // Workspace id -> "running", "question" or "done", from agent-status marks.
   property var agentStates: ({})
 
@@ -127,6 +129,11 @@ BarWidget {
     target: Hyprland
     function onRawEvent(event) {
       if (!event || !event.name) return
+      // Sent by the SUPER press and release binds in bindings.lua.
+      if (event.name === "custom" && String(event.data).indexOf("super-held ") === 0) {
+        root.superHeld = String(event.data).slice(11) === "1"
+        return
+      }
       if (root.stateEvents.indexOf(String(event.name)) !== -1) refreshDebounce.restart()
     }
   }
@@ -157,6 +164,16 @@ BarWidget {
       waitForEnd: true
       onStreamFinished: root.applyState(text)
     }
+  }
+
+  // The SUPER binds in bindings.lua also write the flag here, for the state
+  // at startup; their socket event is what updates it while running.
+  FileView {
+    path: root.stateDir + "/super-held"
+    watchChanges: true
+    printErrors: false
+    onFileChanged: reload()
+    onLoaded: root.superHeld = text().trim() === "1"
   }
 
   // Written by the SUPER + CTRL + T binding in bindings.lua.
@@ -217,7 +234,9 @@ BarWidget {
 
         implicitWidth: button.implicitWidth
         implicitHeight: button.implicitHeight
-        opacity: occupied || focused ? 1 : 0.5
+        // Hidden workspaces keep their place, so nothing shifts when they show.
+        readonly property bool shown: focused || root.superHeld
+        opacity: !shown ? 0 : (occupied || focused ? 1 : 0.5)
         // The focused workspace glows instead of being replaced by a filled square.
         layer.enabled: focused
         layer.effect: Item {
@@ -254,6 +273,7 @@ BarWidget {
           verticalPadding: 6
           fixedWidth: root.vertical ? root.barSize : Style.space(20)
           fixedHeight: root.barSize
+          interactive: slot.shown
           onPressed: function() { root.focusWorkspace(slot.modelData) }
         }
 
