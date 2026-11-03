@@ -88,34 +88,6 @@ bind("SUPER + CTRL + T", "Toggle number keys between desktop and TV workspaces",
   save_tv_keys()
 end)
 
--- The bar shows only the focused workspace, and the rest while SUPER is held.
--- Hyprland reports the key itself, through these non-consuming binds, so every
--- SUPER shortcut still fires. The bar reacts to a custom socket event at once
--- (an inotify-watched file alone lagged ~80ms) and reads this file on start.
-local super_held_path = state_home .. "/omarchy/super-held"
-
-local function save_super_held(held)
-  hl.dispatch(hl.dsp.event("super-held " .. (held and "1" or "0")))
-  local file = io.open(super_held_path, "w")
-  if file then
-    file:write(held and "1\n" or "0\n")
-    file:close()
-  end
-end
-
--- A reload mid-press must not leave the workspaces showing.
-save_super_held(false)
-
-for _, key in ipairs({ "SUPER_L", "SUPER_R" }) do
-  local flags = { ignore_mods = true, non_consuming = true, transparent = true }
-  o.bind(key, "Show all workspaces while SUPER is held", function()
-    save_super_held(true)
-  end, flags)
-  o.bind(key, "Hide other workspaces when SUPER is released", function()
-    save_super_held(false)
-  end, { ignore_mods = true, non_consuming = true, transparent = true, release = true })
-end
-
 local function number_key_workspace(index)
   return tostring(tv_keys and index + 10 or index)
 end
