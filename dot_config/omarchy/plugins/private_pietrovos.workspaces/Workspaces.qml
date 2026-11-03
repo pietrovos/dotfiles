@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Effects
 import QtQuick.Layouts
+import QtQuick.Shapes
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
@@ -26,7 +27,7 @@ BarWidget {
   readonly property string stateDir: (Quickshell.env("XDG_STATE_HOME") || (Quickshell.env("HOME") + "/.local/state")) + "/omarchy"
   readonly property string tvKeysPath: stateDir + "/tv-workspace-keys"
 
-  // Centre of the focused number, where the underline heads.
+  // Centre of the focused number, where the ring heads.
   readonly property real markerX: {
     var index = visibleIds.indexOf(focusedId)
     var item = buttons.count > 0 && index >= 0 ? buttons.itemAt(index) : null
@@ -207,30 +208,48 @@ BarWidget {
     }
   }
 
-  // A short line under the focused number that slides to the next one. It eases
-  // one frame at a time with each frame counted as at most 1/60s: switching
-  // workspaces can stall the bar for ~100ms, and a timed animation skipped
-  // most of a downward slide during that stall.
-  Rectangle {
-    id: underline
+  // An oval ring around the focused number that slides to the next one. It
+  // eases one frame at a time with each frame counted as at most 1/60s:
+  // switching workspaces can stall the bar for ~100ms, and a timed animation
+  // skipped most of a slide during that stall.
+  Item {
+    id: ring
     property real centerX: -1
     visible: root.markerShown
-    width: 12
-    height: 2
-    radius: 1
-    color: root.bar ? root.bar.barForeground : Color.foreground
+    height: root.height - 12
+    width: height * 1.5
     x: centerX - width / 2
-    y: root.height - 5
+    y: (root.height - height) / 2
+
+    Shape {
+      anchors.fill: parent
+      preferredRendererType: Shape.CurveRenderer
+
+      ShapePath {
+        strokeColor: root.bar ? root.bar.barForeground : Color.foreground
+        strokeWidth: 1.5
+        fillColor: "transparent"
+
+        PathAngleArc {
+          centerX: ring.width / 2
+          centerY: ring.height / 2
+          radiusX: ring.width / 2 - 1
+          radiusY: ring.height / 2 - 1
+          startAngle: 0
+          sweepAngle: 360
+        }
+      }
+    }
 
     FrameAnimation {
-      running: root.markerShown && underline.centerX !== root.markerX
+      running: root.markerShown && ring.centerX !== root.markerX
       onTriggered: {
-        var gap = root.markerX - underline.centerX
-        if (underline.centerX < 0 || Math.abs(gap) < 0.3) {
-          underline.centerX = root.markerX
+        var gap = root.markerX - ring.centerX
+        if (ring.centerX < 0 || Math.abs(gap) < 0.3) {
+          ring.centerX = root.markerX
           return
         }
-        underline.centerX += gap * (1 - Math.exp(-16 * Math.min(frameTime, 1 / 60)))
+        ring.centerX += gap * (1 - Math.exp(-16 * Math.min(frameTime, 1 / 60)))
       }
     }
   }

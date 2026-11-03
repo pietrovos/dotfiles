@@ -218,6 +218,12 @@ from Omarchy defaults when these files can be inspected.
   refreshed on occupancy/focus Hyprland events (including `changeworkspaceid`)
   and a 5s safety poll, so the bar greys out the emptied source number the
   moment a swap lands.
+- `pietrovos.workspaces` circles the focused number with a spinning ring
+  (a 270-degree `Shape` arc, bar foreground, 1.6s per turn on a
+  `RotationAnimator`, diameter `root.height - 10`) that slides between numbers
+  with the frame-capped easing the old underline used. It replaced a 2px
+  underline at the user's request (2026-11-02); `- 6` was big enough to brush
+  neighbouring numbers. The glow stays.
 - `pietrovos.workspaces` always shows ten numbers (empty ones dimmed): 1–10,
   or 11–20 while the number keys are on the TV.
   A hide-empty-workspaces variant was tried and reverted (2026-10-26).
