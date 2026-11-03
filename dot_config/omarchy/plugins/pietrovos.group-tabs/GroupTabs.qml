@@ -6,6 +6,7 @@ import Quickshell.Hyprland
 import Quickshell.Io
 import qs.Commons
 import qs.Ui
+import "../pietrovos.workspaces"
 
 BarWidget {
   id: root
@@ -18,6 +19,10 @@ BarWidget {
 
   readonly property string stateDir: (Quickshell.env("XDG_STATE_HOME") || (Quickshell.env("HOME") + "/.local/state")) + "/omarchy"
   readonly property string namesPath: stateDir + "/group-subspaces.json"
+  readonly property string agentsDir: stateDir + "/agent-marks"
+  // Window address -> "running" or "done", from the marks agent-status leaves.
+  // pietrovos.workspaces leaves these to the tabs while this group is shown.
+  property var agentMarks: ({})
   readonly property real labelGap: shownName !== "" ? Style.spaceReal(-1) : 0
 
   // What is drawn, kept through the fade-out after the group goes away.
@@ -39,6 +44,17 @@ BarWidget {
 
   function refresh() {
     if (!groupProbe.running) groupProbe.running = true
+    if (!marksProbe.running) marksProbe.running = true
+  }
+
+  function updateMarks(output) {
+    var marks = {}
+    var lines = String(output).trim().split("\n")
+    for (var i = 0; i < lines.length; i++) {
+      var fields = lines[i].trim().split(" ")
+      if (fields[1] === "running" || fields[1] === "done") marks[fields[0]] = fields[1]
+    }
+    agentMarks = marks
   }
 
   function updateGroup(output) {
@@ -92,6 +108,23 @@ BarWidget {
         root.subspaceName = ""
       }
     }
+  }
+
+  Process {
+    id: marksProbe
+    command: ["sh", "-c", "for mark in \"$1\"/0x*; do [ -f \"$mark\" ] && printf '%s %s\\n' \"${mark##*/}\" \"$(cat \"$mark\")\"; done; true", "sh", root.agentsDir]
+    stdout: StdioCollector {
+      waitForEnd: true
+      onStreamFinished: root.updateMarks(text)
+    }
+  }
+
+  // Touched by agent-status whenever an agent starts or finishes.
+  FileView {
+    path: root.agentsDir + "/changed"
+    watchChanges: true
+    printErrors: false
+    onFileChanged: root.refresh()
   }
 
   Timer {
@@ -160,10 +193,16 @@ BarWidget {
         model: root.shownMembers
 
         WidgetButton {
+          id: tab
+          required property string modelData
+          required property int index
           readonly property bool focused: index === root.activeIndex
+          readonly property string agent: root.agentMarks[modelData] || ""
 
           bar: root.bar
           text: index === 9 ? "0" : String(index + 1)
+          // A ring or checkmark takes the number's place while its agent has news.
+          labelVisible: agent === ""
           opacity: focused ? 1 : 0.55
           // The shown tab glows instead of being replaced by a filled square.
           layer.enabled: focused
@@ -194,6 +233,12 @@ BarWidget {
           fixedWidth: Style.space(20)
           fixedHeight: tabGroup.height
           onPressed: root.focusMember(index + 1)
+
+          AgentMark {
+            anchors.centerIn: parent
+            agent: tab.agent
+            tint: root.bar ? root.bar.barForeground : Color.foreground
+          }
         }
       }
     }
