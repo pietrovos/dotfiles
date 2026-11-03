@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Hyprland
@@ -21,9 +22,12 @@ BarWidget {
   property int focusedId: 0
   property bool refreshPending: false
   property bool tvKeys: false
+  // Workspace id -> "running" or "done", from the marks agent-status leaves.
+  property var agentStates: ({})
 
   readonly property string stateDir: (Quickshell.env("XDG_STATE_HOME") || (Quickshell.env("HOME") + "/.local/state")) + "/omarchy"
   readonly property string tvKeysPath: stateDir + "/tv-workspace-keys"
+  readonly property string agentsDir: stateDir + "/agent-marks"
 
   // The ten workspaces the number keys currently reach.
   readonly property var visibleIds: tvKeys
@@ -54,18 +58,20 @@ BarWidget {
 
   function applyState(text) {
     var parts = String(text).split("@@@")
-    if (parts.length < 2) return
+    if (parts.length < 4) return
 
     var active
     var list
+    var clients
     try {
       active = JSON.parse(parts[0].trim())
       list = JSON.parse(parts[1].trim())
+      clients = JSON.parse(parts[2].trim())
     } catch (error) {
       return
     }
 
-    if (!active || !Array.isArray(list)) return
+    if (!active || !Array.isArray(list) || !Array.isArray(clients)) return
 
     var occupied = {}
     for (var i = 0; i < list.length; i++) {
@@ -75,6 +81,32 @@ BarWidget {
 
     root.occupiedIds = occupied
     root.focusedId = (active.id > 0 && active.id <= 20) ? active.id : 0
+
+    // A running agent wins over a finished one on the same workspace. A
+    // checkmark clears once its window is the shown tab on the focused
+    // workspace, like the completion notification.
+    var windows = {}
+    for (var c = 0; c < clients.length; c++) windows[clients[c].address] = clients[c]
+
+    var agents = {}
+    var lines = parts[3].trim().split("\n")
+    for (var l = 0; l < lines.length; l++) {
+      var fields = lines[l].trim().split(" ")
+      var window = windows[fields[0]]
+      if (!window || (fields[1] !== "running" && fields[1] !== "done")) continue
+
+      var workspace = window.workspace.id
+      if (fields[1] === "done" && window.visible && workspace === active.id) {
+        root.clearAgent(fields[0])
+        continue
+      }
+      if (agents[workspace] !== "running") agents[workspace] = fields[1]
+    }
+    root.agentStates = agents
+  }
+
+  function clearAgent(address) {
+    if (root.bar) root.bar.run("rm -f " + Util.shellQuote(root.agentsDir + "/" + address))
   }
 
   function focusWorkspace(id) {
@@ -106,7 +138,7 @@ BarWidget {
 
   Process {
     id: stateProc
-    command: ["sh", "-c", "hyprctl -j activeworkspace; printf '\\n@@@\\n'; hyprctl -j workspaces"]
+    command: ["sh", "-c", "hyprctl -j activeworkspace; printf '\\n@@@\\n'; hyprctl -j workspaces; printf '\\n@@@\\n'; hyprctl -j clients; printf '\\n@@@\\n'; for mark in \"$1\"/0x*; do [ -f \"$mark\" ] && printf '%s %s\\n' \"${mark##*/}\" \"$(cat \"$mark\")\"; done; true", "sh", root.agentsDir]
 
     onRunningChanged: {
       if (!running && root.refreshPending) root.refresh()
@@ -125,6 +157,14 @@ BarWidget {
     printErrors: false
     onFileChanged: reload()
     onLoaded: root.tvKeys = text().trim() === "1"
+  }
+
+  // Touched by agent-status whenever an agent starts or finishes.
+  FileView {
+    path: root.agentsDir + "/changed"
+    watchChanges: true
+    printErrors: false
+    onFileChanged: root.refresh()
   }
 
   Component.onCompleted: root.refresh()
@@ -164,17 +204,43 @@ BarWidget {
 
         readonly property bool occupied: root.occupiedIds[modelData] === true
         readonly property bool focused: root.focusedId === modelData
+        readonly property string agent: root.agentStates[modelData] || ""
 
         implicitWidth: button.implicitWidth
         implicitHeight: button.implicitHeight
         opacity: occupied || focused ? 1 : 0.5
+        // The focused workspace glows instead of being replaced by a filled square.
+        layer.enabled: focused
+        layer.effect: Item {
+          id: glow
+          property var source
+          // Stacked shadows: one MultiEffect shadow tops out at full opacity.
+          Repeater {
+            model: 3
+            MultiEffect {
+              anchors.fill: parent
+              source: glow.source
+              shadowEnabled: true
+              shadowColor: root.bar ? root.bar.barForeground : Color.foreground
+              shadowBlur: 1.0
+              blurMax: 32
+              shadowScale: 1.2
+              autoPaddingEnabled: false
+              paddingRect: Qt.rect(48, 48, 48, 48)
+              shadowOpacity: 1
+              shadowHorizontalOffset: 0
+              shadowVerticalOffset: 0
+            }
+          }
+        }
 
         WidgetButton {
           id: button
           anchors.fill: parent
           bar: root.bar
           text: String(slot.modelData % 10)
-          labelVisible: !slot.focused
+          // A ring or checkmark takes the number's place while an agent has news.
+          labelVisible: slot.agent === "" || root.vertical
           horizontalMargin: 6
           verticalPadding: 6
           fixedWidth: root.vertical ? root.barSize : Style.space(20)
@@ -182,13 +248,12 @@ BarWidget {
           onPressed: function() { root.focusWorkspace(slot.modelData) }
         }
 
-        // The focused workspace shows a dimmed ring in place of its number, with
-        // a bright point and fading tail travelling around it. The light stays
-        // inside the ring's outline: a blurred glow spilled past it.
+        // An agent at work: a dimmed ring with a bright point and fading tail
+        // travelling around it, kept inside the ring's outline.
         Item {
           id: marker
           readonly property color tint: root.bar ? root.bar.barForeground : Color.foreground
-          visible: slot.focused && !root.vertical
+          visible: slot.agent === "running" && !root.vertical
           anchors.centerIn: parent
           width: 13
           height: 13
@@ -235,6 +300,32 @@ BarWidget {
               ctx.arc(width / 2, height / 2, r, 0, 2 * Math.PI)
               ctx.stroke()
             }
+          }
+        }
+
+        // The agent finished: a checkmark until its window is looked at.
+        Canvas {
+          id: check
+          readonly property color tint: root.bar ? root.bar.barForeground : Color.foreground
+          visible: slot.agent === "done" && !root.vertical
+          anchors.centerIn: parent
+          width: 13
+          height: 13
+          antialiasing: true
+          onTintChanged: requestPaint()
+
+          onPaint: {
+            var ctx = getContext("2d")
+            ctx.reset()
+            ctx.strokeStyle = tint
+            ctx.lineWidth = 2
+            ctx.lineCap = "round"
+            ctx.lineJoin = "round"
+            ctx.beginPath()
+            ctx.moveTo(2, 7)
+            ctx.lineTo(5.5, 10.5)
+            ctx.lineTo(11, 3)
+            ctx.stroke()
           }
         }
       }

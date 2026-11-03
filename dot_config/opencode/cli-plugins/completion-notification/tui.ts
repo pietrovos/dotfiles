@@ -95,6 +95,11 @@ async function notify(window: HyprClient | undefined, title: string, body?: stri
   }
 }
 
+// Ring or checkmark on this window's workspace in the bar (pietrovos.workspaces).
+function markAgent(state: "running" | "done") {
+  void output([`${process.env.HOME}/.local/bin/agent-status`, state, String(process.pid)])
+}
+
 function describe(window: HyprClient | undefined) {
   const workspace = window?.workspace.name || String(window?.workspace.id || "unknown")
   const tab = window && window.grouped.length > 1
@@ -119,6 +124,7 @@ export default Plugin.define({
     const finished = async (sessionID: string) => {
       if (!running.delete(sessionID) && !shown(sessionID)) return
       if (!isRoot(sessionID)) return
+      markAgent("done")
       try {
         const window = await windowForProcess()
         if (await isOnScreen(window)) return
@@ -130,7 +136,9 @@ export default Plugin.define({
 
     const dispose = [
       context.data.on("session.execution.started", (event) => {
-        if (shown(event.data.sessionID)) running.add(event.data.sessionID)
+        if (!shown(event.data.sessionID)) return
+        running.add(event.data.sessionID)
+        if (isRoot(event.data.sessionID)) markAgent("running")
       }),
       context.data.on("session.execution.succeeded", (event) => void finished(event.data.sessionID)),
       context.data.on("session.execution.failed", (event) => void finished(event.data.sessionID)),

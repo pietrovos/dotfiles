@@ -7,6 +7,11 @@
             "type": "command",
             "command": "~/.claude/hooks/notify.sh finished",
             "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "~/.local/bin/agent-status done",
+            "timeout": 10
           }
         ]
       }
@@ -30,6 +35,28 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/notify.sh question",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.local/bin/agent-status running",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.local/bin/agent-status clear",
             "timeout": 10
           }
         ]
