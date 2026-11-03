@@ -190,8 +190,8 @@ BarWidget {
           readonly property color tint: root.bar ? root.bar.barForeground : Color.foreground
           visible: slot.focused && !root.vertical
           anchors.centerIn: parent
-          width: 12
-          height: 12
+          width: 13
+          height: 13
           onTintChanged: halo.requestPaint()
 
           // Drawn at 3x and scaled down so it stays crisp at this size.
@@ -215,20 +215,20 @@ BarWidget {
 
             onPaint: {
               var ctx = getContext("2d")
-              var line = 4.5
+              var line = 6
               var r = width / 2 - line / 2
               var tint = marker.tint
               ctx.reset()
               ctx.lineWidth = line
 
-              ctx.strokeStyle = Qt.rgba(tint.r, tint.g, tint.b, 0.4)
+              ctx.strokeStyle = Qt.rgba(tint.r, tint.g, tint.b, 0.3)
               ctx.beginPath()
               ctx.arc(width / 2, height / 2, r, 0, 2 * Math.PI)
               ctx.stroke()
 
               var comet = ctx.createConicalGradient(width / 2, height / 2, 0)
               comet.addColorStop(0, Qt.rgba(tint.r, tint.g, tint.b, 1))
-              comet.addColorStop(0.35, Qt.rgba(tint.r, tint.g, tint.b, 0))
+              comet.addColorStop(0.45, Qt.rgba(tint.r, tint.g, tint.b, 0))
               comet.addColorStop(1, Qt.rgba(tint.r, tint.g, tint.b, 0))
               ctx.strokeStyle = comet
               ctx.beginPath()
