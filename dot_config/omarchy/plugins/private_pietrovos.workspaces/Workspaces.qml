@@ -1,7 +1,5 @@
 import QtQuick
-import QtQuick.Effects
 import QtQuick.Layouts
-import QtQuick.Shapes
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
@@ -26,14 +24,6 @@ BarWidget {
 
   readonly property string stateDir: (Quickshell.env("XDG_STATE_HOME") || (Quickshell.env("HOME") + "/.local/state")) + "/omarchy"
   readonly property string tvKeysPath: stateDir + "/tv-workspace-keys"
-
-  // Centre of the focused number, where the ring heads.
-  readonly property real markerX: {
-    var index = visibleIds.indexOf(focusedId)
-    var item = buttons.count > 0 && index >= 0 ? buttons.itemAt(index) : null
-    return item ? item.x + item.width / 2 : -1
-  }
-  readonly property bool markerShown: markerX >= 0 && !vertical
 
   // The ten workspaces the number keys currently reach.
   readonly property var visibleIds: tvKeys
@@ -175,30 +165,15 @@ BarWidget {
         bar: root.bar
         text: String(modelData % 10)
         opacity: occupied || focused ? 1 : 0.5
-        // The Sharingan behind it marks the focused workspace; the glow's halo
-        // ringed it in grey.
-        layer.enabled: false
-        layer.effect: Item {
-          id: glow
-          property var source
-          // Stacked shadows: one MultiEffect shadow tops out at full opacity.
-          Repeater {
-            model: 3
-            MultiEffect {
-              anchors.fill: parent
-              source: glow.source
-              shadowEnabled: true
-              shadowColor: root.bar ? root.bar.barForeground : Color.foreground
-              shadowBlur: 1.0
-              blurMax: 32
-              shadowScale: 1.2
-              autoPaddingEnabled: false
-              paddingRect: Qt.rect(48, 48, 48, 48)
-              shadowOpacity: 1
-              shadowHorizontalOffset: 0
-              shadowVerticalOffset: 0
-            }
-          }
+        // The focused workspace shows a Sharingan in place of its number: the
+        // eye fades in as the number fades out, and back when focus moves on.
+        readonly property color labelColor: root.bar ? root.bar.barForeground : Color.foreground
+        foreground: Qt.rgba(labelColor.r, labelColor.g, labelColor.b, 1 - eye.level)
+
+        Sharingan {
+          id: eye
+          z: -1
+          lit: parent.focused && !root.vertical
         }
         horizontalMargin: 6
         verticalPadding: 6
@@ -209,19 +184,19 @@ BarWidget {
     }
   }
 
-  // A slowly spinning Sharingan behind the focused number that slides to the
-  // next one. It eases one frame at a time with each frame counted as at most
-  // 1/60s: switching workspaces can stall the bar for ~100ms, and a timed
-  // animation skipped most of a slide during that stall.
-  Item {
+  // A slowly spinning Sharingan that fades in while lit and out when not. The
+  // fade eases one frame at a time with each frame counted as at most 1/60s:
+  // switching workspaces can stall the bar for ~100ms, and a timed animation
+  // skipped most of its motion during that stall.
+  component Sharingan: Item {
     id: ring
-    property real centerX: -1
-    visible: root.markerShown
-    z: -1
-    height: root.height - 6
+    property bool lit: false
+    property real level: 0
+    visible: level > 0
+    opacity: level
+    anchors.centerIn: parent
+    height: parent.height - 6
     width: height
-    x: centerX - width / 2
-    y: (root.height - height) / 2
 
     // Theme colours: the iris is the accent, the rim, pupil and tomoe the bar
     // background, so it follows theme changes.
@@ -256,7 +231,7 @@ BarWidget {
         ctx.translate(r, r)
 
         var iris = ctx.createRadialGradient(0, 0, r * 0.1, 0, 0, r)
-        // Darker in the middle so the number on top stays readable.
+        // Darker toward the pupil.
         iris.addColorStop(0, Qt.darker(ring.irisColor, 1.7))
         iris.addColorStop(1, ring.irisColor)
         ctx.fillStyle = iris
@@ -304,14 +279,11 @@ BarWidget {
     }
 
     FrameAnimation {
-      running: root.markerShown && ring.centerX !== root.markerX
+      running: ring.level !== (ring.lit ? 1 : 0)
       onTriggered: {
-        var gap = root.markerX - ring.centerX
-        if (ring.centerX < 0 || Math.abs(gap) < 0.3) {
-          ring.centerX = root.markerX
-          return
-        }
-        ring.centerX += gap * (1 - Math.exp(-16 * Math.min(frameTime, 1 / 60)))
+        var target = ring.lit ? 1 : 0
+        var gap = target - ring.level
+        ring.level = Math.abs(gap) < 0.01 ? target : ring.level + gap * (1 - Math.exp(-12 * Math.min(frameTime, 1 / 60)))
       }
     }
   }

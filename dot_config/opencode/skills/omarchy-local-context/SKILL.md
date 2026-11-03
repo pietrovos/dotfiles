@@ -218,13 +218,19 @@ from Omarchy defaults when these files can be inspected.
   refreshed on occupancy/focus Hyprland events (including `changeworkspaceid`)
   and a 5s safety poll, so the bar greys out the emptied source number the
   moment a swap lands.
-- `pietrovos.workspaces` puts a slowly spinning Sharingan (Canvas drawn at 3x
-  and scaled to 1/3 for crispness; red radial iris, black rim, pupil, faint
-  ring and three tomoe; `RotationAnimator` 4s per turn; `root.height - 6`)
-  behind the focused number, sliding between numbers with the frame-capped
-  easing. The focused number's glow is off (`layer.enabled: false`), since its
-  halo ringed the eye in grey. It replaced a static oval ring, which replaced
-  a 2px underline (2026-11-02); a spinning 270-degree ring was rejected too.
+- `pietrovos.workspaces` replaces the focused number with a slowly spinning
+  Sharingan (the label's `foreground` alpha is `1 - eye.level`, so the number
+  fades out as the eye fades in): an inline `component Sharingan` in every button (Canvas drawn at 3x,
+  scaled 1/3; `RotationAnimator` 4s per turn; `parent.height - 6`). Colours
+  follow the theme: iris `Color.accent` (darker 1.7x at the centre), rim/pupil/tomoe `Color.bar.background`; it repaints
+  when they change. On a switch it fades out on the old number while fading in
+  on the new one (user rejected sliding), via a `FrameAnimation` easing
+  `level` with frames capped at 1/60s. The old glow is gone. It replaced a
+  static oval ring and a 2px underline (2026-11-02).
+- `~/.config/hypr/hyprland.lua` sets `QSG_RENDER_LOOP=threaded`. Qt chose the
+  basic loop, which renders the three bar windows in turn on one thread and
+  held bar animations to ~39fps on the 240Hz MSI; threaded measured ~239fps
+  (gpu-screen-recorder `-fm content` on DP-2, per-frame md5 of the bar crop).
 - `pietrovos.workspaces` always shows ten numbers (empty ones dimmed): 1–10,
   or 11–20 while the number keys are on the TV.
   A hide-empty-workspaces variant was tried and reverted (2026-10-26).
