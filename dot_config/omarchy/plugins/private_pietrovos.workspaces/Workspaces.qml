@@ -156,122 +156,41 @@ BarWidget {
       id: buttons
       model: root.visibleIds
 
-      WidgetButton {
+      // WidgetButton fades its opacity and label colour, so dimming happens on
+      // this plain wrapper and the focused number is hidden outright: both snap.
+      Item {
+        id: slot
         required property int modelData
 
         readonly property bool occupied: root.occupiedIds[modelData] === true
         readonly property bool focused: root.focusedId === modelData
 
-        bar: root.bar
-        text: String(modelData % 10)
+        implicitWidth: button.implicitWidth
+        implicitHeight: button.implicitHeight
         opacity: occupied || focused ? 1 : 0.5
-        // The focused workspace shows a Sharingan in place of its number: the
-        // eye fades in as the number fades out, and back when focus moves on.
-        readonly property color labelColor: root.bar ? root.bar.barForeground : Color.foreground
-        foreground: Qt.rgba(labelColor.r, labelColor.g, labelColor.b, 1 - eye.level)
 
-        Sharingan {
-          id: eye
-          z: -1
-          lit: parent.focused && !root.vertical
+        WidgetButton {
+          id: button
+          anchors.fill: parent
+          bar: root.bar
+          text: String(slot.modelData % 10)
+          // The focused workspace shows a dot in place of its number.
+          labelVisible: !slot.focused
+          horizontalMargin: 6
+          verticalPadding: 6
+          fixedWidth: root.vertical ? root.barSize : Style.space(20)
+          fixedHeight: root.barSize
+          onPressed: function() { root.focusWorkspace(slot.modelData) }
         }
-        horizontalMargin: 6
-        verticalPadding: 6
-        fixedWidth: root.vertical ? root.barSize : Style.space(20)
-        fixedHeight: root.barSize
-        onPressed: function() { root.focusWorkspace(modelData) }
-      }
-    }
-  }
 
-  // A static Sharingan that fades in while lit and out when not. The
-  // fade eases one frame at a time with each frame counted as at most 1/60s:
-  // switching workspaces can stall the bar for ~100ms, and a timed animation
-  // skipped most of its motion during that stall.
-  component Sharingan: Item {
-    id: ring
-    property bool lit: false
-    property real level: 0
-    visible: level > 0
-    opacity: level
-    anchors.centerIn: parent
-    height: parent.height - 14
-    width: height
-
-    // Theme colours: the iris is the bar's text colour at full strength, the
-    // rim, pupil and tomoe the bar background, so it stays crisp on any theme.
-    readonly property color irisColor: Color.bar.text
-    readonly property color inkColor: Color.bar.background
-    onIrisColorChanged: eye.requestPaint()
-    onInkColorChanged: eye.requestPaint()
-
-    // Drawn at 3x and scaled down so it stays crisp at this size.
-    Canvas {
-      id: eye
-      anchors.centerIn: parent
-      width: parent.width * 3
-      height: parent.height * 3
-      scale: 1 / 3
-      smooth: true
-      antialiasing: true
-      onWidthChanged: requestPaint()
-
-      onPaint: {
-        var ctx = getContext("2d")
-        var r = width / 2
-        ctx.reset()
-        ctx.translate(r, r)
-
-        ctx.fillStyle = ring.irisColor
-        ctx.beginPath()
-        ctx.arc(0, 0, r - 2, 0, 2 * Math.PI)
-        ctx.fill()
-        ctx.strokeStyle = ring.inkColor
-        ctx.lineWidth = 4
-        ctx.stroke()
-
-        // The faint ring the tomoe ride on.
-        ctx.lineWidth = 1.5
-        ctx.beginPath()
-        ctx.arc(0, 0, r * 0.58, 0, 2 * Math.PI)
-        ctx.stroke()
-
-        ctx.fillStyle = ring.inkColor
-        ctx.beginPath()
-        ctx.arc(0, 0, r * 0.2, 0, 2 * Math.PI)
-        ctx.fill()
-
-        // Three tomoe: a round head with a thin tail curling back along the ring.
-        var head = r * 0.16
-        for (var i = 0; i < 3; i++) {
-          var angle = i * 2 * Math.PI / 3 - Math.PI / 2
-          var cx = Math.cos(angle) * r * 0.58
-          var cy = Math.sin(angle) * r * 0.58
-          var nx = Math.cos(angle), ny = Math.sin(angle)
-          var tx = -ny, ty = nx
-
-          ctx.beginPath()
-          ctx.arc(cx, cy, head, 0, 2 * Math.PI)
-          ctx.fill()
-
-          ctx.beginPath()
-          ctx.moveTo(cx + nx * head, cy + ny * head)
-          ctx.quadraticCurveTo(cx + nx * head * 0.9 - tx * head * 1.8, cy + ny * head * 0.9 - ty * head * 1.8,
-                               cx - tx * head * 3.4 + nx * head * 0.9, cy - ty * head * 3.4 + ny * head * 0.9)
-          ctx.quadraticCurveTo(cx - tx * head * 1.6 + nx * head * 0.15, cy - ty * head * 1.6 + ny * head * 0.15,
-                               cx - tx * head * 0.6 - nx * head * 0.8, cy - ty * head * 0.6 - ny * head * 0.8)
-          ctx.closePath()
-          ctx.fill()
+        Rectangle {
+          visible: slot.focused && !root.vertical
+          anchors.centerIn: parent
+          width: 8
+          height: 8
+          radius: 4
+          color: root.bar ? root.bar.barForeground : Color.foreground
         }
-      }
-    }
-
-    FrameAnimation {
-      running: ring.level !== (ring.lit ? 1 : 0)
-      onTriggered: {
-        var target = ring.lit ? 1 : 0
-        var gap = target - ring.level
-        ring.level = Math.abs(gap) < 0.01 ? target : ring.level + gap * (1 - Math.exp(-12 * Math.min(frameTime, 1 / 60)))
       }
     }
   }

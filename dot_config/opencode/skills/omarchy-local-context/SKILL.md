@@ -218,17 +218,12 @@ from Omarchy defaults when these files can be inspected.
   refreshed on occupancy/focus Hyprland events (including `changeworkspaceid`)
   and a 5s safety poll, so the bar greys out the emptied source number the
   moment a swap lands.
-- `pietrovos.workspaces` replaces the focused number with a slowly spinning
-  Sharingan (the label's `foreground` alpha is `1 - eye.level`, so the number
-  fades out as the eye fades in): an inline `component Sharingan` in every button (Canvas drawn at 3x,
-  scaled 1/3; `RotationAnimator` 4s per turn; `parent.height - 6`). Colours
-  follow the theme: iris a flat `Color.bar.text`, rim/pupil/tomoe
-  `Color.bar.background` (an accent-coloured iris with a darkened centre
-  looked faded and was rejected: Monoiffy's accent is mid grey) it repaints
-  when they change. On a switch it fades out on the old number while fading in
-  on the new one (user rejected sliding), via a `FrameAnimation` easing
-  `level` with frames capped at 1/60s. The old glow is gone. It replaced a
-  static oval ring and a 2px underline (2026-11-02).
+- `pietrovos.workspaces` replaces the focused number with an 8px solid dot in
+  the bar text colour (the label's `foreground` goes transparent), switching
+  instantly. Rejected on 2026-11-02, in order: the glow alone, a sliding
+  underline, a static oval ring, and a Sharingan (spinning or static, accent or
+  text-coloured, any size) with a crossfade between numbers. The user dislikes
+  both the Sharingan and the fade animation; do not bring either back unasked.
 - `~/.config/hypr/hyprland.lua` sets `QSG_RENDER_LOOP=threaded`. Qt chose the
   basic loop, which renders the three bar windows in turn on one thread and
   held bar animations to ~39fps on the 240Hz MSI; threaded measured ~239fps
