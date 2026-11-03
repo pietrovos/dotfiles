@@ -225,13 +225,13 @@ if [[ -n ${marker} ]]; then
 fi
 filter=""
 
-# Esc and applying a theme both leave a position to come back to.
+# Esc and applying a theme both leave a position to come back to. Whatever was
+# typed is not part of it.
 if [[ -f ${resume} ]]; then
-  IFS=$'\t' read -r saved_view saved_selected saved_filter <"${resume}"
+  IFS=$'\t' read -r saved_view saved_selected <"${resume}"
   if [[ ${saved_view} == "folders" || -e ${covers}/${saved_view}.jpg ]]; then
     view=${saved_view}
     selected=${saved_selected}
-    filter=${saved_filter}
   fi
 fi
 
@@ -244,7 +244,9 @@ while true; do
 
   case "${action}" in
     exit)
-      printf '%s\t%s\t%s\n' "${view}" "${picked}" "${filter}" >"${resume}"
+      # With no matches nothing is selected, so keep the item it opened on.
+      [[ -e ${picked} ]] || picked=${selected}
+      printf '%s\t%s\n' "${view}" "${picked}" >"${resume}"
       exit 0
       ;;
     back)
@@ -256,7 +258,7 @@ while true; do
       choice=${picked##*/}
       choice=${choice%.*}
       if [[ ${view} != "folders" ]]; then
-        printf '%s\t%s\t%s\n' "${view}" "${picked}" "${filter}" >"${resume}"
+        printf '%s\t%s\n' "${view}" "${picked}" >"${resume}"
         exec 9>&-
         exec omarchy-theme-set "${choice}"
       elif [[ ${choice} == "Organize" ]]; then

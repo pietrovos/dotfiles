@@ -151,7 +151,7 @@ Item {
   }
 
   // Reports "<action>\t<path>\t<filter>", so theme-folders can tell apply, back
-  // and exit apart and reopen exactly where the picker was left.
+  // and exit apart and reopen on the item the picker was left at.
   function finishWith(action) {
     var path = currentPath()
     if (!selectionFile || (action === "apply" && !path)) {
