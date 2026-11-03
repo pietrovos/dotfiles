@@ -219,8 +219,11 @@ from Omarchy defaults when these files can be inspected.
   and a 5s safety poll, so the bar greys out the emptied source number the
   moment a swap lands.
 - `pietrovos.workspaces` replaces the focused number with an 8px solid dot in
-  the bar text colour (the label's `foreground` goes transparent), switching
-  instantly. Rejected on 2026-11-02, in order: the glow alone, a sliding
+  the bar text colour, and every change snaps. Stock `WidgetButton` fades its
+  own `opacity` (140ms) and label `color` (160ms) and neither can be disabled
+  from outside, so each number is a plain `Item` wrapper that carries the
+  occupied/empty dimming, with the button inside and `labelVisible: false`
+  for the focused one (a transparent `foreground` faded). Rejected on 2026-11-02, in order: the glow alone, a sliding
   underline, a static oval ring, and a Sharingan (spinning or static, accent or
   text-coloured, any size) with a crossfade between numbers. The user dislikes
   both the Sharingan and the fade animation; do not bring either back unasked.
