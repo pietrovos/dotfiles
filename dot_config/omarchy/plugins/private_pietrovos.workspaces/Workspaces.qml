@@ -26,15 +26,13 @@ BarWidget {
   readonly property string stateDir: (Quickshell.env("XDG_STATE_HOME") || (Quickshell.env("HOME") + "/.local/state")) + "/omarchy"
   readonly property string tvKeysPath: stateDir + "/tv-workspace-keys"
 
-  // How the focused workspace is marked: "dot", "orbit" or "underline".
-  property string marker: "dot"
+  // Centre of the focused number, where the underline heads.
   readonly property real markerX: {
     var index = visibleIds.indexOf(focusedId)
     var item = buttons.count > 0 && index >= 0 ? buttons.itemAt(index) : null
     return item ? item.x + item.width / 2 : -1
   }
   readonly property bool markerShown: markerX >= 0 && !vertical
-  onMarkerXChanged: console.log("MARKERDBG markerX", markerX, "focused", focusedId)
 
   // The ten workspaces the number keys currently reach.
   readonly property var visibleIds: tvKeys
@@ -138,17 +136,6 @@ BarWidget {
     onLoaded: root.tvKeys = text().trim() === "1"
   }
 
-  FileView {
-    path: root.stateDir + "/workspace-marker"
-    watchChanges: true
-    printErrors: false
-    onFileChanged: reload()
-    onLoaded: {
-      var value = text().trim()
-      root.marker = ["dot", "orbit", "underline"].indexOf(value) !== -1 ? value : "dot"
-    }
-  }
-
   Component.onCompleted: root.refresh()
 
   readonly property real trailingGap: root.vertical ? 0 : Style.spaceReal(1.5)
@@ -220,64 +207,31 @@ BarWidget {
     }
   }
 
-  readonly property color markerColor: root.bar ? root.bar.barForeground : Color.foreground
-
-  // A dot under the number that bobs, and glides to the next workspace.
+  // A short line under the focused number that slides to the next one. It eases
+  // one frame at a time with each frame counted as at most 1/60s: switching
+  // workspaces can stall the bar for ~100ms, and a timed animation skipped
+  // most of a downward slide during that stall.
   Rectangle {
-    id: dot
-    property real bob: 0
-    visible: root.markerShown && root.marker === "dot"
-    width: 4
-    height: 4
-    radius: 2
-    color: root.markerColor
-    x: root.markerX - width / 2
-    y: root.height - 7 + bob
-    Behavior on x { NumberAnimation { duration: 260; easing.type: Easing.OutCubic } }
-    SequentialAnimation on bob {
-      running: dot.visible
-      loops: Animation.Infinite
-      NumberAnimation { to: -2.5; duration: 700; easing.type: Easing.InOutSine }
-      NumberAnimation { to: 0; duration: 700; easing.type: Easing.InOutSine }
-    }
-  }
-
-  // A dot circling the number.
-  Item {
-    id: orbit
-    property real angle: 0
-    visible: root.markerShown && root.marker === "orbit"
-    x: root.markerX
-    y: root.height / 2
-    Behavior on x { NumberAnimation { duration: 260; easing.type: Easing.OutCubic } }
-    NumberAnimation on angle {
-      running: orbit.visible
-      loops: Animation.Infinite
-      from: 0
-      to: 2 * Math.PI
-      duration: 2400
-    }
-
-    Rectangle {
-      width: 3
-      height: 3
-      radius: 1.5
-      color: root.markerColor
-      x: 11 * Math.cos(orbit.angle) - width / 2
-      y: 10 * Math.sin(orbit.angle) - height / 2
-    }
-  }
-
-  // A short line under the number that slides to the next workspace.
-  Rectangle {
-    visible: root.markerShown && root.marker === "underline"
-    onXChanged: console.log("MARKERDBG ux", x.toFixed(1))
+    id: underline
+    property real centerX: -1
+    visible: root.markerShown
     width: 12
     height: 2
     radius: 1
-    color: root.markerColor
-    x: root.markerX - width / 2
+    color: root.bar ? root.bar.barForeground : Color.foreground
+    x: centerX - width / 2
     y: root.height - 5
-    Behavior on x { NumberAnimation { duration: 260; easing.type: Easing.OutCubic } }
+
+    FrameAnimation {
+      running: root.markerShown && underline.centerX !== root.markerX
+      onTriggered: {
+        var gap = root.markerX - underline.centerX
+        if (underline.centerX < 0 || Math.abs(gap) < 0.3) {
+          underline.centerX = root.markerX
+          return
+        }
+        underline.centerX += gap * (1 - Math.exp(-16 * Math.min(frameTime, 1 / 60)))
+      }
+    }
   }
 }

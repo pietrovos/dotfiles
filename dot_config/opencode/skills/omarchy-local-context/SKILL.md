@@ -140,13 +140,15 @@ from Omarchy defaults when these files can be inspected.
   a visible box; asymmetric padding (e.g. 96 right/bottom) pushed the scaled
   glow off-centre toward the bottom-right.
 - `pietrovos.workspaces` keeps its steady glow (occupied 100%, empty 50%) and
-  adds a moving marker on the focused workspace, chosen by the machine-local
-  `$XDG_STATE_HOME/omarchy/workspace-marker` (watched live, default `dot`):
-  `dot` bobs under the number, `orbit` circles it, `underline` sits under it;
-  all glide to the new workspace on switch (260ms OutCubic). Rejected on
-  2026-11-02: dimming occupied to 65%/empty 30% with a bigger focused number
-  (ugly), and a pulsing glow (user wanted something moving around it).
-  Edits to this mounted widget need `omarchy restart shell`.
+  draws a 12x2 underline under the focused number that slides to the next one.
+  `pietrovos.group-tabs` widens and fades in (and out) via a `reveal` 0..1,
+  drawing retained `shownMembers`/`shownName` so its tabs survive the fade-out.
+  Both ease with a `FrameAnimation` (exponential, each frame capped at 1/60s),
+  not a timed Behavior: workspace switches stall the bar ~100ms, which made a
+  timed OutCubic slide skip most of its motion (looked like no slide going
+  down). Rejected on 2026-11-02: dimming occupied/empty with a bigger focused
+  number, a pulsing glow, a bobbing dot and an orbiting dot.
+  Edits to these mounted widgets need `omarchy restart shell`.
 - The subspace widget has a single rounded, 1px border around its numbered
   tabs and optional name, using the bar foreground color at 50% opacity.
 - The widget is placed after `pietrovos.workspaces` in

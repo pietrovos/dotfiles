@@ -18,7 +18,24 @@ BarWidget {
 
   readonly property string stateDir: (Quickshell.env("XDG_STATE_HOME") || (Quickshell.env("HOME") + "/.local/state")) + "/omarchy"
   readonly property string namesPath: stateDir + "/group-subspaces.json"
-  readonly property real labelGap: subspaceName !== "" ? Style.spaceReal(-1) : 0
+  readonly property real labelGap: shownName !== "" ? Style.spaceReal(-1) : 0
+
+  // What is drawn, kept through the fade-out after the group goes away.
+  property var shownMembers: []
+  property string shownName: ""
+  // 0 hidden, 1 fully open: the widget widens and fades in from nothing. It
+  // eases one frame at a time with each frame counted as at most 1/60s, since
+  // it opens on workspace switches, which can stall the bar for ~100ms.
+  property real reveal: 0
+  readonly property real revealTarget: members.length > 0 && !vertical ? 1 : 0
+
+  FrameAnimation {
+    running: root.reveal !== root.revealTarget
+    onTriggered: {
+      var gap = root.revealTarget - root.reveal
+      root.reveal = Math.abs(gap) < 0.005 ? root.revealTarget : root.reveal + gap * (1 - Math.exp(-14 * Math.min(frameTime, 1 / 60)))
+    }
+  }
 
   function refresh() {
     if (!groupProbe.running) groupProbe.running = true
@@ -38,6 +55,10 @@ BarWidget {
       var grouped = active.grouped || []
       members = grouped
       activeIndex = grouped.indexOf(active.address)
+      if (grouped.length > 0) {
+        shownMembers = grouped
+        shownName = subspaceName
+      }
     } catch (error) {
       members = []
       activeIndex = -1
@@ -51,8 +72,10 @@ BarWidget {
     root.bar.run("/home/pietrovos/.config/hypr/select-group-window " + index)
   }
 
-  visible: members.length > 0 && !vertical
-  implicitWidth: visible ? leadingGap + tabGroup.implicitWidth + labelGap + labelBox.implicitWidth : 0
+  visible: reveal > 0
+  opacity: reveal
+  clip: reveal < 1
+  implicitWidth: visible ? (leadingGap + tabGroup.implicitWidth + labelGap + labelBox.implicitWidth) * reveal : 0
   implicitHeight: root.barSize
 
   Process {
@@ -130,11 +153,11 @@ BarWidget {
     GridLayout {
       id: grid
       anchors.centerIn: parent
-      columns: root.members.length
+      columns: root.shownMembers.length
       columnSpacing: Style.space(1)
 
       Repeater {
-        model: root.members
+        model: root.shownMembers
 
         WidgetButton {
           readonly property bool focused: index === root.activeIndex
@@ -178,7 +201,7 @@ BarWidget {
 
   Item {
     id: labelBox
-    visible: root.subspaceName !== ""
+    visible: root.shownName !== ""
     x: tabGroup.x + tabGroup.width + root.labelGap
     anchors.verticalCenter: parent.verticalCenter
     implicitWidth: subspaceLabel.implicitWidth + Style.space(8)
@@ -197,7 +220,7 @@ BarWidget {
       id: subspaceLabel
       anchors.verticalCenter: parent.verticalCenter
       x: Style.space(4)
-      text: root.subspaceName
+      text: root.shownName
       color: root.bar ? root.bar.barForeground : Color.foreground
       opacity: 0.85
       font.family: Style.font.family
