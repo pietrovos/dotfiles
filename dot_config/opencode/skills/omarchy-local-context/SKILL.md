@@ -218,19 +218,33 @@ from Omarchy defaults when these files can be inspected.
   refreshed on occupancy/focus Hyprland events (including `changeworkspaceid`)
   and a 5s safety poll, so the bar greys out the emptied source number the
   moment a swap lands.
-- `pietrovos.workspaces` replaces the focused number with a 13px ring in the
-  bar text colour: a 2px outline at 30% with a bright comet (conical gradient,
-  full to clear over 45% of the turn) travelling round it, drawn on a 3x
-  Canvas spun by a `RotationAnimator` (1.6s per turn). The light must stay
-  inside the outline: a blurred MultiEffect spark glowed past it and was
-  rejected. An 8px solid dot came before it. Every change snaps. Stock `WidgetButton` fades its
-  own `opacity` (140ms) and label `color` (160ms) and neither can be disabled
-  from outside, so each number is a plain `Item` wrapper that carries the
-  occupied/empty dimming, with the button inside and `labelVisible: false`
-  for the focused one (a transparent `foreground` faded). Rejected on 2026-11-02, in order: the glow alone, a sliding
-  underline, a static oval ring, and a Sharingan (spinning or static, accent or
-  text-coloured, any size) with a crossfade between numbers. The user dislikes
-  both the Sharingan and the fade animation; do not bring either back unasked.
+- `pietrovos.workspaces` marks the focused workspace with its original glowing
+  number (the 3-shadow MultiEffect layer, now on each number's wrapper item).
+  Workspaces with a coding agent show agent state in place of the number: a
+  13px ring with a bright comet travelling inside its 2px outline while the
+  agent runs (3x Canvas, `RotationAnimator` 1.6s/turn), and a 2px checkmark
+  once it finishes, until its window is the shown tab on the focused
+  workspace (the bar then deletes the mark, matching the completion
+  notification). Running beats done on a shared workspace. Rejected for focus
+  on 2026-11-02: dimming, a pulsing glow, bobbing/orbiting dots, a sliding
+  underline, an oval ring, a Sharingan (any style), crossfades, a solid dot,
+  and the comet ring itself ("looks like a loading animation", hence agents).
+- Agent marks: `~/.local/bin/agent-status running|done|clear [pid]` walks up
+  from pid to the Hyprland window and writes `running`/`done` to
+  `$XDG_STATE_HOME/omarchy/agent-marks/<window address>`, pruning marks of
+  closed windows and touching `changed`, which the bar watches (plus its 5s
+  poll). Not `omarchy/agents`: that holds the Agents usage widget's `usage`.
+  Claude Code: `UserPromptSubmit` -> running, `Stop` -> done (beside
+  notify.sh), `SessionEnd` -> clear, in `~/.claude/settings.json`. OpenCode:
+  `markAgent()` in `cli-plugins/completion-notification/tui.ts` on root
+  `session.execution.started` and in `finished`. An interrupted Claude turn
+  fires no Stop hook, so its ring stays until the next prompt or session end.
+- Workspace number changes snap. Stock `WidgetButton` fades its own `opacity`
+  (140ms) and label `color` (160ms) and neither can be disabled from outside,
+  so each number is a plain `Item` wrapper carrying the occupied/empty dimming
+  and the glow, with the button inside; agent state hides the number through
+  `labelVisible` (a transparent `foreground` faded). The user dislikes fade
+  animations on the numbers and the Sharingan; do not bring either back unasked.
 - `~/.config/hypr/hyprland.lua` sets `QSG_RENDER_LOOP=threaded`. Qt chose the
   basic loop, which renders the three bar windows in turn on one thread and
   held bar animations to ~39fps on the 240Hz MSI; threaded measured ~239fps

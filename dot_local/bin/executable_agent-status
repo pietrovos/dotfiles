@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+# Marks the Hyprland window hosting a coding agent as running or done, for the
+# workspace bar (pietrovos.workspaces): a ring while it works, a checkmark once
+# it finishes. Called from Claude Code hooks and OpenCode's completion plugin.
+#
+# Usage: agent-status running|done|clear [pid]
+# The window is found by walking up from pid (default: the caller).
+
+state=${1:-}
+pid=${2:-$PPID}
+dir="${XDG_STATE_HOME:-${HOME}/.local/state}/omarchy/agent-marks"
+
+[[ ${state} == @(running|done|clear) ]] || exit 2
+mkdir -p "${dir}"
+clients=$(hyprctl clients -j 2>/dev/null) || exit 0
+
+address=""
+for _ in $(seq 1 10); do
+  address=$(jq -r --argjson pid "${pid}" 'map(select(.pid == $pid)) | first | .address // empty' <<<"${clients}")
+  [[ -n ${address} ]] && break
+  pid=$(ps -o ppid= -p "${pid}" 2>/dev/null | tr -d ' ')
+  [[ -z ${pid} || ${pid} -le 1 ]] && break
+done
+
+# Marks of windows that have since closed go with them.
+for mark in "${dir}"/0x*; do
+  [[ -e ${mark} ]] || continue
+  jq -e --arg address "${mark##*/}" 'any(.[]; .address == $address)' <<<"${clients}" >/dev/null || rm -f "${mark}"
+done
+
+[[ -n ${address} ]] || exit 0
+if [[ ${state} == clear ]]; then
+  rm -f "${dir}/${address}"
+else
+  printf '%s\n' "${state}" >"${dir}/${address}"
+fi
+
+# The bar watches this file to refresh straight away.
+date +%s%N >"${dir}/changed"
