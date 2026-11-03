@@ -222,7 +222,9 @@ from Omarchy defaults when these files can be inspected.
   Sharingan (the label's `foreground` alpha is `1 - eye.level`, so the number
   fades out as the eye fades in): an inline `component Sharingan` in every button (Canvas drawn at 3x,
   scaled 1/3; `RotationAnimator` 4s per turn; `parent.height - 6`). Colours
-  follow the theme: iris `Color.accent` (darker 1.7x at the centre), rim/pupil/tomoe `Color.bar.background`; it repaints
+  follow the theme: iris a flat `Color.bar.text`, rim/pupil/tomoe
+  `Color.bar.background` (an accent-coloured iris with a darkened centre
+  looked faded and was rejected: Monoiffy's accent is mid grey) it repaints
   when they change. On a switch it fades out on the old number while fading in
   on the new one (user rejected sliding), via a `FrameAnimation` easing
   `level` with frames capped at 1/60s. The old glow is gone. It replaced a

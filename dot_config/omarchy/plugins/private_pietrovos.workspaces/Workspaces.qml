@@ -184,7 +184,7 @@ BarWidget {
     }
   }
 
-  // A slowly spinning Sharingan that fades in while lit and out when not. The
+  // A static Sharingan that fades in while lit and out when not. The
   // fade eases one frame at a time with each frame counted as at most 1/60s:
   // switching workspaces can stall the bar for ~100ms, and a timed animation
   // skipped most of its motion during that stall.
@@ -195,12 +195,12 @@ BarWidget {
     visible: level > 0
     opacity: level
     anchors.centerIn: parent
-    height: parent.height - 6
+    height: parent.height - 14
     width: height
 
-    // Theme colours: the iris is the accent, the rim, pupil and tomoe the bar
-    // background, so it follows theme changes.
-    readonly property color irisColor: Color.accent
+    // Theme colours: the iris is the bar's text colour at full strength, the
+    // rim, pupil and tomoe the bar background, so it stays crisp on any theme.
+    readonly property color irisColor: Color.bar.text
     readonly property color inkColor: Color.bar.background
     onIrisColorChanged: eye.requestPaint()
     onInkColorChanged: eye.requestPaint()
@@ -216,25 +216,13 @@ BarWidget {
       antialiasing: true
       onWidthChanged: requestPaint()
 
-      RotationAnimator on rotation {
-        running: ring.visible
-        loops: Animation.Infinite
-        from: 0
-        to: 360
-        duration: 4000
-      }
-
       onPaint: {
         var ctx = getContext("2d")
         var r = width / 2
         ctx.reset()
         ctx.translate(r, r)
 
-        var iris = ctx.createRadialGradient(0, 0, r * 0.1, 0, 0, r)
-        // Darker toward the pupil.
-        iris.addColorStop(0, Qt.darker(ring.irisColor, 1.7))
-        iris.addColorStop(1, ring.irisColor)
-        ctx.fillStyle = iris
+        ctx.fillStyle = ring.irisColor
         ctx.beginPath()
         ctx.arc(0, 0, r - 2, 0, 2 * Math.PI)
         ctx.fill()
