@@ -175,8 +175,9 @@ BarWidget {
         bar: root.bar
         text: String(modelData % 10)
         opacity: occupied || focused ? 1 : 0.5
-        // The focused workspace glows instead of being replaced by a filled square.
-        layer.enabled: focused
+        // The Sharingan behind it marks the focused workspace; the glow's halo
+        // ringed it in grey.
+        layer.enabled: false
         layer.effect: Item {
           id: glow
           property var source
@@ -208,35 +209,87 @@ BarWidget {
     }
   }
 
-  // An oval ring around the focused number that slides to the next one. It
-  // eases one frame at a time with each frame counted as at most 1/60s:
-  // switching workspaces can stall the bar for ~100ms, and a timed animation
-  // skipped most of a slide during that stall.
+  // A slowly spinning Sharingan behind the focused number that slides to the
+  // next one. It eases one frame at a time with each frame counted as at most
+  // 1/60s: switching workspaces can stall the bar for ~100ms, and a timed
+  // animation skipped most of a slide during that stall.
   Item {
     id: ring
     property real centerX: -1
     visible: root.markerShown
-    height: root.height - 14
-    width: height * 1.4
+    z: -1
+    height: root.height - 6
+    width: height
     x: centerX - width / 2
     y: (root.height - height) / 2
 
-    Shape {
-      anchors.fill: parent
-      preferredRendererType: Shape.CurveRenderer
+    // Drawn at 3x and scaled down so it stays crisp at this size.
+    Canvas {
+      anchors.centerIn: parent
+      width: parent.width * 3
+      height: parent.height * 3
+      scale: 1 / 3
+      smooth: true
+      antialiasing: true
+      onWidthChanged: requestPaint()
 
-      ShapePath {
-        strokeColor: root.bar ? root.bar.barForeground : Color.foreground
-        strokeWidth: 1.5
-        fillColor: "transparent"
+      RotationAnimator on rotation {
+        running: ring.visible
+        loops: Animation.Infinite
+        from: 0
+        to: 360
+        duration: 4000
+      }
 
-        PathAngleArc {
-          centerX: ring.width / 2
-          centerY: ring.height / 2
-          radiusX: ring.width / 2 - 1
-          radiusY: ring.height / 2 - 1
-          startAngle: 0
-          sweepAngle: 360
+      onPaint: {
+        var ctx = getContext("2d")
+        var r = width / 2
+        ctx.reset()
+        ctx.translate(r, r)
+
+        var iris = ctx.createRadialGradient(0, 0, r * 0.1, 0, 0, r)
+        iris.addColorStop(0, "#e0262c")
+        iris.addColorStop(1, "#8c0d12")
+        ctx.fillStyle = iris
+        ctx.beginPath()
+        ctx.arc(0, 0, r - 2, 0, 2 * Math.PI)
+        ctx.fill()
+        ctx.strokeStyle = "#000000"
+        ctx.lineWidth = 4
+        ctx.stroke()
+
+        // The faint ring the tomoe ride on.
+        ctx.lineWidth = 1.5
+        ctx.beginPath()
+        ctx.arc(0, 0, r * 0.58, 0, 2 * Math.PI)
+        ctx.stroke()
+
+        ctx.fillStyle = "#000000"
+        ctx.beginPath()
+        ctx.arc(0, 0, r * 0.2, 0, 2 * Math.PI)
+        ctx.fill()
+
+        // Three tomoe: a round head with a thin tail curling back along the ring.
+        var head = r * 0.16
+        for (var i = 0; i < 3; i++) {
+          var angle = i * 2 * Math.PI / 3 - Math.PI / 2
+          var cx = Math.cos(angle) * r * 0.58
+          var cy = Math.sin(angle) * r * 0.58
+          var nx = Math.cos(angle), ny = Math.sin(angle)
+          var tx = -ny, ty = nx
+
+          ctx.beginPath()
+          ctx.arc(cx, cy, head, 0, 2 * Math.PI)
+          ctx.fill()
+
+          ctx.beginPath()
+          ctx.moveTo(cx + nx * head, cy + ny * head)
+          ctx.quadraticCurveTo(cx + nx * head * 0.9 - tx * head * 1.8, cy + ny * head * 0.9 - ty * head * 1.8,
+                               cx - tx * head * 3.4 + nx * head * 0.9, cy - ty * head * 3.4 + ny * head * 0.9)
+          ctx.quadraticCurveTo(cx - tx * head * 1.6 + nx * head * 0.15, cy - ty * head * 1.6 + ny * head * 0.15,
+                               cx - tx * head * 0.6 - nx * head * 0.8, cy - ty * head * 0.6 - ny * head * 0.8)
+          ctx.closePath()
+          ctx.fill()
         }
       }
     }

@@ -218,12 +218,13 @@ from Omarchy defaults when these files can be inspected.
   refreshed on occupancy/focus Hyprland events (including `changeworkspaceid`)
   and a 5s safety poll, so the bar greys out the emptied source number the
   moment a swap lands.
-- `pietrovos.workspaces` rings the focused number with a static oval (a
-  360-degree `PathAngleArc`, bar foreground, 1.5px; height `root.height - 14`,
-  width 1.4x that) that slides between numbers with the frame-capped easing
-  the old underline used. It replaced a 2px underline (2026-11-02); a spinning
-  270-degree ring was rejected as ugly, and a 1.5x-wide oval at `- 12`
-  touched the `TV` tag. The glow stays.
+- `pietrovos.workspaces` puts a slowly spinning Sharingan (Canvas drawn at 3x
+  and scaled to 1/3 for crispness; red radial iris, black rim, pupil, faint
+  ring and three tomoe; `RotationAnimator` 4s per turn; `root.height - 6`)
+  behind the focused number, sliding between numbers with the frame-capped
+  easing. The focused number's glow is off (`layer.enabled: false`), since its
+  halo ringed the eye in grey. It replaced a static oval ring, which replaced
+  a 2px underline (2026-11-02); a spinning 270-degree ring was rejected too.
 - `pietrovos.workspaces` always shows ten numbers (empty ones dimmed): 1–10,
   or 11–20 while the number keys are on the TV.
   A hide-empty-workspaces variant was tried and reverted (2026-10-26).
