@@ -164,11 +164,18 @@ BarWidget {
         bar: root.bar
         text: String(modelData % 10)
         opacity: occupied || focused ? 1 : 0.5
-        // The focused workspace glows instead of being replaced by a filled square.
+        // The focused workspace glows instead of being replaced by a filled square,
+        // and the glow breathes so it stands apart from the occupied ones.
         layer.enabled: focused
         layer.effect: Item {
           id: glow
           property var source
+          property real pulse: 1
+          SequentialAnimation on pulse {
+            loops: Animation.Infinite
+            NumberAnimation { to: 0.25; duration: 1100; easing.type: Easing.InOutSine }
+            NumberAnimation { to: 1; duration: 1100; easing.type: Easing.InOutSine }
+          }
           // Stacked shadows: one MultiEffect shadow tops out at full opacity.
           Repeater {
             model: 3
@@ -182,7 +189,7 @@ BarWidget {
               shadowScale: 1.2
               autoPaddingEnabled: false
               paddingRect: Qt.rect(48, 48, 48, 48)
-              shadowOpacity: 1
+              shadowOpacity: glow.pulse
               shadowHorizontalOffset: 0
               shadowVerticalOffset: 0
             }

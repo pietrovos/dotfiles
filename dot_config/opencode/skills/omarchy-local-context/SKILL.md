@@ -139,6 +139,9 @@ from Omarchy defaults when these files can be inspected.
   `paddingRect: Qt.rect(48, 48, 48, 48)`. Auto padding clipped the halo into
   a visible box; asymmetric padding (e.g. 96 right/bottom) pushed the scaled
   glow off-centre toward the bottom-right.
+- `pietrovos.workspaces` uses three brightness steps: focused 100% with the
+  glow and a 1.2x number, occupied 65%, empty 30%. Occupied used to share 100%
+  with focused, which the user found too hard to tell apart (2026-11-02).
 - The subspace widget has a single rounded, 1px border around its numbered
   tabs and optional name, using the bar foreground color at 50% opacity.
 - The widget is placed after `pietrovos.workspaces` in
