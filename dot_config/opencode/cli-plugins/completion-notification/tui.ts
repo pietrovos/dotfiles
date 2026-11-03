@@ -96,7 +96,7 @@ async function notify(window: HyprClient | undefined, title: string, body?: stri
 }
 
 // Ring or checkmark on this window's workspace in the bar (pietrovos.workspaces).
-function markAgent(state: "running" | "done") {
+function markAgent(state: "running" | "question" | "done") {
   void output([`${process.env.HOME}/.local/bin/agent-status`, state, String(process.pid)])
 }
 
@@ -147,6 +147,7 @@ export default Plugin.define({
         const sessionID = event.data.form.sessionID
         if (!running.has(sessionID) && !shown(sessionID)) return
         if (!isRoot(sessionID)) return
+        markAgent("question")
         try {
           const window = await windowForProcess()
           if (await isFocused(window)) return
@@ -154,6 +155,13 @@ export default Plugin.define({
         } catch {
           // Notifications must never interrupt an OpenCode session.
         }
+      }),
+      // An answered or dismissed question puts the session back to work.
+      context.data.on("form.replied", (event) => {
+        if (running.has(event.data.sessionID) && isRoot(event.data.sessionID)) markAgent("running")
+      }),
+      context.data.on("form.cancelled", (event) => {
+        if (running.has(event.data.sessionID) && isRoot(event.data.sessionID)) markAgent("running")
       }),
     ]
 

@@ -24,6 +24,11 @@
             "type": "command",
             "command": "~/.claude/hooks/notify.sh question",
             "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "~/.local/bin/agent-status question",
+            "timeout": 10
           }
         ]
       }
@@ -35,6 +40,11 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/notify.sh question",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "~/.local/bin/agent-status question",
             "timeout": 10
           }
         ]
@@ -57,6 +67,18 @@
           {
             "type": "command",
             "command": "~/.local/bin/agent-status clear",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.local/bin/agent-status resume",
             "timeout": 10
           }
         ]

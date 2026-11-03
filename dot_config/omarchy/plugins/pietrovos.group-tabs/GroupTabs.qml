@@ -20,7 +20,7 @@ BarWidget {
   readonly property string stateDir: (Quickshell.env("XDG_STATE_HOME") || (Quickshell.env("HOME") + "/.local/state")) + "/omarchy"
   readonly property string namesPath: stateDir + "/group-subspaces.json"
   readonly property string agentsDir: stateDir + "/agent-marks"
-  // Window address -> "running" or "done", from the marks agent-status leaves.
+  // Window address -> "running", "question" or "done", from agent-status marks.
   // pietrovos.workspaces leaves these to the tabs while this group is shown.
   property var agentMarks: ({})
   readonly property real labelGap: shownName !== "" ? Style.spaceReal(-1) : 0
@@ -52,7 +52,7 @@ BarWidget {
     var lines = String(output).trim().split("\n")
     for (var i = 0; i < lines.length; i++) {
       var fields = lines[i].trim().split(" ")
-      if (fields[1] === "running" || fields[1] === "done") marks[fields[0]] = fields[1]
+      if (["running", "question", "done"].indexOf(fields[1]) !== -1) marks[fields[0]] = fields[1]
     }
     agentMarks = marks
   }

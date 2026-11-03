@@ -225,7 +225,14 @@ from Omarchy defaults when these files can be inspected.
   agent runs (3x Canvas, `RotationAnimator` 1.6s/turn), and a 2px checkmark
   once it finishes, until its window is the shown tab on the focused
   workspace (the bar then deletes the mark, matching the completion
-  notification). Running beats done on a shared workspace. Rejected for focus
+  notification). Running beats done on a shared workspace. An agent whose
+  window is in the subspace `pietrovos.group-tabs` is showing (the active
+  window's group, on the focused workspace) is marked on its group tab instead
+  of the workspace number; both widgets use the same rule (`hyprctl
+  activewindow`, which is null after a shell restart until something is
+  focused, and then neither shows tabs). The ring and check live in
+  `pietrovos.workspaces/AgentMark.qml`; group-tabs imports it with
+  `import "../pietrovos.workspaces"`. Rejected for focus
   on 2026-11-02: dimming, a pulsing glow, bobbing/orbiting dots, a sliding
   underline, an oval ring, a Sharingan (any style), crossfades, a solid dot,
   and the comet ring itself ("looks like a loading animation", hence agents).

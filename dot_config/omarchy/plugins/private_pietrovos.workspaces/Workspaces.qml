@@ -22,7 +22,7 @@ BarWidget {
   property int focusedId: 0
   property bool refreshPending: false
   property bool tvKeys: false
-  // Workspace id -> "running" or "done", from the marks agent-status leaves.
+  // Workspace id -> "running", "question" or "done", from agent-status marks.
   property var agentStates: ({})
 
   readonly property string stateDir: (Quickshell.env("XDG_STATE_HOME") || (Quickshell.env("HOME") + "/.local/state")) + "/omarchy"
@@ -86,8 +86,8 @@ BarWidget {
     root.occupiedIds = occupied
     root.focusedId = (active.id > 0 && active.id <= 20) ? active.id : 0
 
-    // A running agent wins over a finished one on the same workspace. A
-    // checkmark clears once its window is the shown tab on the focused
+    // On a shared workspace a question wins over a running agent, and that over
+    // a finished one. A checkmark clears once its window is the shown tab on the focused
     // workspace, like the completion notification.
     var windows = {}
     for (var c = 0; c < clients.length; c++) windows[clients[c].address] = clients[c]
@@ -100,7 +100,8 @@ BarWidget {
     for (var l = 0; l < lines.length; l++) {
       var fields = lines[l].trim().split(" ")
       var window = windows[fields[0]]
-      if (!window || (fields[1] !== "running" && fields[1] !== "done")) continue
+      var rank = ["done", "running", "question"].indexOf(fields[1])
+      if (!window || rank === -1) continue
 
       var workspace = window.workspace.id
       if (fields[1] === "done" && window.visible && workspace === active.id) {
@@ -108,7 +109,7 @@ BarWidget {
         continue
       }
       if (shownGroup.indexOf(fields[0]) !== -1) continue
-      if (agents[workspace] !== "running") agents[workspace] = fields[1]
+      if (rank > ["done", "running", "question"].indexOf(agents[workspace])) agents[workspace] = fields[1]
     }
     root.agentStates = agents
   }
