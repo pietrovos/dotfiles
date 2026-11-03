@@ -3,9 +3,10 @@ import qs.Commons
 
 // What a coding agent shows in place of a number in the bar: a ring with a
 // bright point and fading tail travelling around it while the agent runs, a
-// question mark while it waits on an answer, and a checkmark once it finishes. The light stays inside the ring's outline: a
-// blurred glow spilled past it. Used by pietrovos.workspaces and, through a
-// directory import, pietrovos.group-tabs.
+// question mark while it waits on an answer, and a checkmark once it finishes.
+// The light stays inside the ring's outline: a blurred glow spilled past it.
+// Used by pietrovos.workspaces and, through a directory import,
+// pietrovos.group-tabs.
 Item {
   id: mark
 

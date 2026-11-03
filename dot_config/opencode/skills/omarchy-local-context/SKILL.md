@@ -242,9 +242,15 @@ from Omarchy defaults when these files can be inspected.
   closed windows and touching `changed`, which the bar watches (plus its 5s
   poll). Not `omarchy/agents`: that holds the Agents usage widget's `usage`.
   Claude Code: `UserPromptSubmit` -> running, `Stop` -> done (beside
-  notify.sh), `SessionEnd` -> clear, in `~/.claude/settings.json`. OpenCode:
-  `markAgent()` in `cli-plugins/completion-notification/tui.ts` on root
-  `session.execution.started` and in `finished`. An interrupted Claude turn
+  notify.sh), `SessionEnd` -> clear, `Notification` permission_prompt and
+  `PreToolUse` AskUserQuestion -> question, and `PostToolUse` `*` -> resume
+  (question back to running; it greps for a waiting question first, so it is
+  a no-op when none is), in `~/.claude/settings.json`. OpenCode: `markAgent()`
+  in `cli-plugins/completion-notification/tui.ts` on root
+  `session.execution.started`, in `finished`, on `form.created` (question) and
+  `form.replied`/`form.cancelled` (running). The `opencode` launched is mise's
+  `npm-opencode-cli` (2.0.29 has these events), not the custom build. A
+  question shows a bold "?"; on a shared workspace question > running > done. An interrupted Claude turn
   fires no Stop hook, so its ring stays until the next prompt or session end.
 - Workspace number changes snap. Stock `WidgetButton` fades its own `opacity`
   (140ms) and label `color` (160ms) and neither can be disabled from outside,
