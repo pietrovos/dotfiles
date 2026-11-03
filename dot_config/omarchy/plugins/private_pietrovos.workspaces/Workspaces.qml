@@ -216,8 +216,8 @@ BarWidget {
     id: ring
     property real centerX: -1
     visible: root.markerShown
-    height: root.height - 12
-    width: height * 1.5
+    height: root.height - 14
+    width: height * 1.4
     x: centerX - width / 2
     y: (root.height - height) / 2
 
